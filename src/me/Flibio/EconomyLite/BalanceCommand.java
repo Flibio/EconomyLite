@@ -18,9 +18,14 @@ import com.google.common.base.Optional;
 public class BalanceCommand implements CommandCallable {
 	
 	private DataEditor dataEditor;
+	private String plural;
+	private String singular;
 	
 	public BalanceCommand(Logger log){
 		dataEditor = new DataEditor(log);
+		
+		plural = Main.getCurrencyPlural();
+		singular = Main.getCurrencySingular();
 	}
 
 	@Override
@@ -68,13 +73,24 @@ public class BalanceCommand implements CommandCallable {
 			return Optional.of(CommandResult.builder().successCount(0).build());
 		}
 		
+		int playerBalance = dataEditor.getBalance(name);
+		
+		String currencyName = plural;
+		if(playerBalance == 1){
+			currencyName = singular;
+		}
+		
 		player.sendMessage(Texts.builder("Your").color(TextColors.YELLOW).append(
 				Texts.builder(" EconomyLite ").color(TextColors.GREEN).build()
 				).append(
 						Texts.builder("balance: ").color(TextColors.YELLOW).build()
 						).append(
-								Texts.builder(""+dataEditor.getBalance(name)).color(TextColors.DARK_GREEN).build()
-								).build());
+								Texts.builder(""+playerBalance).color(TextColors.DARK_GREEN).build()
+								).append(
+										Texts.builder(" "+currencyName).color(TextColors.YELLOW).build()
+										)
+								
+										.build());
 		
 		return Optional.of(CommandResult.success());
 	}

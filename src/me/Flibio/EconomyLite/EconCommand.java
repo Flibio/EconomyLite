@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -18,14 +17,19 @@ import com.google.common.base.Optional;
 public class EconCommand implements CommandCallable {
 	
 	private DataEditor dataEditor;
+	private String plural;
+	private String singular;
 	
 	public EconCommand(Logger log){
 		dataEditor = new DataEditor(log);
+		
+		plural = Main.getCurrencyPlural();
+		singular = Main.getCurrencySingular();
 	}
 
 	@Override
 	public Optional<Text> getHelp(CommandSource source) {
-		return Optional.of(Texts.builder("Usage: /econ add|remove|set <amount of currency> <player>").build());
+		return Optional.of(Texts.builder("Usage: /econ add|remove|set <amount of "+plural+"> <player>").build());
 	}
 
 	@Override
@@ -36,21 +40,27 @@ public class EconCommand implements CommandCallable {
 	@Override
 	public List<String> getSuggestions(CommandSource source, String args)
 			throws CommandException {
-		return Arrays.asList("/econ add|remove|set <amount of currency> <player>");
+		return Arrays.asList("/econ add|remove|set <amount of "+plural+"> <player>");
 	}
 
 	@Override
 	public Text getUsage(CommandSource source) {
-		return Texts.builder("/econ add|remove|set <amount of currency> <player>").build();
+		return Texts.builder("/econ add|remove|set <amount of "+plural+"> <player>").build();
 	}
 
 	@Override
 	public Optional<CommandResult> process(CommandSource source, String arg_string)
 			throws CommandException {
+		//Check if source has permission
+		if(!source.hasPermission("econ.admin")) {
+			source.sendMessage(Texts.builder("You do not have permission to run this command!").color(TextColors.RED).build());
+			return Optional.of(CommandResult.builder().successCount(0).build());
+		}
+		
 		String[] args = arg_string.split(" ");
 		
 		if(args.length<3){
-			source.sendMessage(Texts.builder("Usage: /econ add|remove|set <amount of currency> <player>").color(TextColors.RED).build());
+			source.sendMessage(Texts.builder("Usage: /econ add|remove|set <amount of "+plural+"> <player>").color(TextColors.RED).build());
 			return Optional.of(CommandResult.builder().successCount(0).build());
 		}
 		
@@ -81,7 +91,11 @@ public class EconCommand implements CommandCallable {
 			}
 			
 			if(dataEditor.addCurrency(name, amnt)){
-				source.sendMessage(Texts.builder("Successfully added "+amnt+" currency to "+name+"'s balance!").color(TextColors.GREEN).build());
+				String currencyName = plural;
+				if(amnt == 1){
+					currencyName = singular;
+				}
+				source.sendMessage(Texts.builder("Successfully added "+amnt+" "+currencyName+" to "+name+"'s balance!").color(TextColors.GREEN).build());
 				return Optional.of(CommandResult.success());
 			} else {
 				source.sendMessage(Texts.builder("Error: Internal plugin error occured while changing the balance").color(TextColors.RED).build());
@@ -114,7 +128,11 @@ public class EconCommand implements CommandCallable {
 			}
 			
 			if(dataEditor.removeCurrency(name, amnt)){
-				source.sendMessage(Texts.builder("Successfully removed "+amnt+" currency from "+name+"!").color(TextColors.GREEN).build());
+				String currencyName = plural;
+				if(amnt == 1){
+					currencyName = singular;
+				}
+				source.sendMessage(Texts.builder("Successfully removed "+amnt+" "+currencyName+" from "+name+"!").color(TextColors.GREEN).build());
 				return Optional.of(CommandResult.success());
 			} else {
 				source.sendMessage(Texts.builder("Error: Internal plugin error occured while changing the balance").color(TextColors.RED).build());
@@ -155,17 +173,13 @@ public class EconCommand implements CommandCallable {
 			
 		} else {
 			//Invalid first argument
-			source.sendMessage(Texts.builder("Usage: /econ add|remove|set <amount of currency> <player>").color(TextColors.RED).build());
+			source.sendMessage(Texts.builder("Usage: /econ add|remove|set <amount of "+plural+"> <player>").color(TextColors.RED).build());
 			return Optional.of(CommandResult.builder().successCount(0).build());
 		}
 	}
 
 	@Override
 	public boolean testPermission(CommandSource source) {
-		if(source instanceof Player){
-			Player p = (Player) source;
-			return p.hasPermission("econ.admin");
-		}
 		return source.hasPermission("econ.admin");
 	}
 

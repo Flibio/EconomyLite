@@ -45,7 +45,7 @@ public class DataEditor {
 		try {
 			manager.save(root);
 		} catch (IOException e) {
-			logger.error("Error loading data file!");
+			logger.error("Error saving data file!");
 			logger.error(e.getMessage());
 			return false;
 		}
