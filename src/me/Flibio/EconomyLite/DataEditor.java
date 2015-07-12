@@ -14,96 +14,114 @@ import org.slf4j.Logger;
 public class DataEditor {
 	
 	private Logger logger;
+	private boolean mySQL;
+	private MySQL sql;
 	
 	public DataEditor(Logger log){
 		this.logger = log;
+		mySQL = Main.sqlEnabled();
 	}
 	
 	protected boolean setBalance(String name, int balance) {
-		ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("EconomyLite/data.conf")).build();
-		ConfigurationNode root;	
-		try {
-			root = manager.load();
-		} catch (IOException e) {
-			logger.error("Error loading data file!");
-			logger.error(e.getMessage());
-			return false;
-		}
-		
-		if(playerExists(name)){
-			Map<Object, ? extends ConfigurationNode> playerMap = root.getChildrenMap();
-			for(Entry<Object, ? extends ConfigurationNode> entry : playerMap.entrySet()){
-				String uuid = (String) entry.getKey();
-				if(root.getNode(uuid).getNode("name").getValue().equals(name)){
-					root.getNode(uuid).getNode("balance").setValue(""+balance);
-				}
-			}
+		if(mySQL){
+			sql = Main.getSQL();
+			return sql.setCurrency(name, balance);
 		} else {
-			return false;
+			ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("config/EconomyLite/data.conf")).build();
+			ConfigurationNode root;	
+			try {
+				root = manager.load();
+			} catch (IOException e) {
+				logger.error("Error loading data file!");
+				logger.error(e.getMessage());
+				return false;
+			}
+			
+			if(playerExists(name)){
+				Map<Object, ? extends ConfigurationNode> playerMap = root.getChildrenMap();
+				for(Entry<Object, ? extends ConfigurationNode> entry : playerMap.entrySet()){
+					String uuid = (String) entry.getKey();
+					if(root.getNode(uuid).getNode("name").getValue().equals(name)){
+						root.getNode(uuid).getNode("balance").setValue(""+balance);
+					}
+				}
+			} else {
+				return false;
+			}
+			
+			try {
+				manager.save(root);
+			} catch (IOException e) {
+				logger.error("Error saving data file!");
+				logger.error(e.getMessage());
+				return false;
+			}
+			return true;
 		}
-		
-		try {
-			manager.save(root);
-		} catch (IOException e) {
-			logger.error("Error saving data file!");
-			logger.error(e.getMessage());
-			return false;
-		}
-		return true;
 	}
 	
 	protected boolean playerExists(String name) {
-		ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("EconomyLite/data.conf")).build();
-		ConfigurationNode root;
-		
-		try {
-			root = manager.load();
-		} catch (IOException e) {
-			logger.error("Error loading data file!");
-			logger.error(e.getMessage());
+		if(mySQL){
+			sql = Main.getSQL();
+			return sql.playerExists(name);
+		} else {
+			ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("config/EconomyLite/data.conf")).build();
+			ConfigurationNode root;
+			
+			try {
+				root = manager.load();
+			} catch (IOException e) {
+				logger.error("Error loading data file!");
+				logger.error(e.getMessage());
+				return false;
+			}
+			
+			//Iterate and find the name
+			Map<Object, ? extends ConfigurationNode> playerMap = root.getChildrenMap();
+			
+			for(Entry<Object, ? extends ConfigurationNode> entry : playerMap.entrySet()){
+				String uuid = (String) entry.getKey();
+				if(root.getNode(uuid).getNode("name").getValue().equals(name)){
+					return true;
+				}
+			}
 			return false;
 		}
-		
-		//Iterate and find the name
-		Map<Object, ? extends ConfigurationNode> playerMap = root.getChildrenMap();
-		
-		for(Entry<Object, ? extends ConfigurationNode> entry : playerMap.entrySet()){
-			String uuid = (String) entry.getKey();
-			if(root.getNode(uuid).getNode("name").getValue().equals(name)){
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	protected int getBalance(String name) {
-		ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("EconomyLite/data.conf")).build();
-		ConfigurationNode root;
-		
-		try {
-			root = manager.load();
-		} catch (IOException e) {
-			logger.error("Error loading data file!");
-			logger.error(e.getMessage());
-			return 0;
-		}
-
-		Map<Object, ? extends ConfigurationNode> playerMap = root.getChildrenMap();
-		
-		for(Entry<Object, ? extends ConfigurationNode> entry : playerMap.entrySet()){
-			String uuid = (String) entry.getKey();
-			if(root.getNode(uuid).getNode("name").getValue().equals(name)){
-				String amnt = root.getNode(uuid).getNode("balance").getString();
-				try{
-					return Integer.parseInt(amnt);
-				} catch(NumberFormatException e){
-					logger.error("Invalid number read from data file!");
-					logger.error(e.getMessage());
-					return 0;
+		if(mySQL){
+			sql = Main.getSQL();
+			return sql.getCurrency(name);
+		} else {
+			ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("config/EconomyLite/data.conf")).build();
+			ConfigurationNode root;
+			
+			try {
+				root = manager.load();
+			} catch (IOException e) {
+				logger.error("Error loading data file!");
+				logger.error(e.getMessage());
+				return 0;
+			}
+	
+			Map<Object, ? extends ConfigurationNode> playerMap = root.getChildrenMap();
+			
+			for(Entry<Object, ? extends ConfigurationNode> entry : playerMap.entrySet()){
+				String uuid = (String) entry.getKey();
+				if(root.getNode(uuid).getNode("name").getValue().equals(name)){
+					String amnt = root.getNode(uuid).getNode("balance").getString();
+					try{
+						return Integer.parseInt(amnt);
+					} catch(NumberFormatException e){
+						logger.error("Invalid number read from data file!");
+						logger.error(e.getMessage());
+						return 0;
+					}
 				}
 			}
+			return 0;
 		}
-		return 0;
 	}
 	
 	protected boolean addCurrency(String name, int amount){

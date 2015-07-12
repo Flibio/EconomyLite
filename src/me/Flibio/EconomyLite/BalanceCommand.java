@@ -53,7 +53,7 @@ public class BalanceCommand implements CommandCallable {
 	public Optional<CommandResult> process(CommandSource source, String arg_string)
 			throws CommandException {
 		if(!(source instanceof Player)){
-			source.sendMessage(Texts.builder("Error: You must a player to use /balance").color(TextColors.RED).build());
+			source.sendMessage(Texts.builder("Error: You must be a player to use /balance").color(TextColors.RED).build());
 			return Optional.of(CommandResult.builder().successCount(0).build());
 		}
 		

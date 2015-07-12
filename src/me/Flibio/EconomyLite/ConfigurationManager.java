@@ -19,7 +19,7 @@ public class ConfigurationManager {
 	}
 	
 	protected ConfigurationNode getFile(){
-		ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("EconomyLite/config.conf")).build();
+		ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("config/EconomyLite/config.conf")).build();
 		ConfigurationNode root;	
 		try {
 			root = manager.load();
@@ -32,7 +32,7 @@ public class ConfigurationManager {
 	}
 	
 	protected void saveFile(ConfigurationNode root){
-		ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("EconomyLite/config.conf")).build();
+		ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("config/EconomyLite/config.conf")).build();
 		
 		try {
 			manager.save(root);
