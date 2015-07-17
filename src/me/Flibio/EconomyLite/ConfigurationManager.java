@@ -9,6 +9,8 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
 
+import com.typesafe.config.ConfigException;
+
 public class ConfigurationManager {
 	
 	
@@ -25,6 +27,11 @@ public class ConfigurationManager {
 			root = manager.load();
 		} catch (IOException e) {
 			logger.error("Error loading configuation file!");
+			logger.error(e.getMessage());
+			return null;
+		} catch (ConfigException e) {
+			logger.error("Error loading configuation file!");
+			logger.error("To use a blank value in configuration, just use double quotes \"\" !");
 			logger.error(e.getMessage());
 			return null;
 		}

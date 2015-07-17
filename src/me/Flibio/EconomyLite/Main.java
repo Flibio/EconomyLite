@@ -2,7 +2,6 @@ package me.Flibio.EconomyLite;
 
 import java.io.File;
 import java.io.IOException;
-
 import ninja.leaping.configurate.ConfigurationNode;
 
 import org.slf4j.Logger;
@@ -15,12 +14,12 @@ import org.spongepowered.api.service.sql.SqlService;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "0.0.4")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "0.0.5")
 public class Main {
 	
 	@Inject
 	private Logger logger;
-	
+
 	private static String currencyPlural = "";
 	private static String currencySingular = "";
 	private static boolean sql = false;
@@ -29,6 +28,7 @@ public class Main {
 	private static String database = "";
 	private static String username = "";
 	private static String password = "";
+	private static String scoreboard = "";
 	private static MySQL mySQL;
 	
 	@Subscribe
@@ -39,10 +39,11 @@ public class Main {
 		configurationDefaults();
 		loadOptions();
 		
-        event.getGame().getEventManager().register(this, new PlayerJoin(logger));
+        event.getGame().getEventManager().register(this, new PlayerJoin(logger,event.getGame()));
+        event.getGame().getEventManager().register(this, new PlayerBalanceChange(logger,event.getGame()));
         
-        event.getGame().getCommandDispatcher().register(this, new EconCommand(logger), "econ");
-        event.getGame().getCommandDispatcher().register(this, new BalanceCommand(logger), "balance");
+        event.getGame().getCommandDispatcher().register(this, new EconCommand(logger,event.getGame()), "econ");
+        event.getGame().getCommandDispatcher().register(this, new BalanceCommand(logger,event.getGame()), "balance");
         
         Optional<SqlService> sqlServiceOptional = event.getGame().getServiceManager().provide(SqlService.class);
 
@@ -60,6 +61,7 @@ public class Main {
 			type = "MySQL";
 		}
 		logger.info("Storage type: "+type);
+		logger.info("Scoreboard: "+scoreboardEnabled());
 	}
 	
 	private void createFiles(){
@@ -121,7 +123,7 @@ public class Main {
 			if(!root.getChildrenMap().containsKey("Currency-Singular")){
 				root.getNode("Currency-Singular").setValue("Coin");
 			}
-			//check if MySQL Node exists
+			//Check if MySQL Node exists
 			if(!root.getChildrenMap().containsKey("MySQL")){
 				root.getNode("MySQL").getNode("enabled").setValue(false);
 			}
@@ -130,7 +132,7 @@ public class Main {
 				root.getNode("MySQL").getNode("hostname").setValue("hostname");
 			}
 			if(!root.getNode("MySQL").getChildrenMap().containsKey("port")){
-				root.getNode("MySQL").getNode("port").setValue("3306");
+				root.getNode("MySQL").getNode("port").setValue(3306);
 			}
 			if(!root.getNode("MySQL").getChildrenMap().containsKey("database")){
 				root.getNode("MySQL").getNode("database").setValue("database");
@@ -140,6 +142,10 @@ public class Main {
 			}
 			if(!root.getNode("MySQL").getChildrenMap().containsKey("password")){
 				root.getNode("MySQL").getNode("password").setValue("password");
+			}
+			//end mysql
+			if(!root.getChildrenMap().containsKey("Scoreboard")){
+				root.getNode("Scoreboard").setValue("disabled");
 			}
 			manager.saveFile(root);
 		}
@@ -178,6 +184,9 @@ public class Main {
 					password = root.getNode("MySQL").getNode("password").getString();
 				}
 			}
+			if(root.getChildrenMap().containsKey("Scoreboard")){
+				scoreboard = root.getNode("Scoreboard").getString();
+			}
 		}
 	}
 	
@@ -193,7 +202,16 @@ public class Main {
 		return sql;
 	}
 	
-	public static MySQL getSQL(){
+	public static boolean scoreboardEnabled(){
+		if(scoreboard.equalsIgnoreCase("enabled")){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	protected static MySQL getSQL(){
 		return mySQL;
 	}
+	
 }

@@ -10,22 +10,29 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
+import org.spongepowered.api.Game;
 
 public class DataEditor {
 	
 	private Logger logger;
 	private boolean mySQL;
 	private MySQL sql;
+	private Game game;
 	
-	public DataEditor(Logger log){
+	public DataEditor(Logger log, Game game){
 		this.logger = log;
 		mySQL = Main.sqlEnabled();
+		this.game = game;
 	}
 	
 	protected boolean setBalance(String name, int balance) {
 		if(mySQL){
 			sql = Main.getSQL();
-			return sql.setCurrency(name, balance);
+			boolean success = sql.setCurrency(name, balance);
+			if(success){
+				game.getEventManager().post(new BalanceChangeEvent(name));
+			}
+			return success;
 		} else {
 			ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(new File("config/EconomyLite/data.conf")).build();
 			ConfigurationNode root;	
@@ -56,6 +63,7 @@ public class DataEditor {
 				logger.error(e.getMessage());
 				return false;
 			}
+			game.getEventManager().post(new BalanceChangeEvent(name));
 			return true;
 		}
 	}

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -21,8 +22,8 @@ public class BalanceCommand implements CommandCallable {
 	private String plural;
 	private String singular;
 	
-	public BalanceCommand(Logger log){
-		dataEditor = new DataEditor(log);
+	public BalanceCommand(Logger log,Game game){
+		dataEditor = new DataEditor(log,game);
 		
 		plural = Main.getCurrencyPlural();
 		singular = Main.getCurrencySingular();

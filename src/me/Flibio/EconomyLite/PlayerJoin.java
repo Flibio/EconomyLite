@@ -9,18 +9,27 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
+import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.scoreboard.critieria.Criteria;
+import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
+import org.spongepowered.api.scoreboard.objective.Objective;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 
 public class PlayerJoin {
 	
 	private Logger logger;
 	private boolean mySQL;
 	private MySQL sql;
+	private Game game;
 	
-	public PlayerJoin(Logger logger){
+	public PlayerJoin(Logger logger, Game game){
 		this.logger = logger;
+		this.game = game;
 		mySQL = Main.sqlEnabled();
 	}
 	
@@ -31,6 +40,7 @@ public class PlayerJoin {
 		String uuid = player.getUniqueId().toString();
 		UUID UUID = player.getUniqueId();
 		
+		//Economy setup
 		if(mySQL){
 			sql = Main.getSQL();
 			sql.reconnect();
@@ -69,6 +79,20 @@ public class PlayerJoin {
 				logger.error("Error loading data file!");
 				logger.error(e.getMessage());
 				return;
+			}
+		}
+		
+		if(Main.scoreboardEnabled()){
+			int playerBalance = (new DataEditor(logger,game)).getBalance(player.getName());
+			
+			if(player!=null){
+				Scoreboard board = game.getRegistry().getScoreboardBuilder().build();
+				Objective obj = game.getRegistry().getObjectiveBuilder().name("EconomyLite").criterion(Criteria.DUMMY).displayName(Texts.builder("Economy").color(TextColors.YELLOW).build()).build();
+				obj.getScore(Texts.builder("Balance: ").color(TextColors.GREEN).build()).setScore(playerBalance);
+				board.addObjective(obj);
+				board.addObjective(obj, DisplaySlots.SIDEBAR);
+				
+				player.setScoreboard(board);
 			}
 		}
 	}

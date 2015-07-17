@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -20,8 +21,8 @@ public class EconCommand implements CommandCallable {
 	private String plural;
 	private String singular;
 	
-	public EconCommand(Logger log){
-		dataEditor = new DataEditor(log);
+	public EconCommand(Logger log, Game game){
+		dataEditor = new DataEditor(log,game);
 		
 		plural = Main.getCurrencyPlural();
 		singular = Main.getCurrencySingular();
@@ -95,7 +96,14 @@ public class EconCommand implements CommandCallable {
 				if(amnt == 1){
 					currencyName = singular;
 				}
-				source.sendMessage(Texts.builder("Successfully added "+amnt+" "+currencyName+" to "+name+"'s balance!").color(TextColors.GREEN).build());
+				Text removeCompleteText = Texts.builder("EconomyLite » ").color(TextColors.GOLD).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder("Added ").color(TextColors.YELLOW).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(amnt+" ").color(TextColors.DARK_GREEN).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(currencyName).color(TextColors.GREEN).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(" to ").color(TextColors.YELLOW).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(name+"'s").color(TextColors.GREEN).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(" balance!").color(TextColors.YELLOW).build()).build();
+				source.sendMessage(removeCompleteText);
 				return Optional.of(CommandResult.success());
 			} else {
 				source.sendMessage(Texts.builder("Error: Internal plugin error occured while changing the balance").color(TextColors.RED).build());
@@ -132,7 +140,14 @@ public class EconCommand implements CommandCallable {
 				if(amnt == 1){
 					currencyName = singular;
 				}
-				source.sendMessage(Texts.builder("Successfully removed "+amnt+" "+currencyName+" from "+name+"!").color(TextColors.GREEN).build());
+				Text removeCompleteText = Texts.builder("EconomyLite » ").color(TextColors.GOLD).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder("Removed ").color(TextColors.YELLOW).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(amnt+" ").color(TextColors.DARK_GREEN).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(currencyName).color(TextColors.GREEN).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(" from ").color(TextColors.YELLOW).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(name).color(TextColors.GREEN).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder("!").color(TextColors.YELLOW).build()).build();
+				source.sendMessage(removeCompleteText);
 				return Optional.of(CommandResult.success());
 			} else {
 				source.sendMessage(Texts.builder("Error: Internal plugin error occured while changing the balance").color(TextColors.RED).build());
@@ -164,7 +179,13 @@ public class EconCommand implements CommandCallable {
 			}
 			
 			if(dataEditor.setBalance(name, amnt)){
-				source.sendMessage(Texts.builder("Successfully set the balance of "+name+" to "+amnt+"!").color(TextColors.GREEN).build());
+				Text removeCompleteText = Texts.builder("EconomyLite » ").color(TextColors.GOLD).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder("Set the balance of ").color(TextColors.YELLOW).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(name).color(TextColors.GREEN).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(" to ").color(TextColors.YELLOW).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder(amnt+"").color(TextColors.DARK_GREEN).build()).build();
+				removeCompleteText = removeCompleteText.builder().append(Texts.builder("!").color(TextColors.YELLOW).build()).build();
+				source.sendMessage(removeCompleteText);
 				return Optional.of(CommandResult.success());
 			} else {
 				source.sendMessage(Texts.builder("Error: Internal plugin error occured while changing the balance").color(TextColors.RED).build());

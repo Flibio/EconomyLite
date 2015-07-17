@@ -146,6 +146,9 @@ public class MySQL {
 	}
 	
 	protected int getCurrency(String name) {
+		/*
+		 * create custom event that is fired
+		 */
 		reconnect();
 		int amount;
 		ResultSet res;
@@ -156,8 +159,7 @@ public class MySQL {
 			res.next();
 			amount = res.getInt("currency");
 		} catch (SQLException e) {
-			logger.error("Error getting currency of player...");
-			e.printStackTrace();
+			logger.error("Error getting currency of player..."+e.getMessage());
 			amount = 0;
 		}
 		closeConnection();
