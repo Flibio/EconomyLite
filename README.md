@@ -14,6 +14,8 @@ EconomyLite is a plugin made for [**Sponge**](https://spongepowered.org/). It is
   - Almost every aspect of EconomyLite can be changed to suit your needs
  - Username Change Support
   - Any player can change their name, and EconomyLite can handle it 
+ - Businesses
+  - EconomyLite has full support for creating businesses
  
 <br>
 ###Downloads
