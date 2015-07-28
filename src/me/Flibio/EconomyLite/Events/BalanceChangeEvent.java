@@ -1,4 +1,4 @@
-package me.Flibio.EconomyLite;
+package me.Flibio.EconomyLite.Events;
 
 import org.spongepowered.api.event.AbstractEvent;
 import org.spongepowered.api.event.Cancellable;
@@ -6,10 +6,10 @@ import org.spongepowered.api.event.Cancellable;
 public class BalanceChangeEvent extends AbstractEvent implements Cancellable {
 	
 	private boolean cancelled = false;
-	private String player;
+	private String playerUUID;
 	
-	public BalanceChangeEvent(String player){
-		this.player = player;
+	public BalanceChangeEvent(String playerUUID){
+		this.playerUUID = playerUUID;
 	}
 
 	@Override
@@ -22,8 +22,13 @@ public class BalanceChangeEvent extends AbstractEvent implements Cancellable {
 		this.cancelled = cancelled;
 	}
 	
-	public String getPlayerName(){
-		return player;
+	/**
+	 * Gets the UUID of the player whose balance changed
+	 * 
+	 * @return Player's UUID
+	 */
+	public String getPlayerUUID(){
+		return playerUUID;
 	}
 
 }
