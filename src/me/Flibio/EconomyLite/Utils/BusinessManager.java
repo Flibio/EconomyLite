@@ -15,7 +15,11 @@ public class BusinessManager {
 	private FileManager fileManager;
 	
 	/**
-	 * EconomyLite's Business API
+	 * EconomyLite's Business API. 
+	 * 
+	 * Methods will query a MySQL Database if the EconomyLite user has opted to save data to a database. 
+	 * 
+	 * If possible, you should run these methods in a seperate thread.
 	 */
 	public BusinessManager() {
 		fileManager = new FileManager();

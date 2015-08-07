@@ -10,6 +10,7 @@ import me.Flibio.EconomyLite.Commands.BusinessDeleteCommand;
 import me.Flibio.EconomyLite.Commands.BusinessInviteAcceptCommand;
 import me.Flibio.EconomyLite.Commands.BusinessInviteCommand;
 import me.Flibio.EconomyLite.Commands.BusinessLeaveCommand;
+import me.Flibio.EconomyLite.Commands.BusinessOwnersCommand;
 import me.Flibio.EconomyLite.Commands.BusinessRegisterCommand;
 import me.Flibio.EconomyLite.Commands.BusinessTransferCommand;
 import me.Flibio.EconomyLite.Commands.PayCommand;
@@ -42,7 +43,7 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.0")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.1")
 public class Main {
 	
 	@Inject
@@ -229,6 +230,13 @@ public class Main {
 				    .arguments(GenericArguments.integer(Texts.of("amount")),GenericArguments.remainingJoinedStrings(Texts.of("business")))
 				    .executor(new BusinessTransferCommand())
 				    .build();
+			//Owners Child
+			CommandSpec businessOwnersCommand = CommandSpec.builder()
+				    .description(Texts.of("View the owners of a business"))
+				    .permission("econ.busines.owners")
+				    .arguments(GenericArguments.remainingJoinedStrings(Texts.of("business")))
+				    .executor(new BusinessOwnersCommand())
+				    .build();
 			//Main Command
 			CommandSpec businessCommand = CommandSpec.builder()
 				    .description(Texts.of("Business management commands"))
@@ -239,6 +247,7 @@ public class Main {
 				    .child(businessInviteCommand, "invite", "inv")
 				    .child(businessInviteAcceptCommand, "inviteAccept")
 				    .child(businessTransferCommand, "transfer")
+				    .child(businessOwnersCommand, "owners")
 				    .build();
 			game.getCommandDispatcher().register(this, businessCommand, "business");
 		}

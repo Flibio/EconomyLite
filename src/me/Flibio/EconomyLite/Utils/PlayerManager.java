@@ -1,5 +1,6 @@
 package me.Flibio.EconomyLite.Utils;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import me.Flibio.EconomyLite.Main;
@@ -21,7 +22,11 @@ public class PlayerManager {
 	private Game game;
 	
 	/**
-	 * EconomyLite's Player API
+	 * EconomyLite's Player API. 
+	 * 
+	 * Methods will query a MySQL Database if the EconomyLite user has opted to save data to a database. 
+	 * 
+	 * If possible, you should run these methods in a seperate thread.
 	 */
 	public PlayerManager() {
 		this.game = Main.access.game;
@@ -49,6 +54,30 @@ public class PlayerManager {
 				return "";
 			}
 			return profile.getUniqueId().toString();
+		} else {
+			return "";
+		}
+	}
+	
+	/**
+	 * Looks up a player's name
+	 * @param uuid
+	 * 	UUID of the player whom to lookup
+	 * @return
+	 * 	Name of the corresponding player
+	 */
+	public String getName(String uuid) {
+		Optional<GameProfileResolver> resolverOptional = game.getServiceManager().provide(GameProfileResolver.class);
+		if(resolverOptional.isPresent()) {
+			GameProfileResolver resolver = resolverOptional.get();
+			GameProfile profile;
+			try {
+				profile = resolver.get(UUID.fromString(uuid)).get();
+			} catch (InterruptedException | ExecutionException e) {
+				logger.error("Error getting player's name");
+				return "";
+			}
+			return profile.getName().toString();
 		} else {
 			return "";
 		}

@@ -8,6 +8,11 @@ public class BalanceChangeEvent extends AbstractEvent implements Cancellable {
 	private boolean cancelled = false;
 	private String playerUUID;
 	
+	/**
+	 * Sponge event called when a player's balance changes
+	 * @param playerUUID
+	 * 	The UUID of the player whose balance changed
+	 */
 	public BalanceChangeEvent(String playerUUID){
 		this.playerUUID = playerUUID;
 	}

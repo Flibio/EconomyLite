@@ -251,6 +251,23 @@ public class TextUtils {
 		return text;
 	}
 	
+	public Text ownersTitle(String businessName) {
+		Text text = Texts.builder("EconomyLite » ").color(TextColors.GOLD).build();
+		
+		text = text.builder().append(basicText("Owners of ",TextColors.YELLOW)).build();
+		text = text.builder().append(basicText(businessName+":",TextColors.GREEN)).build();
+		
+		return text;
+	}
+	
+	public Text owner(String owner) {
+		Text text = Texts.builder(" + ").color(TextColors.YELLOW).build();
+		
+		text = text.builder().append(basicText(owner,TextColors.GREEN)).build();
+		
+		return text;
+	}
+	
 	public String getDownloadUrl(String jsonRelease) {
 		return jsonRelease.split("browser_download_url")[1].split("}",2)[0].replaceAll("\"", "").replaceFirst(":", "").trim();
 	}

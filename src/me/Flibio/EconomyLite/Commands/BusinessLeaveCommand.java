@@ -41,12 +41,13 @@ public class BusinessLeaveCommand implements CommandExecutor {
 					String businessName = businessNameOptional.get();
 					//Check if the business already exists
 					if(businessManager.businessExists(businessName)) {
+						String correctName = businessManager.getCorrectBusinessName(businessName);
 						//Check if the player is an owner
 						if(businessManager.ownerExists(businessName, player.getUniqueId().toString())) {
 							//Check if the player is the only owner
 							if(businessManager.getBusinessOwners(businessName).size()==1) {
 								//Tell player that the business will be deleted
-								player.sendMessage(textUtils.leaveOnlyOwner(businessName));
+								player.sendMessage(textUtils.leaveOnlyOwner(correctName));
 								businessManager.setConfirmationNeeded(businessName, false);
 								//Expire in 1 minute
 								Thread expireThread = new Thread(new Runnable(){
