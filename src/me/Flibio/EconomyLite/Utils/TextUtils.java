@@ -268,6 +268,14 @@ public class TextUtils {
 		return text;
 	}
 	
+	public Text change(String change) {
+		Text text = Texts.builder(" + ").color(TextColors.YELLOW).build();
+		
+		text = text.builder().append(basicText(change,TextColors.GREEN)).build();
+		
+		return text;
+	}
+	
 	public String getDownloadUrl(String jsonRelease) {
 		return jsonRelease.split("browser_download_url")[1].split("}",2)[0].replaceAll("\"", "").replaceFirst(":", "").trim();
 	}

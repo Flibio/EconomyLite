@@ -26,7 +26,7 @@ public class PlayerJoinListener {
 	private FileManager fileManager = new FileManager();
 	private ScoreboardUtils scoreboardUtils = new ScoreboardUtils();
 	private PlayerManager playerManager = new PlayerManager();
-	private TaskBuilder taskBuilder = Main.access.game.getScheduler().getTaskBuilder();
+	private TaskBuilder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
 	
 	@Subscribe
 	public void onPlayerJoin(PlayerJoinEvent event) {

@@ -22,7 +22,7 @@ public class BusinessDeleteCommand implements CommandExecutor {
 	private TextUtils textUtils = new TextUtils();
 	private BusinessManager businessManager = new BusinessManager();
 	private PlayerManager playerManager = new PlayerManager();
-	private TaskBuilder taskBuilder = Main.access.game.getScheduler().getTaskBuilder();
+	private TaskBuilder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
 
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)

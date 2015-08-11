@@ -1,6 +1,5 @@
 package me.Flibio.EconomyLite.Runnables;
 
-
 import me.Flibio.EconomyLite.Main;
 import me.Flibio.EconomyLite.Utils.HttpUtils;
 import me.Flibio.EconomyLite.Utils.JsonUtils;
@@ -25,6 +24,8 @@ public class UpdateRunnable implements Runnable{
 			//Get the data
 			String latest = httpUtils.requestData("https://api.github.com/repos/Flibio/EconomyLite/releases/latest");
 			String version = jsonUtils.getVersion(latest).replace("v", "");
+			String changes = httpUtils.requestData("https://flibio.github.io/EconomyLite/changelogs/"+version.replaceAll("\\.", "-")+".txt");
+			String[] iChanges = changes.split(";");
 			String url = jsonUtils.getUrl(latest);
 			boolean prerelease = jsonUtils.isPreRelease(latest);
 			//Make sure the latest update is not a prerelease
@@ -33,6 +34,11 @@ public class UpdateRunnable implements Runnable{
 				String currentVersion = Main.access.version;
 				if(textUtils.versionCompare(version, currentVersion)>0) {
 					player.sendMessage(textUtils.updateAvailable(version, url));
+					for(String change : iChanges) {
+						if(!change.trim().isEmpty()) {
+							player.sendMessage(textUtils.change(change));
+						}
+					}
 				}
 			}
 		}

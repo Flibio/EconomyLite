@@ -18,7 +18,7 @@ public class RemoveCommand implements CommandExecutor {
 
 	private TextUtils textUtils = new TextUtils();
 	private PlayerManager playerManager = new PlayerManager();
-	private TaskBuilder taskBuilder = Main.access.game.getScheduler().getTaskBuilder();	
+	private TaskBuilder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();	
 
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)

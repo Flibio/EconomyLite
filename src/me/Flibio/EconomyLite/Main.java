@@ -43,7 +43,7 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.1")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.2")
 public class Main {
 	
 	@Inject
@@ -113,7 +113,7 @@ public class Main {
 			logger.error("Error enabling plugin metrics!");
 		}
 		//Reset business confirmations
-		game.getScheduler().getTaskBuilder().execute(new Runnable() {
+		game.getScheduler().createTaskBuilder().execute(new Runnable() {
 			public void run() {
 				fileManager.loadFile(FileType.BUSINESS_DATA);
 				ConfigurationNode root = fileManager.getFile(FileType.BUSINESS_DATA);
@@ -133,6 +133,8 @@ public class Main {
 			//Check for an update
 			String latest = httpUtils.requestData("https://api.github.com/repos/Flibio/EconomyLite/releases/latest");
 			String version = jsonUtils.getVersion(latest).replace("v", "");
+			String changes = httpUtils.requestData("https://flibio.github.io/EconomyLite/changelogs/"+version.replaceAll("\\.", "-")+".txt");
+			String[] iChanges = changes.split(";");
 			String url = jsonUtils.getUrl(latest);
 			boolean prerelease = jsonUtils.isPreRelease(latest);
 			//Make sure the latest update is not a prerelease
@@ -142,6 +144,11 @@ public class Main {
 				if(textUtils.versionCompare(version, currentVersion)>0) {
 					logger.info("EconomyLite v"+version+" is now available to download!");
 					logger.info(url);
+					for(String change : iChanges) {
+						if(!change.trim().isEmpty()) {
+							logger.info("+ "+change);
+						}
+					}
 				}
 			}
 		}
