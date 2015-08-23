@@ -40,8 +40,8 @@ To learn all about using EconomyLite, check out the [**wiki!**](https://github.c
 
 Having an issue with EconomyLite? Found a bug? View the issue tracker on GitHub [**here!**](https://github.com/Flibio/EconomyLite/issues).
 
-###Donations
+###Support Me
 
 ***
 
-[**Support me by becoming a Patron!**](https://www.patreon.com/Flibio?ty=h)
+[**Like my work? Please consider supporting me!**](http://flibio.weebly.com/support-me.html)
