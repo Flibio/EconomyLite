@@ -43,7 +43,7 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.2")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.3")
 public class Main {
 	
 	@Inject
@@ -70,7 +70,7 @@ public class Main {
 	
 	@Subscribe
 	public void onServerInitialize(InitializationEvent event) {
-		logger.info("EconomyLite by Flibio initializing!");
+		logger.info("EconomyLite v"+version+" by Flibio initializing!");
 		//Set the access
 		access = this;
 		

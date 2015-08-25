@@ -39,5 +39,23 @@ public class EconomyLiteAPI {
 	public String getVersion() {
 		return Main.access.version;
 	}
+	
+	/**
+	 * Gets the singular label for currency
+	 * @return
+	 * 	String of the singular label
+	 */
+	public String getSingularCurrencyLabel() {
+		return Main.access.currencySingular;
+	}
+	
+	/**
+	 * Gets the plural label for currency
+	 * @return
+	 * 	String of the plural label
+	 */
+	public String getPluralCurrencyLabel() {
+		return Main.access.currencyPlural;
+	}
 
 }
