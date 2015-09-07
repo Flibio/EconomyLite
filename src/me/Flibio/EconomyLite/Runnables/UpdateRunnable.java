@@ -5,7 +5,7 @@ import me.Flibio.EconomyLite.Utils.HttpUtils;
 import me.Flibio.EconomyLite.Utils.JsonUtils;
 import me.Flibio.EconomyLite.Utils.TextUtils;
 
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 
 public class UpdateRunnable implements Runnable{
 	

@@ -1,7 +1,7 @@
 package me.Flibio.EconomyLite.Events;
 
-import org.spongepowered.api.event.AbstractEvent;
 import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.event.impl.AbstractEvent;
 
 public class BalanceChangeEvent extends AbstractEvent implements Cancellable {
 	

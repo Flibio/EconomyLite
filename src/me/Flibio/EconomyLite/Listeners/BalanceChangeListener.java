@@ -8,8 +8,8 @@ import me.Flibio.EconomyLite.Events.BalanceChangeEvent;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.ScoreboardUtils;
 
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -21,7 +21,7 @@ public class BalanceChangeListener {
 	private PlayerManager playerManager = new PlayerManager();
 	private ScoreboardUtils scoreboardUtils = new ScoreboardUtils();
 	
-	@Subscribe
+	@Listener
 	public void onPlayerBalanceChange(BalanceChangeEvent event) {
 		String uuid = event.getPlayerUUID();
 		

@@ -13,9 +13,9 @@ import me.Flibio.EconomyLite.Utils.ScoreboardUtils;
 import me.Flibio.EconomyLite.Utils.TextUtils;
 import ninja.leaping.configurate.ConfigurationNode;
 
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.service.scheduler.TaskBuilder;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -28,9 +28,9 @@ public class PlayerJoinListener {
 	private PlayerManager playerManager = new PlayerManager();
 	private TaskBuilder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
 	
-	@Subscribe
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getUser();
+	@Listener
+	public void onPlayerJoin(ClientConnectionEvent.Join event) {
+		Player player = (Player) event.getTargetEntity();
 		String uuid = player.getUniqueId().toString();
 		
 		if(Main.access.sqlEnabled) {
