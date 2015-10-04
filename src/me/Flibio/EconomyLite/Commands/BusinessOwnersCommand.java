@@ -1,7 +1,5 @@
 package me.Flibio.EconomyLite.Commands;
 
-import java.util.ArrayList;
-
 import me.Flibio.EconomyLite.Main;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
@@ -16,7 +14,8 @@ import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 
-import com.google.common.base.Optional;
+import java.util.ArrayList;
+import java.util.Optional;
 
 public class BusinessOwnersCommand implements CommandExecutor{
 	

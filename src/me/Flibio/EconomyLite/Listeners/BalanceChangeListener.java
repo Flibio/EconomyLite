@@ -1,8 +1,5 @@
 package me.Flibio.EconomyLite.Listeners;
 
-import java.util.HashMap;
-import java.util.UUID;
-
 import me.Flibio.EconomyLite.Main;
 import me.Flibio.EconomyLite.Events.BalanceChangeEvent;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
@@ -14,7 +11,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 
-import com.google.common.base.Optional;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.UUID;
 
 public class BalanceChangeListener {
 	

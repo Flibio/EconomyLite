@@ -1,8 +1,5 @@
 package me.Flibio.EconomyLite;
 
-import java.io.IOException;
-import java.util.HashMap;
-
 import me.Flibio.EconomyLite.API.EconomyLiteAPI;
 import me.Flibio.EconomyLite.Commands.AddCommand;
 import me.Flibio.EconomyLite.Commands.BalanceCommand;
@@ -40,10 +37,13 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.args.GenericArguments;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.4")
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Optional;
+
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.5")
 public class Main {
 	
 	@Inject
