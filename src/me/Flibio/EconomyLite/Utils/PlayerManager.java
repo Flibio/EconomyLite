@@ -1,8 +1,5 @@
 package me.Flibio.EconomyLite.Utils;
 
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-
 import me.Flibio.EconomyLite.Main;
 import me.Flibio.EconomyLite.Events.BalanceChangeEvent;
 import me.Flibio.EconomyLite.Utils.FileManager.FileType;
@@ -13,7 +10,9 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.service.profile.GameProfileResolver;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public class PlayerManager {
 	
