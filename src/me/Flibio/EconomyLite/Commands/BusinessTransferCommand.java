@@ -6,7 +6,7 @@ import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
 
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.scheduler.TaskBuilder;
+import org.spongepowered.api.service.scheduler.Task.Builder;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
@@ -21,7 +21,7 @@ public class BusinessTransferCommand implements CommandExecutor{
 	private TextUtils textUtils = new TextUtils();
 	private PlayerManager playerManager = new PlayerManager();
 	private BusinessManager businessManager = new BusinessManager();
-	private TaskBuilder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
 	
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)

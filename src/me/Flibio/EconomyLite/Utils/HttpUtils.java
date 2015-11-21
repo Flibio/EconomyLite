@@ -8,13 +8,9 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-import me.Flibio.EconomyLite.Main;
-import org.slf4j.Logger;
-
 public class HttpUtils {
 	
 	private final String USER_AGENT = "Mozilla/5.0";
-	private Logger logger = Main.access.logger;
 	
 	public HttpUtils() {
 		
@@ -25,14 +21,12 @@ public class HttpUtils {
 		try {
 			obj = new URL(url);
 		} catch (MalformedURLException e) {
-			logger.error("Error requesting page via HTTP");
 			return "";
 		}
 		HttpURLConnection con;
 		try {
 			con = (HttpURLConnection) obj.openConnection();
 		} catch (IOException e) {
-			logger.error("Error requesting page via HTTP");
 			return "";
 		}
  
@@ -40,7 +34,6 @@ public class HttpUtils {
 		try {
 			con.setRequestMethod("GET");
 		} catch (ProtocolException e) {
-			logger.error("Error requesting page via HTTP");
 			return "";
 		}
  
@@ -51,7 +44,6 @@ public class HttpUtils {
 		try {
 			in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		} catch (IOException e) {
-			logger.error("Error requesting page via HTTP");
 			return "";
 		}
 		String inputLine;
@@ -62,13 +54,11 @@ public class HttpUtils {
 				response.append(inputLine);
 			}
 		} catch (IOException e) {
-			logger.error("Error requesting page via HTTP");
 			return "";
 		}
 		try {
 			in.close();
 		} catch (IOException e) {
-			logger.error("Error requesting page via HTTP");
 			return "";
 		}
 		con.disconnect();

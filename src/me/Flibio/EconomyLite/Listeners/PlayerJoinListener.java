@@ -16,7 +16,7 @@ import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.service.scheduler.TaskBuilder;
+import org.spongepowered.api.service.scheduler.Task.Builder;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
@@ -26,7 +26,7 @@ public class PlayerJoinListener {
 	private FileManager fileManager = new FileManager();
 	private ScoreboardUtils scoreboardUtils = new ScoreboardUtils();
 	private PlayerManager playerManager = new PlayerManager();
-	private TaskBuilder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
 	
 	@Listener
 	public void onPlayerJoin(ClientConnectionEvent.Join event) {

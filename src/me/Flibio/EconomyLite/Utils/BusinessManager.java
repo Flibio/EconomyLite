@@ -8,8 +8,6 @@ import me.Flibio.EconomyLite.Utils.FileManager.FileType;
 import me.Flibio.EconomyLite.Utils.MySQLManager.ChangeAction;
 import ninja.leaping.configurate.ConfigurationNode;
 
-import com.google.common.base.Function;
-
 public class BusinessManager {
 	
 	private FileManager fileManager;
@@ -173,11 +171,7 @@ public class BusinessManager {
 			if(businessExists(businessName)) {
 				ConfigurationNode business = getBusiness(businessName);
 				if(business==null) return null;
-				List<String> ownerList = business.getNode("owners").getList(stringTransformer);
-				ArrayList<String> owners = new ArrayList<String>();
-				for(String owner : ownerList) {
-					owners.add(owner);
-				}
+				ArrayList<String> owners = getStringListValues(business.getNode("owners"));
 				return owners;
 			} else {
 				return null;
@@ -204,7 +198,7 @@ public class BusinessManager {
 			if(businessExists(businessName)) {
 				ConfigurationNode business = getBusiness(businessName);
 				if(business==null) return false;
-				List<String> owners = business.getNode("owners").getList(stringTransformer);
+				ArrayList<String> owners = getStringListValues(business.getNode("owners"));
 				if(owners.contains(uuid)) {
 					return true;
 				} else {
@@ -238,11 +232,7 @@ public class BusinessManager {
 			if(businessExists(businessName)) {
 				ConfigurationNode business = getBusiness(businessName);
 				if(business==null) return false;
-				List<String> ownerList = business.getNode("owners").getList(stringTransformer);
-				ArrayList<String> owners = new ArrayList<String>();
-				for(String owner : ownerList) {
-					owners.add(owner);
-				}
+				ArrayList<String> owners = getStringListValues(business.getNode("owners"));
 				owners.add(uuid);
 				
 				root.getNode(business.getKey()).getNode("owners").setValue(owners);
@@ -276,11 +266,7 @@ public class BusinessManager {
 			if(businessExists(businessName)) {
 				ConfigurationNode business = getBusiness(businessName);
 				if(business==null) return false;
-				List<String> ownerList = business.getNode("owners").getList(stringTransformer);
-				ArrayList<String> owners = new ArrayList<String>();
-				for(String owner : ownerList) {
-					owners.add(owner);
-				}
+				ArrayList<String> owners = getStringListValues(business.getNode("owners"));
 				owners.remove(uuid);
 				root.getNode(business.getKey()).getNode("owners").setValue(owners);
 				fileManager.saveFile(FileType.BUSINESS_DATA, root);
@@ -398,7 +384,7 @@ public class BusinessManager {
 		if(businessExists(businessName)) {
 			ConfigurationNode business = getBusiness(businessName);
 			if(business==null) return false;
-			List<String> invitedList = business.getNode("invited").getList(stringTransformer);
+			ArrayList<String> invitedList = getStringListValues(business.getNode("invited"));
 			ArrayList<String> invited = new ArrayList<String>();
 			for(String invitee : invitedList) {
 				invited.add(invitee);
@@ -435,7 +421,7 @@ public class BusinessManager {
 			if(businessExists(businessName)) {
 				ConfigurationNode business = getBusiness(businessName);
 				if(business==null) return false;
-				List<String> invited = business.getNode("invited").getList(stringTransformer);
+				ArrayList<String> invited = getStringListValues(business.getNode("invited"));
 				if(invited.contains(uuid)) {
 					return true;
 				} else {
@@ -558,14 +544,18 @@ public class BusinessManager {
 		}
 	}
 	
-	Function<Object,String> stringTransformer = new Function<Object,String>() {
-	    @Override
-	    public String apply(Object input) {
-	        if (input instanceof String) {
-	            return (String) input;
-	        } else {
-	            return null;
-	        }
-	    }
-	};
+	private ArrayList<String> getStringListValues(ConfigurationNode node) {
+		Object rawList = node.getValue();
+		ArrayList<String> toReturn = new ArrayList<String>();
+		
+		if(rawList instanceof List<?>) {
+			List<?> list = (List<?>) rawList;
+			for(Object rawObject : list) {
+				if(rawObject instanceof String) {
+					toReturn.add((String) rawObject);
+				}
+			}
+		}
+		return toReturn;
+	}
 }

@@ -35,8 +35,8 @@ public class ScoreboardUtils {
 	 * @return Completed scoreboard
 	 */
 	public Scoreboard createScoreboard(String objectiveName, Text displayName, HashMap<Text, Integer> objectiveValues) {
-		Scoreboard board = game.getRegistry().createScoreboardBuilder().build();
-		Objective obj = game.getRegistry().createObjectiveBuilder().name(objectiveName).criterion(Criteria.DUMMY).displayName(displayName).build();
+		Scoreboard board = game.getRegistry().createBuilder(Scoreboard.Builder.class).build();
+		Objective obj = game.getRegistry().createBuilder(Objective.Builder.class).name(objectiveName).criterion(Criteria.DUMMY).displayName(displayName).build();
 		for(Text name : objectiveValues.keySet()) {
 			int value = objectiveValues.get(name);
 			obj.getScore(name).setScore(value);

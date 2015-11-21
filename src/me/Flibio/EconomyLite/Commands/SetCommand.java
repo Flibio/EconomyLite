@@ -4,7 +4,7 @@ import me.Flibio.EconomyLite.Main;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
 
-import org.spongepowered.api.service.scheduler.TaskBuilder;
+import org.spongepowered.api.service.scheduler.Task.Builder;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
@@ -18,7 +18,7 @@ public class SetCommand implements CommandExecutor {
 	
 	private TextUtils textUtils = new TextUtils();
 	private PlayerManager playerManager = new PlayerManager();
-	private TaskBuilder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
 
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)

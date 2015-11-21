@@ -43,7 +43,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.5")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.6")
 public class Main {
 	
 	@Inject
