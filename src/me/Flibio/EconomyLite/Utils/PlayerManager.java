@@ -7,10 +7,9 @@ import ninja.leaping.configurate.ConfigurationNode;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.GameProfile;
-import org.spongepowered.api.service.profile.GameProfileResolver;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.GameProfileManager;
 
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -42,20 +41,15 @@ public class PlayerManager {
 	 * 	String of the UUID found(blank string if an error occured)
 	 */
 	public String getUUID(String name) {
-		Optional<GameProfileResolver> resolverOptional = game.getServiceManager().provide(GameProfileResolver.class);
-		if(resolverOptional.isPresent()) {
-			GameProfileResolver resolver = resolverOptional.get();
-			GameProfile profile;
-			try {
-				profile = resolver.get(name).get();
-			} catch (InterruptedException | ExecutionException e) {
-				logger.error("Error getting player's UUID");
-				return "";
-			}
-			return profile.getUniqueId().toString();
-		} else {
+		GameProfileManager manager = game.getServer().getGameProfileManager();
+		GameProfile profile;
+		try {
+			profile = manager.get(name).get();
+		} catch (InterruptedException | ExecutionException e) {
+			logger.error("Error getting player's UUID");
 			return "";
 		}
+		return profile.getUniqueId().toString();
 	}
 	
 	/**
@@ -66,20 +60,15 @@ public class PlayerManager {
 	 * 	Name of the corresponding player
 	 */
 	public String getName(String uuid) {
-		Optional<GameProfileResolver> resolverOptional = game.getServiceManager().provide(GameProfileResolver.class);
-		if(resolverOptional.isPresent()) {
-			GameProfileResolver resolver = resolverOptional.get();
-			GameProfile profile;
-			try {
-				profile = resolver.get(UUID.fromString(uuid)).get();
-			} catch (InterruptedException | ExecutionException e) {
-				logger.error("Error getting player's name");
-				return "";
-			}
-			return profile.getName().toString();
-		} else {
+		GameProfileManager manager = game.getServer().getGameProfileManager();
+		GameProfile profile;
+		try {
+			profile = manager.get(UUID.fromString(uuid)).get();
+		} catch (InterruptedException | ExecutionException e) {
+			logger.error("Error getting player's name");
 			return "";
 		}
+		return profile.getName().toString();
 	}
 	
 	/**

@@ -16,7 +16,7 @@ import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.service.scheduler.Task.Builder;
+import org.spongepowered.api.scheduler.Task.Builder;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;

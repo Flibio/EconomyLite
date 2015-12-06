@@ -27,6 +27,8 @@ import ninja.leaping.configurate.ConfigurationNode;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -34,16 +36,13 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.args.GenericArguments;
-import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import com.google.inject.Inject;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.6")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.7")
 public class Main {
 	
 	@Inject
@@ -73,7 +72,7 @@ public class Main {
 		logger.info("EconomyLite v"+version+" by Flibio initializing!");
 		//Set the access
 		access = this;
-		
+
 		fileManager = new FileManager();
 		businessManager = new BusinessManager();
 		
@@ -101,16 +100,11 @@ public class Main {
 			logger.error("Error: EconomyLite API already exists. Do you have 2 EconomyLite plugins installed?");
 		}
 		//Start Metrics
-		try {
-			EconomyLiteMetrics metrics = new EconomyLiteMetrics();
-			if (!metrics.isOptOut()&&optionEnabled("metrics")) {
-				logger.info("PluginMetrics enabled!");
-				metrics.start();
-			} else {
-				logger.info("PluginMetrics disabled!");
-			}
-		} catch (IOException e) {
-			logger.error("Error enabling plugin metrics!");
+		if(optionEnabled("statistics")) {
+			logger.info("Started EconomyLite Statistics!");
+			game.getEventManager().registerListeners(this, new Statistics());
+		} else {
+			logger.info("EconomyLite Statistics are disabled!");
 		}
 		//Reset business confirmations
 		game.getScheduler().createTaskBuilder().execute(new Runnable() {
@@ -171,7 +165,7 @@ public class Main {
 			    .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Texts.of("business"))))
 			    .executor(new BalanceCommand())
 			    .build();
-		game.getCommandDispatcher().register(this, balanceCommand, "balance", "bal");
+		game.getCommandManager().register(this, balanceCommand, "balance", "bal");
 		//Add Child Command
 		CommandSpec addCommand = CommandSpec.builder()
 			    .description(Texts.of("Add currency to a player's balance"))
@@ -198,7 +192,7 @@ public class Main {
 			    .child(removeCommand, "remove")
 			    .child(setCommand, "set")
 			    .build();
-		game.getCommandDispatcher().register(this, econCommand, "econ");
+		game.getCommandManager().register(this, econCommand, "econ");
 		//Business Commands
 		if(optionEnabled("businesses")) {
 			//Register Child
@@ -262,7 +256,7 @@ public class Main {
 				    .child(businessTransferCommand, "transfer")
 				    .child(businessOwnersCommand, "owners")
 				    .build();
-			game.getCommandDispatcher().register(this, businessCommand, "business");
+			game.getCommandManager().register(this, businessCommand, "business");
 		}
 		//Pay Commands
 		CommandSpec payCommand = CommandSpec.builder()
@@ -271,14 +265,14 @@ public class Main {
 			    .arguments(GenericArguments.integer(Texts.of("amount")), GenericArguments.remainingJoinedStrings(Texts.of("who")))
 			    .executor(new PayCommand())
 			    .build();
-		game.getCommandDispatcher().register(this, payCommand, "pay");
+		game.getCommandManager().register(this, payCommand, "pay");
 		CommandSpec payOverrideCommand = CommandSpec.builder()
 			    .description(Texts.of("Pay another player or business"))
 			    .permission("econ.pay")
 			    .arguments(GenericArguments.string(Texts.of("whoType")), GenericArguments.integer(Texts.of("amount")), GenericArguments.remainingJoinedStrings(Texts.of("who")))
 			    .executor(new PayOverrideCommand())
 			    .build();
-		game.getCommandDispatcher().register(this, payOverrideCommand, "paySpecified");
+		game.getCommandManager().register(this, payOverrideCommand, "paySpecified");
 	}
 
 	//Generates all files and sets default configuration using FileManager class
@@ -294,7 +288,7 @@ public class Main {
 		fileManager.testDefault("Currency-Plural", "Coins");
 		fileManager.testDefault("Scoreboard", "disabled");
 		fileManager.testDefault("Businesses", "enabled");
-		fileManager.testDefault("PluginMetrics", "enabled");
+		fileManager.testDefault("Plugin-Statistics", "enabled");
 		fileManager.testDefault("Update-Notifications", "enabled");
 		fileManager.testDefault("MySQL.Enabled", "disabled");
 		fileManager.testDefault("MySQL.Hostname", "hostname");
@@ -313,7 +307,7 @@ public class Main {
 		currencyPlural = configOptions.get("currencyPlural");
 		configOptions.put("scoreboard", fileManager.getConfigValue("Scoreboard"));
 		configOptions.put("businesses", fileManager.getConfigValue("Businesses"));
-		configOptions.put("metrics", fileManager.getConfigValue("PluginMetrics"));
+		configOptions.put("statistics", fileManager.getConfigValue("Plugin-Statistics"));
 		configOptions.put("updates", fileManager.getConfigValue("Update-Notifications"));
 		configOptions.put("mysql.enabled", fileManager.getConfigValue("MySQL.Enabled"));
 		configOptions.put("mysql.hostname", fileManager.getConfigValue("MySQL.Hostname"));
