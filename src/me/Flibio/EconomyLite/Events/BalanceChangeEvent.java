@@ -1,6 +1,7 @@
 package me.Flibio.EconomyLite.Events;
 
 import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
 public class BalanceChangeEvent extends AbstractEvent implements Cancellable {
@@ -34,6 +35,11 @@ public class BalanceChangeEvent extends AbstractEvent implements Cancellable {
 	 */
 	public String getPlayerUUID(){
 		return playerUUID;
+	}
+
+	@Override
+	public Cause getCause() {
+		return Cause.of("EconomyLite");
 	}
 
 }

@@ -42,7 +42,7 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.7")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.8")
 public class Main {
 	
 	@Inject
@@ -80,7 +80,7 @@ public class Main {
 		initializeFiles();
 		loadConfigurationOptions();
 		//Attempt to load MySQL if it is enabled
-		Optional<SqlService> sqlServiceOptional = event.getGame().getServiceManager().provide(SqlService.class);
+		Optional<SqlService> sqlServiceOptional = game.getServiceManager().provide(SqlService.class);
 		if(optionEnabled("mysql.enabled")&&sqlServiceOptional.isPresent()) {
 			//Enable MySQL
 			sqlEnabled = true;
