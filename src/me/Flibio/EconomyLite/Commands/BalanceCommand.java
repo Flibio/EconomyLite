@@ -1,6 +1,6 @@
 package me.Flibio.EconomyLite.Commands;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
@@ -21,7 +21,7 @@ public class BalanceCommand implements CommandExecutor{
 	private TextUtils textUtils = new TextUtils();
 	private PlayerManager playerManager = new PlayerManager();
 	private BusinessManager businessManager = new BusinessManager();
-	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 	
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)
@@ -38,7 +38,7 @@ public class BalanceCommand implements CommandExecutor{
 				Player player = (Player) source;
 				
 				Optional<String> business = args.<String>getOne("business");
-				if(business.isPresent()&&Main.optionEnabled("businesses")) {
+				if(business.isPresent()&&EconomyLite.optionEnabled("businesses")) {
 					//Check if player has permission
 					if(!player.hasPermission("econ.business.balance")) {
 						source.sendMessage(textUtils.basicText("You do not have permission to use this command!", TextColors.RED));
@@ -85,7 +85,7 @@ public class BalanceCommand implements CommandExecutor{
 					}
 				}
 			}
-		}).submit(Main.access);
+		}).submit(EconomyLite.access);
 		return CommandResult.success();
 	}
 	

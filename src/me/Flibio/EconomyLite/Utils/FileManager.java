@@ -3,7 +3,7 @@ package me.Flibio.EconomyLite.Utils;
 import java.io.File;
 import java.io.IOException;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -28,7 +28,7 @@ public class FileManager {
 	private ConfigurationNode dataRoot;
 	
 	public FileManager() {
-		this.logger = Main.access.logger;
+		this.logger = EconomyLite.access.logger;
 	}
 	
 	public void testDefault(String path, Object value) {

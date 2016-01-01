@@ -1,6 +1,6 @@
 package me.Flibio.EconomyLite.Utils;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Events.BalanceChangeEvent;
 import me.Flibio.EconomyLite.Utils.FileManager.FileType;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -27,8 +27,8 @@ public class PlayerManager {
 	 * If possible, you should run these methods in a seperate thread.
 	 */
 	public PlayerManager() {
-		this.game = Main.access.game;
-		this.logger = Main.access.logger;
+		this.game = EconomyLite.access.game;
+		this.logger = EconomyLite.access.logger;
 		
 		fileManager = new FileManager();
 	}
@@ -83,9 +83,9 @@ public class PlayerManager {
 	public boolean setBalance(String uuid, int balance) {
 		//Check if the balance is withing parameters
 		if(balance<0||balance>1000000) return false;
-		if(Main.access.sqlEnabled) {
+		if(EconomyLite.access.sqlEnabled) {
 			//Use MySQL
-			MySQLManager mySQL = Main.getMySQL();
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(mySQL.playerExists(uuid)) {
 				//Change balance
 				if(!mySQL.setBalance(uuid, balance)) return false;
@@ -134,9 +134,9 @@ public class PlayerManager {
 	 * 	Boolean based on if the command was successful or not
 	 */
 	public boolean registerPlayer(String uuid) {
-		if(Main.access.sqlEnabled) {
+		if(EconomyLite.access.sqlEnabled) {
 			//MySQL
-			MySQLManager mySQL = Main.getMySQL();
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(mySQL.playerExists(uuid)) return false;
 			return mySQL.newPlayer(uuid);
 		} else {
@@ -167,9 +167,9 @@ public class PlayerManager {
 	 * 	If the method was successful or not
 	 */
 	public boolean registerPlayer(String uuid, int balance) {
-		if(Main.access.sqlEnabled) {
+		if(EconomyLite.access.sqlEnabled) {
 			//MySQL
-			MySQLManager mySQL = Main.getMySQL();
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(mySQL.playerExists(uuid)) return false;
 			if(!mySQL.newPlayer(uuid)) return false;
 			return mySQL.setBalance(uuid, balance);
@@ -199,9 +199,9 @@ public class PlayerManager {
 	 * 	If the player was found or not
 	 */
 	public boolean playerExists(String uuid) {
-		if(Main.optionEnabled("mysql.enabled")) {
+		if(EconomyLite.optionEnabled("mysql.enabled")) {
 			//Use MySQL
-			MySQLManager mySQL = Main.getMySQL();
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			return mySQL.playerExists(uuid);
 		} else {
 			//Use local file
@@ -227,9 +227,9 @@ public class PlayerManager {
 	 * 	The balance of the player (-1 will be returned if there was an error)
 	 */
 	public int getBalance(String uuid) {
-		if(Main.optionEnabled("mysql.enabled")) {
+		if(EconomyLite.optionEnabled("mysql.enabled")) {
 			//Use MySQL
-			MySQLManager mySQL = Main.getMySQL();
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.playerExists(uuid)) return -1;
 			return mySQL.getBalance(uuid);
 		} else {

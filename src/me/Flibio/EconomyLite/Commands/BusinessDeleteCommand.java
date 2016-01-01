@@ -1,6 +1,6 @@
 package me.Flibio.EconomyLite.Commands;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
@@ -22,7 +22,7 @@ public class BusinessDeleteCommand implements CommandExecutor {
 	private TextUtils textUtils = new TextUtils();
 	private BusinessManager businessManager = new BusinessManager();
 	private PlayerManager playerManager = new PlayerManager();
-	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)
@@ -107,7 +107,7 @@ public class BusinessDeleteCommand implements CommandExecutor {
 					return;
 				}
 			}
-		}).async().submit(Main.access);
+		}).async().submit(EconomyLite.access);
 		return CommandResult.success();
 	}
 

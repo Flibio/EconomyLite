@@ -20,6 +20,7 @@ public class JsonUtils {
 	public String getVersion(String json) {
 		Gson gson = new GsonBuilder().create();
     	JsonGitHubData data = gson.fromJson(json, JsonGitHubData.class);
+    	if(data==null) return "";
     	if(data.getName()==null) return "";
     	String version = data.getName();
     	return version;

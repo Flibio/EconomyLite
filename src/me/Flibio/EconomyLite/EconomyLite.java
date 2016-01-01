@@ -1,6 +1,7 @@
 package me.Flibio.EconomyLite;
 
 import me.Flibio.EconomyLite.API.EconomyLiteAPI;
+import me.Flibio.EconomyLite.API.LiteEconomyService;
 import me.Flibio.EconomyLite.Commands.AddCommand;
 import me.Flibio.EconomyLite.Commands.BalanceCommand;
 import me.Flibio.EconomyLite.Commands.BusinessDeleteCommand;
@@ -33,17 +34,18 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.service.ProviderExistsException;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.sql.SqlService;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 
 import com.google.inject.Inject;
 
 import java.util.HashMap;
 import java.util.Optional;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.0.8")
-public class Main {
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.0")
+public class EconomyLite {
 	
 	@Inject
 	public Logger logger;
@@ -53,8 +55,9 @@ public class Main {
 	
 	private FileManager fileManager;
 	private BusinessManager businessManager;
+	private static Currency currency;
 	
-	public static Main access;
+	public static EconomyLite access;
 	
 	public String currencySingular = "";
 	public String currencyPlural = "";
@@ -63,7 +66,7 @@ public class Main {
 	
 	private static MySQLManager mySQL = null;
 	
-	public String version = Main.class.getAnnotation(Plugin.class).version();
+	public String version = EconomyLite.class.getAnnotation(Plugin.class).version();
 	
 	private static HashMap<String, String> configOptions = new HashMap<String, String>();
 	
@@ -93,12 +96,9 @@ public class Main {
 		registerEvents();
 		registerCommands();
 		//Register EconomyLiteAPI
-		try {
-			game.getServiceManager().setProvider(this, EconomyLiteAPI.class, new EconomyLiteAPI());
-			logger.info("API registered successfully!");
-		} catch (ProviderExistsException e) {
-			logger.error("Error: EconomyLite API already exists. Do you have 2 EconomyLite plugins installed?");
-		}
+		game.getServiceManager().setProvider(this, EconomyLiteAPI.class, new EconomyLiteAPI());
+		game.getServiceManager().setProvider(this, EconomyService.class, new LiteEconomyService());
+		logger.info("API registered successfully!");
 		//Start Metrics
 		if(optionEnabled("statistics")) {
 			logger.info("Started EconomyLite Statistics!");
@@ -137,7 +137,7 @@ public class Main {
 					//Make sure the latest update is not a prerelease
 					if(!prerelease) {
 						//Check if the latest update is newer than the current one
-						String currentVersion = Main.access.version;
+						String currentVersion = EconomyLite.access.version;
 						if(textUtils.versionCompare(version, currentVersion)>0) {
 							logger.info("EconomyLite v"+version+" is now available to download!");
 							logger.info(url);
@@ -161,32 +161,32 @@ public class Main {
 	
 	private void registerCommands() {
 		CommandSpec balanceCommand = CommandSpec.builder()
-			    .description(Texts.of("View EconomyLite balance"))
-			    .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Texts.of("business"))))
+			    .description(Text.of("View EconomyLite balance"))
+			    .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("business"))))
 			    .executor(new BalanceCommand())
 			    .build();
 		game.getCommandManager().register(this, balanceCommand, "balance", "bal");
 		//Add Child Command
 		CommandSpec addCommand = CommandSpec.builder()
-			    .description(Texts.of("Add currency to a player's balance"))
-			    .arguments(GenericArguments.integer(Texts.of("amount")), GenericArguments.string(Texts.of("player")))
+			    .description(Text.of("Add currency to a player's balance"))
+			    .arguments(GenericArguments.integer(Text.of("amount")), GenericArguments.string(Text.of("player")))
 			    .executor(new AddCommand())
 			    .build();
 		//Remove Child Command
 		CommandSpec removeCommand = CommandSpec.builder()
-			    .description(Texts.of("Remove currency from a player's balance"))
-			    .arguments(GenericArguments.integer(Texts.of("amount")), GenericArguments.string(Texts.of("player")))
+			    .description(Text.of("Remove currency from a player's balance"))
+			    .arguments(GenericArguments.integer(Text.of("amount")), GenericArguments.string(Text.of("player")))
 			    .executor(new RemoveCommand())
 			    .build();
 		//Set Child Command
 		CommandSpec setCommand = CommandSpec.builder()
-			    .description(Texts.of("Set a player's balance"))
-			    .arguments(GenericArguments.string(Texts.of("player")), GenericArguments.integer(Texts.of("amount")))
+			    .description(Text.of("Set a player's balance"))
+			    .arguments(GenericArguments.string(Text.of("player")), GenericArguments.integer(Text.of("amount")))
 			    .executor(new SetCommand())
 			    .build();
 		//Main Econ Command
 		CommandSpec econCommand = CommandSpec.builder()
-			    .description(Texts.of("Edit player balances"))
+			    .description(Text.of("Edit player balances"))
 			    .permission("econ.admin")
 			    .child(addCommand, "add")
 			    .child(removeCommand, "remove")
@@ -197,56 +197,56 @@ public class Main {
 		if(optionEnabled("businesses")) {
 			//Register Child
 			CommandSpec businessRegisterCommand = CommandSpec.builder()
-				    .description(Texts.of("Register a new business"))
+				    .description(Text.of("Register a new business"))
 				    .permission("econ.busines.register")
-				    .arguments(GenericArguments.remainingJoinedStrings(Texts.of("business")))
+				    .arguments(GenericArguments.remainingJoinedStrings(Text.of("business")))
 				    .executor(new BusinessRegisterCommand())
 				    .build();
 			//Delete Child
 			CommandSpec businessDeleteCommand = CommandSpec.builder()
-				    .description(Texts.of("Delete a business"))
+				    .description(Text.of("Delete a business"))
 				    .permission("econ.busines.delete")
-				    .arguments(GenericArguments.remainingJoinedStrings(Texts.of("business")))
+				    .arguments(GenericArguments.remainingJoinedStrings(Text.of("business")))
 				    .executor(new BusinessDeleteCommand())
 				    .build();
 			//Leave Child
 			CommandSpec businessLeaveCommand = CommandSpec.builder()
-				    .description(Texts.of("Leave a business as an owner"))
+				    .description(Text.of("Leave a business as an owner"))
 				    .permission("econ.busines.leave")
-				    .arguments(GenericArguments.remainingJoinedStrings(Texts.of("business")))
+				    .arguments(GenericArguments.remainingJoinedStrings(Text.of("business")))
 				    .executor(new BusinessLeaveCommand())
 				    .build();
 			//Invite Child
 			CommandSpec businessInviteCommand = CommandSpec.builder()
-				    .description(Texts.of("Invite an owner to a business"))
+				    .description(Text.of("Invite an owner to a business"))
 				    .permission("econ.busines.invite")
-				    .arguments(GenericArguments.string(Texts.of("player")),GenericArguments.remainingJoinedStrings(Texts.of("business")))
+				    .arguments(GenericArguments.string(Text.of("player")),GenericArguments.remainingJoinedStrings(Text.of("business")))
 				    .executor(new BusinessInviteCommand())
 				    .build();
 			//Invite Accept Child
 			CommandSpec businessInviteAcceptCommand = CommandSpec.builder()
-				    .description(Texts.of("Accept an invite to a business"))
+				    .description(Text.of("Accept an invite to a business"))
 				    .permission("econ.busines.invite")
-				    .arguments(GenericArguments.remainingJoinedStrings(Texts.of("business")))
+				    .arguments(GenericArguments.remainingJoinedStrings(Text.of("business")))
 				    .executor(new BusinessInviteAcceptCommand())
 				    .build();
 			//Transfer Child
 			CommandSpec businessTransferCommand = CommandSpec.builder()
-				    .description(Texts.of("Transfer some of the business funds to your account"))
+				    .description(Text.of("Transfer some of the business funds to your account"))
 				    .permission("econ.busines.transfer")
-				    .arguments(GenericArguments.integer(Texts.of("amount")),GenericArguments.remainingJoinedStrings(Texts.of("business")))
+				    .arguments(GenericArguments.integer(Text.of("amount")),GenericArguments.remainingJoinedStrings(Text.of("business")))
 				    .executor(new BusinessTransferCommand())
 				    .build();
 			//Owners Child
 			CommandSpec businessOwnersCommand = CommandSpec.builder()
-				    .description(Texts.of("View the owners of a business"))
+				    .description(Text.of("View the owners of a business"))
 				    .permission("econ.busines.owners")
-				    .arguments(GenericArguments.remainingJoinedStrings(Texts.of("business")))
+				    .arguments(GenericArguments.remainingJoinedStrings(Text.of("business")))
 				    .executor(new BusinessOwnersCommand())
 				    .build();
 			//Main Command
 			CommandSpec businessCommand = CommandSpec.builder()
-				    .description(Texts.of("Business management commands"))
+				    .description(Text.of("Business management commands"))
 				    .permission("econ.business")
 				    .child(businessRegisterCommand, "register", "reg")
 				    .child(businessDeleteCommand, "delete", "del")
@@ -260,16 +260,16 @@ public class Main {
 		}
 		//Pay Commands
 		CommandSpec payCommand = CommandSpec.builder()
-			    .description(Texts.of("Pay another player or business"))
+			    .description(Text.of("Pay another player or business"))
 			    .permission("econ.pay")
-			    .arguments(GenericArguments.integer(Texts.of("amount")), GenericArguments.remainingJoinedStrings(Texts.of("who")))
+			    .arguments(GenericArguments.integer(Text.of("amount")), GenericArguments.remainingJoinedStrings(Text.of("who")))
 			    .executor(new PayCommand())
 			    .build();
 		game.getCommandManager().register(this, payCommand, "pay");
 		CommandSpec payOverrideCommand = CommandSpec.builder()
-			    .description(Texts.of("Pay another player or business"))
+			    .description(Text.of("Pay another player or business"))
 			    .permission("econ.pay")
-			    .arguments(GenericArguments.string(Texts.of("whoType")), GenericArguments.integer(Texts.of("amount")), GenericArguments.remainingJoinedStrings(Texts.of("who")))
+			    .arguments(GenericArguments.string(Text.of("whoType")), GenericArguments.integer(Text.of("amount")), GenericArguments.remainingJoinedStrings(Text.of("who")))
 			    .executor(new PayOverrideCommand())
 			    .build();
 		game.getCommandManager().register(this, payOverrideCommand, "paySpecified");
@@ -328,6 +328,10 @@ public class Main {
 	public static String getOption(String optionName) {
 		if(!configOptions.containsKey(optionName)) return "";
 		return configOptions.get(optionName);
+	}
+	
+	public static Currency getCurrency() {
+		return currency;
 	}
 	
 	public static MySQLManager getMySQL() {

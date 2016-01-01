@@ -1,5 +1,10 @@
 package me.Flibio.EconomyLite.Utils;
 
+import me.Flibio.EconomyLite.EconomyLite;
+
+import org.slf4j.Logger;
+import org.spongepowered.api.service.sql.SqlService;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,11 +13,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import javax.sql.DataSource;
-
-import me.Flibio.EconomyLite.Main;
-
-import org.slf4j.Logger;
-import org.spongepowered.api.service.sql.SqlService;
 
 public class MySQLManager {
 	
@@ -30,7 +30,7 @@ public class MySQLManager {
 	private Statement statement;
 	private SqlService sqlService;
 	
-	private Logger logger = Main.access.logger;
+	private Logger logger = EconomyLite.access.logger;
 	
 	public MySQLManager(String hostname, String port, String database,
 			String username, String password, SqlService sql) {

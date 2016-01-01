@@ -1,6 +1,6 @@
 package me.Flibio.EconomyLite.API;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 
@@ -18,7 +18,7 @@ public class EconomyLiteAPI {
 	 * If possible, you should run these methods in a seperate thread.
 	 */
 	public EconomyLiteAPI() {
-		if(!Main.optionEnabled("businesses")) {
+		if(!EconomyLite.optionEnabled("businesses")) {
 			businessAPI = null;
 		}
 	}
@@ -37,7 +37,7 @@ public class EconomyLiteAPI {
 	 * 	String of the version in format X.Y.Z
 	 */
 	public String getVersion() {
-		return Main.access.version;
+		return EconomyLite.access.version;
 	}
 	
 	/**
@@ -46,7 +46,7 @@ public class EconomyLiteAPI {
 	 * 	String of the singular label
 	 */
 	public String getSingularCurrencyLabel() {
-		return Main.access.currencySingular;
+		return EconomyLite.access.currencySingular;
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class EconomyLiteAPI {
 	 * 	String of the plural label
 	 */
 	public String getPluralCurrencyLabel() {
-		return Main.access.currencyPlural;
+		return EconomyLite.access.currencyPlural;
 	}
 
 }

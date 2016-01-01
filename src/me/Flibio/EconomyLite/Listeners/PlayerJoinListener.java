@@ -1,9 +1,6 @@
 package me.Flibio.EconomyLite.Listeners;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Runnables.UpdateRunnable;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.FileManager;
@@ -18,24 +15,26 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.scheduler.Task.Builder;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PlayerJoinListener {
 
 	private FileManager fileManager = new FileManager();
 	private ScoreboardUtils scoreboardUtils = new ScoreboardUtils();
 	private PlayerManager playerManager = new PlayerManager();
-	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 	
 	@Listener
 	public void onPlayerJoin(ClientConnectionEvent.Join event) {
 		Player player = (Player) event.getTargetEntity();
 		String uuid = player.getUniqueId().toString();
 		
-		if(Main.access.sqlEnabled) {
+		if(EconomyLite.access.sqlEnabled) {
 			//Use MySQL
-			Main.getMySQL().newPlayer(uuid);
+			EconomyLite.getMySQL().newPlayer(uuid);
 		} else {
 			//Use local file
 			fileManager.loadFile(FileType.DATA);
@@ -49,9 +48,9 @@ public class PlayerJoinListener {
 		}
 		
 		//Show scoreboard if it is enabled
-		if(Main.optionEnabled("scoreboard")) {
-			Text displayName = Texts.builder("EconomyLite").color(TextColors.YELLOW).build();
-			Text balanceLabel = Texts.builder("Balance: ").color(TextColors.GREEN).build();
+		if(EconomyLite.optionEnabled("scoreboard")) {
+			Text displayName = Text.builder("EconomyLite").color(TextColors.YELLOW).build();
+			Text balanceLabel = Text.builder("Balance: ").color(TextColors.GREEN).build();
 			
 			HashMap<Text, Integer> objectiveValues = new HashMap<Text, Integer>();
 			objectiveValues.put(balanceLabel, playerManager.getBalance(uuid));
@@ -60,7 +59,7 @@ public class PlayerJoinListener {
 		}
 		
 		//Check if an update is available
-		taskBuilder.execute(new UpdateRunnable(player)).async().submit(Main.access);
+		taskBuilder.execute(new UpdateRunnable(player)).async().submit(EconomyLite.access);
 		//Check if the player has any invites
 		taskBuilder.execute(new Runnable() {
 			public void run() {
@@ -78,7 +77,7 @@ public class PlayerJoinListener {
 					}
 				}
 			}
-		}).async().submit(Main.access);
+		}).async().submit(EconomyLite.access);
 	}
 	
 }

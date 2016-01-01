@@ -1,6 +1,6 @@
 package me.Flibio.EconomyLite.Runnables;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.HttpUtils;
 import me.Flibio.EconomyLite.Utils.JsonUtils;
 import me.Flibio.EconomyLite.Utils.TextUtils;
@@ -20,7 +20,7 @@ public class UpdateRunnable implements Runnable{
 
 	public void run() {
 		//Check if the player has permission
-		if(player.hasPermission("econ.admin.updates")&&Main.optionEnabled("updates")) {
+		if(player.hasPermission("econ.admin.updates")&&EconomyLite.optionEnabled("updates")) {
 			//Get the data
 			String latest = httpUtils.requestData("https://api.github.com/repos/Flibio/EconomyLite/releases/latest");
 			String version = jsonUtils.getVersion(latest).replace("v", "");
@@ -31,7 +31,7 @@ public class UpdateRunnable implements Runnable{
 			//Make sure the latest update is not a prerelease
 			if(!prerelease) {
 				//Check if the latest update is newer than the current one
-				String currentVersion = Main.access.version;
+				String currentVersion = EconomyLite.access.version;
 				if(textUtils.versionCompare(version, currentVersion)>0) {
 					player.sendMessage(textUtils.updateAvailable(version, url));
 					for(String change : iChanges) {

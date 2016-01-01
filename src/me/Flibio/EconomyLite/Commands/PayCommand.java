@@ -1,6 +1,6 @@
 package me.Flibio.EconomyLite.Commands;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
@@ -21,7 +21,7 @@ public class PayCommand implements CommandExecutor{
 	private TextUtils textUtils = new TextUtils();
 	private PlayerManager playerManager = new PlayerManager();
 	private BusinessManager businessManager = new BusinessManager();
-	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 	
 	@Override
 	public CommandResult execute(final CommandSource source, final CommandContext args)
@@ -45,6 +45,11 @@ public class PayCommand implements CommandExecutor{
 					//Both parameters are present
 					int amount = rawAmount.get();
 					String who = rawWho.get();
+					
+					if(who.equalsIgnoreCase(player.getName())) {
+						player.sendMessage(textUtils.basicText("Why would you pay yourself!?", TextColors.RED));
+						return;
+					}
 					
 					if(who.trim().split(" ").length>1) {
 						//Who is a business
@@ -90,7 +95,7 @@ public class PayCommand implements CommandExecutor{
 				}
 
 			}
-		}).async().submit(Main.access);
+		}).async().submit(EconomyLite.access);
 		return CommandResult.success();
 	}
 	
@@ -108,7 +113,7 @@ public class PayCommand implements CommandExecutor{
 				int newBalance = businessManager.getBusinessBalance(businessName) + amount;
 				if(newBalance<0||newBalance>1000000) {
 					//Out of range
-					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+Main.access.currencyPlural+"!", TextColors.RED));
+					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
 					return;
 				} else {
 					//Process transaction
@@ -144,7 +149,7 @@ public class PayCommand implements CommandExecutor{
 				int newBalance = playerManager.getBalance(targetUUID) + amount;
 				if(newBalance<0||newBalance>1000000) {
 					//Out of range
-					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+Main.access.currencyPlural+"!", TextColors.RED));
+					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
 					return;
 				} else {
 					//Process transaction

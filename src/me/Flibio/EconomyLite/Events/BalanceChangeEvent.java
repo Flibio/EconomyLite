@@ -4,10 +4,12 @@ import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
+import java.util.UUID;
+
 public class BalanceChangeEvent extends AbstractEvent implements Cancellable {
 	
 	private boolean cancelled = false;
-	private String playerUUID;
+	private UUID playerUUID;
 	
 	/**
 	 * Sponge event called when a player's balance changes
@@ -15,7 +17,7 @@ public class BalanceChangeEvent extends AbstractEvent implements Cancellable {
 	 * 	The UUID of the player whose balance changed
 	 */
 	public BalanceChangeEvent(String playerUUID){
-		this.playerUUID = playerUUID;
+		this.playerUUID = UUID.fromString(playerUUID);
 	}
 
 	@Override
@@ -30,10 +32,9 @@ public class BalanceChangeEvent extends AbstractEvent implements Cancellable {
 	
 	/**
 	 * Gets the UUID of the player whose balance changed
-	 * 
 	 * @return Player's UUID
 	 */
-	public String getPlayerUUID(){
+	public UUID getPlayerUUID(){
 		return playerUUID;
 	}
 

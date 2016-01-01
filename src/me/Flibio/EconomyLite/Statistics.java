@@ -21,13 +21,13 @@ public class Statistics {
 	private String accessKey = "";
 	
 	public Statistics() {
-		Optional<InetSocketAddress> addrOptional = Main.access.game.getServer().getBoundAddress();
-		Main.access.game.getScheduler().createTaskBuilder().execute(r -> {
+		Optional<InetSocketAddress> addrOptional = EconomyLite.access.game.getServer().getBoundAddress();
+		EconomyLite.access.game.getScheduler().createTaskBuilder().execute(r -> {
 			String ipAddrResponse = "";
 			try {
 				ipAddrResponse = post("http://checkip.amazonaws.com","");
 			} catch(Exception e) {
-				Main.access.logger.error(e.getMessage());
+				EconomyLite.access.logger.error(e.getMessage());
 			}
 			if(addrOptional.isPresent()&&!ipAddrResponse.isEmpty()) {
 				InetSocketAddress addr = addrOptional.get();
@@ -38,22 +38,22 @@ public class Statistics {
 					String response = post("http://api.flibio.net/serverStarted.php","ip="+ip);
 					if(!response.contains("error")&&response.length()>10) {
 						accessKey = response;
-						Main.access.game.getScheduler().createTaskBuilder().execute(t -> {
+						EconomyLite.access.game.getScheduler().createTaskBuilder().execute(t -> {
 							try {
 								post("http://api.flibio.net/pinger.php","key="+accessKey+"&ip="+this.ip+"&pl="+
-										Main.access.game.getServer().getOnlinePlayers().size());
+										EconomyLite.access.game.getServer().getOnlinePlayers().size());
 							} catch(Exception e) {
-								Main.access.logger.error(e.getMessage());
+								EconomyLite.access.logger.error(e.getMessage());
 							}
-						}).async().interval(1, TimeUnit.MINUTES).delay(1, TimeUnit.MINUTES).submit(Main.access);
+						}).async().interval(1, TimeUnit.MINUTES).delay(1, TimeUnit.MINUTES).submit(EconomyLite.access);
 					}
 				} catch(Exception e) {
-					Main.access.logger.error(e.getMessage());
+					EconomyLite.access.logger.error(e.getMessage());
 				}
 			} else {
 				this.ip = "";
 			}
-		}).async().submit(Main.access);
+		}).async().submit(EconomyLite.access);
 	}
 	
 	@Listener
@@ -62,7 +62,7 @@ public class Statistics {
 		try {
 			post("http://api.flibio.net/stopped.php","key="+accessKey+"&ip="+this.ip);
 		} catch (Exception e) {
-			Main.access.logger.error(e.getMessage());
+			EconomyLite.access.logger.error(e.getMessage());
 		}
 	}
 	

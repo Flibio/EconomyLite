@@ -1,6 +1,6 @@
 package me.Flibio.EconomyLite.Commands;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
@@ -21,7 +21,7 @@ public class PayOverrideCommand implements CommandExecutor{
 	private TextUtils textUtils = new TextUtils();
 	private PlayerManager playerManager = new PlayerManager();
 	private BusinessManager businessManager = new BusinessManager();
-	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 	
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)
@@ -50,6 +50,10 @@ public class PayOverrideCommand implements CommandExecutor{
 					
 					if(whoType.equalsIgnoreCase("player")) {
 						//Who is a player
+						if(who.equalsIgnoreCase(player.getName())) {
+							player.sendMessage(textUtils.basicText("Why would you pay yourself!?", TextColors.RED));
+							return;
+						}
 						String playerName = who;
 						String playerUUID = playerManager.getUUID(playerName);
 						if(playerManager.playerExists(playerUUID)) {
@@ -85,7 +89,7 @@ public class PayOverrideCommand implements CommandExecutor{
 				}
 
 			}
-		}).async().submit(Main.access);
+		}).async().submit(EconomyLite.access);
 		return CommandResult.success();
 	}
 	
@@ -103,7 +107,7 @@ public class PayOverrideCommand implements CommandExecutor{
 				int newBalance = businessManager.getBusinessBalance(businessName) + amount;
 				if(newBalance<0||newBalance>1000000) {
 					//Out of range
-					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+Main.access.currencyPlural+"!", TextColors.RED));
+					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
 					return;
 				} else {
 					//Process transaction
@@ -139,7 +143,7 @@ public class PayOverrideCommand implements CommandExecutor{
 				int newBalance = playerManager.getBalance(targetUUID) + amount;
 				if(newBalance<0||newBalance>1000000) {
 					//Out of range
-					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+Main.access.currencyPlural+"!", TextColors.RED));
+					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
 					return;
 				} else {
 					//Process transaction

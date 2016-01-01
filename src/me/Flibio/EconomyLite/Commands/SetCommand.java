@@ -1,6 +1,6 @@
 package me.Flibio.EconomyLite.Commands;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
 
@@ -18,7 +18,7 @@ public class SetCommand implements CommandExecutor {
 	
 	private TextUtils textUtils = new TextUtils();
 	private PlayerManager playerManager = new PlayerManager();
-	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)
@@ -41,7 +41,7 @@ public class SetCommand implements CommandExecutor {
 						//Check if the amount is in-between of the parameters
 						if(amount<0||amount>1000000) {
 							//New balance is to big or small
-							source.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+Main.access.currencyPlural+"!", TextColors.RED));
+							source.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
 							return;
 						}
 						//Set the player's balance
@@ -65,7 +65,7 @@ public class SetCommand implements CommandExecutor {
 					return;
 				}
 			}
-		}).async().submit(Main.access);
+		}).async().submit(EconomyLite.access);
 		return CommandResult.success();
 	}
 

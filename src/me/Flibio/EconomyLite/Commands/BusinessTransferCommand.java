@@ -1,6 +1,6 @@
 package me.Flibio.EconomyLite.Commands;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
@@ -21,7 +21,7 @@ public class BusinessTransferCommand implements CommandExecutor{
 	private TextUtils textUtils = new TextUtils();
 	private PlayerManager playerManager = new PlayerManager();
 	private BusinessManager businessManager = new BusinessManager();
-	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 	
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)
@@ -71,15 +71,15 @@ public class BusinessTransferCommand implements CommandExecutor{
 					int newBalance = businessBalance + playerBalance;
 					//Make sure the new balance is within the parameters
 					if(newBalance<0||newBalance>1000000) {
-						player.sendMessage(textUtils.basicText("Your balance must stay within 0 and 1,000,000 "+Main.access.currencyPlural+"!", TextColors.RED));
+						player.sendMessage(textUtils.basicText("Your balance must stay within 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
 						return;
 					}
 					//Attempt to transfer the money
-					if(!businessManager.setBusinessBalance(businessName, businessBalance-amount)) {
+					if(!businessManager.removeCurrency(businessName, amount)) {
 						player.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
 						return;
 					}
-					if(!playerManager.setBalance(player.getUniqueId().toString(), newBalance)) {
+					if(!playerManager.setBalance(player.getUniqueId().toString(), playerBalance+amount)) {
 						player.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
 						return;
 					}
@@ -93,7 +93,7 @@ public class BusinessTransferCommand implements CommandExecutor{
 				}
 
 			}
-		}).async().submit(Main.access);
+		}).async().submit(EconomyLite.access);
 		return CommandResult.success();
 	}
 	

@@ -1,12 +1,12 @@
 package me.Flibio.EconomyLite.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.FileManager.FileType;
 import me.Flibio.EconomyLite.Utils.MySQLManager.ChangeAction;
 import ninja.leaping.configurate.ConfigurationNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BusinessManager {
 	
@@ -31,9 +31,9 @@ public class BusinessManager {
 	 * 	Boolean based on if the method was successful or not
 	 */
 	public boolean createBusiness(String businessName) {
-		if(Main.access.sqlEnabled) {
+		if(EconomyLite.access.sqlEnabled) {
 			//MySQL
-			MySQLManager mySQL = Main.getMySQL();
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(mySQL.businessExists(businessName)) return false;
 			return mySQL.newBusiness(businessName);
 		} else {
@@ -63,8 +63,8 @@ public class BusinessManager {
 	 * 	Boolean based on if the business was found or not
 	 */
 	public boolean businessExists(String businessName) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			return mySQL.businessExists(businessName);
 		} else {
 			//Load and get the businesses file
@@ -92,8 +92,8 @@ public class BusinessManager {
 	 * 	Integer of the balance of the business(-1 if an error occured)
 	 */
 	public int getBusinessBalance(String businessName) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return -1;
 			return mySQL.getBusinessBalance(businessName);
 		} else {
@@ -127,8 +127,8 @@ public class BusinessManager {
 	 * 	Boolean based on if the method was successful or not
 	 */
 	public boolean setBusinessBalance(String businessName, int amount) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return false;
 			return mySQL.setBusinessBalance(businessName, amount);
 		} else {
@@ -139,14 +139,9 @@ public class BusinessManager {
 			if(businessExists(businessName)) {
 				ConfigurationNode business = getBusiness(businessName);
 				if(business==null) return false;
-				//Get and check the current balance
-				int currentBalance = getBusinessBalance(businessName);
-				if(currentBalance<0) return false;
-				//Get and check the new balance
-				int newBalance = currentBalance + amount;
-				if(newBalance<0||newBalance>1000000) return false;
+				if(amount<0||amount>1000000) return false;
 				//Change the balance
-				root.getNode(business.getKey()).getNode("balance").setValue(newBalance);
+				root.getNode(business.getKey()).getNode("balance").setValue(amount);
 				fileManager.saveFile(FileType.BUSINESS_DATA, root);
 				return true;
 			} else {
@@ -163,8 +158,8 @@ public class BusinessManager {
 	 * 	List of all owners of the specified business
 	 */
 	public ArrayList<String> getBusinessOwners(String businessName) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			return mySQL.getOwners(businessName);
 		} else {
 			//Check if business exists
@@ -189,8 +184,8 @@ public class BusinessManager {
 	 * 	Boolean based on the the player is an owner or not
 	 */
 	public boolean ownerExists(String businessName, String uuid) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return false;
 			return mySQL.getOwners(businessName).contains(uuid);
 		} else {
@@ -220,8 +215,8 @@ public class BusinessManager {
 	 * 	Boolean based on if the method was successful or not
 	 */
 	public boolean addOwner(String businessName, String uuid) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return false;
 			return mySQL.setOwner(ChangeAction.ADD, uuid, businessName);
 		} else {
@@ -254,8 +249,8 @@ public class BusinessManager {
 	 * 	Boolean based on if the method was successful or not
 	 */
 	public boolean removeOwner(String businessName, String uuid) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return false;
 			return mySQL.setOwner(ChangeAction.REMOVE, uuid, businessName);
 		} else {
@@ -285,8 +280,8 @@ public class BusinessManager {
 	 * 	Boolean based on if the method was successful or not
 	 */
 	public boolean deleteBusiness(String businessName) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return false;
 			return mySQL.deleteBusiness(businessName);
 		} else {
@@ -316,8 +311,8 @@ public class BusinessManager {
 	 * 	Boolean based on if the method was successful or not
 	 */
 	public boolean setConfirmationNeeded(String businessName, boolean needed) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return false;
 			return mySQL.setConfirm(businessName, needed);
 		} else {
@@ -345,8 +340,8 @@ public class BusinessManager {
 	 * 	Boolean based on if the business needs confirmation or not
 	 */
 	public boolean confirmationNeeded(String businessName) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return true;
 			return mySQL.needsConfirm(businessName);
 		} else {
@@ -368,8 +363,8 @@ public class BusinessManager {
 	 * 	Boolean based on if the method was successful or not
 	 */
 	public boolean setInvited(String businessName, String uuid, boolean inviteStatus) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return false;
 			if(inviteStatus){
 				return mySQL.setInvite(ChangeAction.ADD, uuid, businessName);
@@ -412,8 +407,8 @@ public class BusinessManager {
 	 * 	Boolean based on if the player was invited or not
 	 */
 	public boolean isInvited(String businessName, String uuid) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return false;
 			return mySQL.getInvited(businessName).contains(uuid);
 		} else {
@@ -468,8 +463,8 @@ public class BusinessManager {
 	 * 	Correctly capitalized business name, empty string if the business is not found
 	 */
 	public String getCorrectBusinessName(String businessName) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			if(!mySQL.businessExists(businessName)) return "";
 			return mySQL.getCapitalizedBusinessName(businessName);
 		} else {
@@ -496,8 +491,8 @@ public class BusinessManager {
 	 * 	An String ArrayList which contains all of the business names the owner is a part of
 	 */
 	public ArrayList<String> getBusinesses(String owner) {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			return mySQL.getBusinesses(owner);
 		} else {
 			//Load and get the business file
@@ -519,13 +514,39 @@ public class BusinessManager {
 	}
 	
 	/**
+	 * Adds the specified amount of currency to the specified business
+	 * @param uuid
+	 * 	Name of the business who will receive the currency
+	 * @param amount
+	 * 	Amount of currency the business will receive
+	 * @return
+	 * 	If the method failed or was successful
+	 */
+	public boolean addCurrency(String id, int amount) {
+		return setBusinessBalance(id, getBusinessBalance(id) + amount);
+	}
+	
+	/**
+	 * Removes the specified amount of currency from the specified business
+	 * @param uuid
+	 * 	Name of the business whom the currency will be taken from
+	 * @param amount
+	 * 	Amount of currency the business will lose
+	 * @return
+	 * 	If the method failed or was successful
+	 */
+	public boolean removeCurrency(String id, int amount) {
+		return setBusinessBalance(id, getBusinessBalance(id) - amount);
+	}
+	
+	/**
 	 * Gets a list of all the businesses
 	 * @return
 	 * 	An String ArrayList which contains all of the business names
 	 */
 	public ArrayList<String> getAllBusinesses() {
-		if(Main.access.sqlEnabled) {
-			MySQLManager mySQL = Main.getMySQL();
+		if(EconomyLite.access.sqlEnabled) {
+			MySQLManager mySQL = EconomyLite.getMySQL();
 			return mySQL.getAllBusinesses();
 		} else {
 			//Load and get the business file

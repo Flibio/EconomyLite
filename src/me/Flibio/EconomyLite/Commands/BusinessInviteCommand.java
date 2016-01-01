@@ -1,6 +1,6 @@
 package me.Flibio.EconomyLite.Commands;
 
-import me.Flibio.EconomyLite.Main;
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
@@ -21,7 +21,7 @@ public class BusinessInviteCommand implements CommandExecutor {
 	private TextUtils textUtils = new TextUtils();
 	private BusinessManager businessManager = new BusinessManager();
 	private PlayerManager playerManager = new PlayerManager();
-	private Builder taskBuilder = Main.access.game.getScheduler().createTaskBuilder();
+	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)
@@ -67,7 +67,7 @@ public class BusinessInviteCommand implements CommandExecutor {
 									//Attempt to send the invite
 									if(businessManager.setInvited(businessName, uuid, true)) {
 										//Success! - Check if the player is online and send them the invite if they are
-										for(Player p : Main.access.game.getServer().getOnlinePlayers()) {
+										for(Player p : EconomyLite.access.game.getServer().getOnlinePlayers()) {
 											if(p.getUniqueId().toString().equals(uuid)) {
 												//Player was found - send invite message
 												p.sendMessage(textUtils.invited(businessManager.getCorrectBusinessName(businessName)));
@@ -98,7 +98,7 @@ public class BusinessInviteCommand implements CommandExecutor {
 					return;
 				}
 			}
-		}).async().submit(Main.access);
+		}).async().submit(EconomyLite.access);
 		return CommandResult.success();
 	}
 
