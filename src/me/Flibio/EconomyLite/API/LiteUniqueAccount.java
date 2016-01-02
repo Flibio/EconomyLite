@@ -1,5 +1,6 @@
 package me.Flibio.EconomyLite.API;
 
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 
 import org.spongepowered.api.event.cause.Cause;
@@ -30,7 +31,7 @@ public class LiteUniqueAccount implements UniqueAccount {
 	public LiteUniqueAccount(UUID uuid) {
 		this.uuid = uuid;
 		this.playerManager = new PlayerManager();
-		this.liteCurrency = new LiteCurrency();
+		this.liteCurrency = (LiteCurrency) EconomyLite.getCurrency();
 	}
 
 	@Override

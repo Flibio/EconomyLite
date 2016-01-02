@@ -1,5 +1,6 @@
 package me.Flibio.EconomyLite.API;
 
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 
 import org.spongepowered.api.event.cause.Cause;
@@ -32,7 +33,7 @@ public class LiteVirtualAccount implements VirtualAccount {
 		this.id = id;
 		this.displayName = Text.of(id);
 		this.businessManager = new BusinessManager();
-		this.liteCurrency = new LiteCurrency();
+		this.liteCurrency = (LiteCurrency) EconomyLite.getCurrency();
 	}
 
 	@Override

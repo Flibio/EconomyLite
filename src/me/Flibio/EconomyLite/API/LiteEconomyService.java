@@ -1,5 +1,6 @@
 package me.Flibio.EconomyLite.API;
 
+import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 
@@ -78,7 +79,7 @@ public class LiteEconomyService implements EconomyService {
 
 	@Override
 	public Currency getDefaultCurrency() {
-		return new LiteCurrency();
+		return EconomyLite.getCurrency();
 	}
 
 }

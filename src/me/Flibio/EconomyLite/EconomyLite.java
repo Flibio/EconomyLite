@@ -1,6 +1,7 @@
 package me.Flibio.EconomyLite;
 
 import me.Flibio.EconomyLite.API.EconomyLiteAPI;
+import me.Flibio.EconomyLite.API.LiteCurrency;
 import me.Flibio.EconomyLite.API.LiteEconomyService;
 import me.Flibio.EconomyLite.Commands.AddCommand;
 import me.Flibio.EconomyLite.Commands.BalanceCommand;
@@ -44,7 +45,7 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.0")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.1")
 public class EconomyLite {
 	
 	@Inject
@@ -331,6 +332,9 @@ public class EconomyLite {
 	}
 	
 	public static Currency getCurrency() {
+		if(currency == null) {
+			currency = new LiteCurrency();
+		}
 		return currency;
 	}
 	
