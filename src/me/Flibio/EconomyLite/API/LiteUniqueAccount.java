@@ -1,8 +1,10 @@
 package me.Flibio.EconomyLite.API;
 
 import me.Flibio.EconomyLite.EconomyLite;
+import me.Flibio.EconomyLite.Events.LiteEconomyTransactionEvent;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
@@ -38,9 +40,13 @@ public class LiteUniqueAccount implements UniqueAccount {
 	public TransactionResult deposit(Currency currency, BigDecimal amount,
 			Cause cause, Set<Context> contexts) {
 		if(playerManager.addCurrency(uuid.toString(),amount.setScale(0, RoundingMode.HALF_UP).intValue())) {
-			return new LiteTransactionResult(this,amount,ResultType.SUCCESS,TransactionTypes.TRANSFER);
+			TransactionResult result = new LiteTransactionResult(this,amount,ResultType.SUCCESS,TransactionTypes.TRANSFER);
+			Sponge.getGame().getEventManager().post(new LiteEconomyTransactionEvent(result));
+			return result;
 		} else {
-			return new LiteTransactionResult(this,amount,ResultType.FAILED,TransactionTypes.TRANSFER);
+			TransactionResult result = new LiteTransactionResult(this,amount,ResultType.FAILED,TransactionTypes.TRANSFER);
+			Sponge.getGame().getEventManager().post(new LiteEconomyTransactionEvent(result));
+			return result;
 		}
 	}
 
@@ -91,9 +97,13 @@ public class LiteUniqueAccount implements UniqueAccount {
 	public TransactionResult setBalance(Currency currency, BigDecimal amount,
 			Cause cause, Set<Context> contexts) {
 		if(playerManager.setBalance(uuid.toString(),amount.setScale(0, RoundingMode.HALF_UP).intValue())) {
-			return new LiteTransactionResult(this,amount,ResultType.SUCCESS,TransactionTypes.TRANSFER);
+			TransactionResult result = new LiteTransactionResult(this,amount,ResultType.SUCCESS,TransactionTypes.TRANSFER);
+			Sponge.getGame().getEventManager().post(new LiteEconomyTransactionEvent(result));
+			return result;
 		} else {
-			return new LiteTransactionResult(this,amount,ResultType.FAILED,TransactionTypes.TRANSFER);
+			TransactionResult result = new LiteTransactionResult(this,amount,ResultType.FAILED,TransactionTypes.TRANSFER);
+			Sponge.getGame().getEventManager().post(new LiteEconomyTransactionEvent(result));
+			return result;
 		}
 	}
 
@@ -103,17 +113,25 @@ public class LiteUniqueAccount implements UniqueAccount {
 		int toAccountBal = account.getBalance(liteCurrency).setScale(0, RoundingMode.HALF_UP).intValue();
 		int amount = bigAmount.setScale(0, RoundingMode.HALF_UP).intValue();
 		if(toAccountBal+amount>1000000) {
-			return new LiteTransferResult(this,BigDecimal.valueOf(amount),ResultType.ACCOUNT_NO_SPACE,account);
+			TransferResult result = new LiteTransferResult(this,BigDecimal.valueOf(amount),ResultType.ACCOUNT_NO_SPACE,account);
+			Sponge.getGame().getEventManager().post(new LiteEconomyTransactionEvent(result));
+			return result;
 		} else {
 			if(getBalance(liteCurrency, new HashSet<Context>()).setScale(0, RoundingMode.HALF_UP).intValue()<amount) {
-				return new LiteTransferResult(this,BigDecimal.valueOf(amount),ResultType.ACCOUNT_NO_FUNDS,account);
+				TransferResult result = new LiteTransferResult(this,BigDecimal.valueOf(amount),ResultType.ACCOUNT_NO_FUNDS,account);
+				Sponge.getGame().getEventManager().post(new LiteEconomyTransactionEvent(result));
+				return result;
 			} else {
 				if(withdraw(liteCurrency,BigDecimal.valueOf(amount),cause,new HashSet<Context>()).getResult().equals(ResultType.SUCCESS)
 						&&account.deposit(liteCurrency,BigDecimal.valueOf(amount),cause,new HashSet<Context>()).getResult().
 						equals(ResultType.SUCCESS)) {
-					return new LiteTransferResult(this,BigDecimal.valueOf(amount),ResultType.SUCCESS,account);
+					TransferResult result = new LiteTransferResult(this,BigDecimal.valueOf(amount),ResultType.SUCCESS,account);
+					Sponge.getGame().getEventManager().post(new LiteEconomyTransactionEvent(result));
+					return result;
 				} else {
-					return new LiteTransferResult(this,BigDecimal.valueOf(amount),ResultType.FAILED,account);
+					TransferResult result = new LiteTransferResult(this,BigDecimal.valueOf(amount),ResultType.FAILED,account);
+					Sponge.getGame().getEventManager().post(new LiteEconomyTransactionEvent(result));
+					return result;
 				}
 			}
 		}
@@ -123,9 +141,13 @@ public class LiteUniqueAccount implements UniqueAccount {
 	public TransactionResult withdraw(Currency currency, BigDecimal amount,
 			Cause cause, Set<Context> contexts) {
 		if(playerManager.removeCurrency(uuid.toString(),amount.setScale(0, RoundingMode.HALF_UP).intValue())) {
-			return new LiteTransactionResult(this,amount,ResultType.SUCCESS,TransactionTypes.WITHDRAW);
+			TransactionResult result = new LiteTransactionResult(this,amount,ResultType.SUCCESS,TransactionTypes.WITHDRAW);
+			Sponge.getGame().getEventManager().post(new LiteEconomyTransactionEvent(result));
+			return result;
 		} else {
-			return new LiteTransactionResult(this,amount,ResultType.FAILED,TransactionTypes.WITHDRAW);
+			TransactionResult result = new LiteTransactionResult(this,amount,ResultType.FAILED,TransactionTypes.WITHDRAW);
+			Sponge.getGame().getEventManager().post(new LiteEconomyTransactionEvent(result));
+			return result;
 		}
 	}
 

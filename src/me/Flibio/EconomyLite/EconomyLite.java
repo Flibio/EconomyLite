@@ -45,7 +45,7 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.1")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.2")
 public class EconomyLite {
 	
 	@Inject
