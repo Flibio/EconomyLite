@@ -45,7 +45,7 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.2")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.3")
 public class EconomyLite {
 	
 	@Inject
@@ -56,6 +56,7 @@ public class EconomyLite {
 	
 	private FileManager fileManager;
 	private BusinessManager businessManager;
+	private static EconomyService economyService;
 	private static Currency currency;
 	
 	public static EconomyLite access;
@@ -98,7 +99,8 @@ public class EconomyLite {
 		registerCommands();
 		//Register EconomyLiteAPI
 		game.getServiceManager().setProvider(this, EconomyLiteAPI.class, new EconomyLiteAPI());
-		game.getServiceManager().setProvider(this, EconomyService.class, new LiteEconomyService());
+		economyService = new LiteEconomyService();
+		game.getServiceManager().setProvider(this, EconomyService.class, economyService);
 		logger.info("API registered successfully!");
 		//Start Metrics
 		if(optionEnabled("statistics")) {
@@ -336,6 +338,15 @@ public class EconomyLite {
 			currency = new LiteCurrency();
 		}
 		return currency;
+	}
+	
+	public static EconomyService getService() {
+		if(economyService==null) {
+			economyService = new LiteEconomyService();
+			return economyService;
+		} else {
+			return economyService;
+		}
 	}
 	
 	public static MySQLManager getMySQL() {

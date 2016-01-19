@@ -11,14 +11,24 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.scheduler.Task.Builder;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.service.economy.account.UniqueAccount;
+import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
+import java.util.UUID;
 
 public class PayOverrideCommand implements CommandExecutor{
 	
 	private TextUtils textUtils = new TextUtils();
+	private EconomyService economyService = EconomyLite.getService();
+	private Currency currency = EconomyLite.getService().getDefaultCurrency();
 	private PlayerManager playerManager = new PlayerManager();
 	private BusinessManager businessManager = new BusinessManager();
 	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
@@ -38,6 +48,10 @@ public class PayOverrideCommand implements CommandExecutor{
 				Player player = (Player) source;
 				
 				String uuid = player.getUniqueId().toString();
+				if(!playerManager.playerExists(uuid)) {
+					player.sendMessage(textUtils.basicText("An internal error has occurred!", TextColors.RED));
+					return;
+				}
 				
 				Optional<String> rawWhoType = args.<String>getOne("whoType");
 				Optional<Integer> rawAmount = args.<Integer>getOne("amount");
@@ -94,7 +108,8 @@ public class PayOverrideCommand implements CommandExecutor{
 	}
 	
 	private void payBusiness(String uuid, int amount, Player player, String businessName) {
-		int balance = playerManager.getBalance(uuid);
+		UniqueAccount account = economyService.getAccount(UUID.fromString(uuid)).get();
+		int balance = account.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue();
 		//Check for an error
 		if(balance>-1) {
 			//Check if the player has enough money
@@ -111,26 +126,29 @@ public class PayOverrideCommand implements CommandExecutor{
 					return;
 				} else {
 					//Process transaction
-					if(playerManager.removeCurrency(uuid, amount)&&businessManager.setBusinessBalance(businessName, newBalance)) {
+					if(account.withdraw(currency,BigDecimal.valueOf(amount),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)&&
+							businessManager.setBusinessBalance(businessName, newBalance)) {
 						//Success
 						player.sendMessage(textUtils.paySuccess(businessName, amount));
 						return;
 					} else {
 						//Error
-						player.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
+						player.sendMessage(textUtils.basicText("An internal error has occurred!", TextColors.RED));
 						return;
 					}
 				}
 			}
 		} else {
 			//Error
-			player.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
+			player.sendMessage(textUtils.basicText("An internal error has occurred!", TextColors.RED));
 			return;
 		}
 	}
 	
 	private void payPlayer(String uuid, int amount, Player player, String playerName, String targetUUID) {
-		int balance = playerManager.getBalance(uuid);
+		UniqueAccount account = economyService.getAccount(UUID.fromString(uuid)).get();
+		UniqueAccount targetAccount = economyService.getAccount(UUID.fromString(targetUUID)).get();
+		int balance = account.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue();
 		//Check for an error
 		if(balance>-1) {
 			//Check if the player has enough money
@@ -140,27 +158,28 @@ public class PayOverrideCommand implements CommandExecutor{
 				return;
 			} else {
 				//Check if the new balance is within parameters
-				int newBalance = playerManager.getBalance(targetUUID) + amount;
+				int newBalance = targetAccount.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue() + amount;
 				if(newBalance<0||newBalance>1000000) {
 					//Out of range
 					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
 					return;
 				} else {
 					//Process transaction
-					if(playerManager.removeCurrency(uuid, amount)&&playerManager.setBalance(targetUUID, newBalance)) {
+					if(account.withdraw(currency,BigDecimal.valueOf(amount),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)&&
+							targetAccount.setBalance(currency,BigDecimal.valueOf(newBalance),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)) {
 						//Success
 						player.sendMessage(textUtils.paySuccess(playerName, amount));
 						return;
 					} else {
 						//Error
-						player.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
+						player.sendMessage(textUtils.basicText("An internal error has occurred!", TextColors.RED));
 						return;
 					}
 				}
 			}
 		} else {
 			//Error
-			player.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
+			player.sendMessage(textUtils.basicText("An internal error has occurred!", TextColors.RED));
 			return;
 		}
 	}

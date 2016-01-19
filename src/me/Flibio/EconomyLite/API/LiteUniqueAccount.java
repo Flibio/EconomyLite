@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
+//Change whole deal to go through the EconomyService, add event to VirtualAccount
 public class LiteUniqueAccount implements UniqueAccount {
 	
 	private UUID uuid;

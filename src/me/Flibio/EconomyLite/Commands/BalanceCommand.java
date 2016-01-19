@@ -2,7 +2,6 @@ package me.Flibio.EconomyLite.Commands;
 
 import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
-import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
 
 import org.spongepowered.api.command.CommandException;
@@ -12,14 +11,19 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task.Builder;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.math.RoundingMode;
 import java.util.Optional;
 
 public class BalanceCommand implements CommandExecutor{
 	
 	private TextUtils textUtils = new TextUtils();
-	private PlayerManager playerManager = new PlayerManager();
+	private EconomyService economyService = EconomyLite.getService();
+	private Currency currency = EconomyLite.getService().getDefaultCurrency();
 	private BusinessManager businessManager = new BusinessManager();
 	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 	
@@ -73,15 +77,23 @@ public class BalanceCommand implements CommandExecutor{
 					}
 				} else {
 					//Player wants to view their balance
-					int balance = playerManager.getBalance(player.getUniqueId().toString());
-					if(balance<0) {
-						//Send error message
-						player.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
+					Optional<UniqueAccount> uOpt = economyService.getAccount(player.getUniqueId());
+					if(!uOpt.isPresent()) {
+						//Account is not present
+						source.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
 						return;
 					} else {
-						//Send player their balance
-						player.sendMessage(textUtils.playerBalanceText(balance));
-						return;
+						UniqueAccount account = uOpt.get();
+						int balance = account.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue();
+						if(balance<0) {
+							//Send error message
+							player.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
+							return;
+						} else {
+							//Send player their balance
+							player.sendMessage(textUtils.playerBalanceText(balance));
+							return;
+						}
 					}
 				}
 			}

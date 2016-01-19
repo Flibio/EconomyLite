@@ -2,7 +2,6 @@ package me.Flibio.EconomyLite.Commands;
 
 import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
-import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
 
 import org.spongepowered.api.command.CommandException;
@@ -11,17 +10,24 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.scheduler.Task.Builder;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.UUID;
 
 public class BusinessDeleteCommand implements CommandExecutor {
 	
 	private TextUtils textUtils = new TextUtils();
-	private BusinessManager businessManager = new BusinessManager();
-	private PlayerManager playerManager = new PlayerManager();
+	private BusinessManager businessManager = new BusinessManager();private EconomyService economyService = EconomyLite.getService();
+	private Currency currency = EconomyLite.getService().getDefaultCurrency();
+	//private PlayerManager playerManager = new PlayerManager();
 	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 
 	@Override
@@ -82,7 +88,15 @@ public class BusinessDeleteCommand implements CommandExecutor {
 									player.sendMessage(textUtils.deleteSuccess(correctName));
 									//Distribute funds to all owners
 									for(String uuid : owners) {
-										playerManager.addCurrency(uuid, eachGet);
+										Optional<UniqueAccount> uOpt = economyService.getAccount(UUID.fromString(uuid));
+										if(!uOpt.isPresent()) {
+											//Account is not present
+											source.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
+											return;
+										} else {
+											UniqueAccount account = uOpt.get();
+											account.deposit(currency, BigDecimal.valueOf(eachGet), Cause.of("EconomyLite"));
+										}
 									}
 									return;
 								} else {

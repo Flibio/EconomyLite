@@ -5,7 +5,6 @@ import me.Flibio.EconomyLite.Runnables.UpdateRunnable;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.FileManager;
 import me.Flibio.EconomyLite.Utils.FileManager.FileType;
-import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.ScoreboardUtils;
 import me.Flibio.EconomyLite.Utils.TextUtils;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -14,17 +13,24 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.scheduler.Task.Builder;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
+import java.util.UUID;
 
 public class PlayerJoinListener {
 
 	private FileManager fileManager = new FileManager();
 	private ScoreboardUtils scoreboardUtils = new ScoreboardUtils();
-	private PlayerManager playerManager = new PlayerManager();
+	private EconomyService economyService = EconomyLite.getService();
+	private Currency currency = EconomyLite.getService().getDefaultCurrency();
 	private Builder taskBuilder = EconomyLite.access.game.getScheduler().createTaskBuilder();
 	
 	@Listener
@@ -53,9 +59,13 @@ public class PlayerJoinListener {
 			Text balanceLabel = Text.builder("Balance: ").color(TextColors.GREEN).build();
 			
 			HashMap<Text, Integer> objectiveValues = new HashMap<Text, Integer>();
-			objectiveValues.put(balanceLabel, playerManager.getBalance(uuid));
-			
-			player.setScoreboard(scoreboardUtils.createScoreboard("EconomyLite", displayName, objectiveValues));
+			Optional<UniqueAccount> uOpt = economyService.getAccount(UUID.fromString(uuid));
+			if(uOpt.isPresent()) {
+				UniqueAccount account = uOpt.get();
+				objectiveValues.put(balanceLabel, account.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue());
+				
+				player.setScoreboard(scoreboardUtils.createScoreboard("EconomyLite", displayName, objectiveValues));
+			}
 		}
 		
 		//Check if an update is available
