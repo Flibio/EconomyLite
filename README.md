@@ -1,47 +1,49 @@
-# EconomyLite
+![EconomyLite](http://i.imgur.com/MsuOo9w.png)
 
-EconomyLite is a plugin made for [**Sponge**](https://spongepowered.org/). It is fully modular, with simple permissions and commands for ease of use. EconomyLite is fully released, but new releases are always being developed.
+EconomyLite is a lightweight, yet advanced economy plugin for your Sponge server. The plugin is built to be customizable, and you can enable and disable features at your will.
 
 ###Features
-***
- - Drag & Drop Installation
-  - Just drop EconomyLite into your "mods" folder with Sponge and start your server
- - Multi-Threaded
-  -  EconomyLite is multi-threaded for the best possible performance
- - Multiple Storage Options
-  - Store your data however you like, MySQL or on a local file
- -  Modular
-  - Almost every aspect of EconomyLite can be changed to suit your needs
- - Username Change Support
-  - Any player can change their name, and EconomyLite can handle it 
- - Businesses
-  - EconomyLite has full support for creating businesses
- 
-<br>
-###Downloads
 
-***
+- Drag & Drop Installation
+ - Just drop EconomyLite into your "mods" folder with Sponge and start your server
+- Multi-Threaded
+ - EconomyLite is multi-threaded for the best possible performance
+- Multiple Storage Options
+ - Store your data however you like, MySQL or on a local file
+- Modular
+ - Almost every aspect of EconomyLite can be changed to suit your needs
+- Username Changes
+ - Any player can change their name, and EconomyLite can handle it
+- Businesses
+ - EconomyLite has full support for creating businesses
+- Administration
+ - Built-in commands used to interact with EconomyLite
 
-EconomyLite is available to download now! Grab the latest release [**here!**](https://github.com/Flibio/EconomyLite/releases)
+###Installation
 
-<br>
+Drag and drop EconomyLite into your "mods" folder along with Sponge and start your server. The configuration file can be found in `config/EconomyLite/config.conf`.
 
-###Wiki
+---
 
-***
+:inbox_tray: [**Download EconomyLite**][1]
 
-To learn all about using EconomyLite, check out the [**wiki!**](https://github.com/Flibio/EconomyLite/wiki)
+:bangbang: [**Issue Tracker**][2]
 
-<br>
+:memo: [**Feature Suggestions**][3]
 
-###Issues & Bugs
+:wrench: [**Source Code**][4]
 
-***
+:books: [**Wiki**][5]
 
-Having an issue with EconomyLite? Found a bug? View the issue tracker on GitHub [**here!**](https://github.com/Flibio/EconomyLite/issues).
+:heavy_dollar_sign: [**Support Me**][6]
 
-###Support Me
+---
 
-***
+![EconomyLite Statistics](http://flibio.net/economylite/stats_img.php)
 
-[**Like my work? Please consider supporting me!**](http://flibio.weebly.com/support-me.html)
+[1]: https://github.com/Flibio/EconomyLite/releases
+[2]: https://github.com/Flibio/EconomyLite/issues
+[3]: https://github.com/Flibio/EconomyLite/issues
+[4]: https://github.com/Flibio/EconomyLite
+[5]: https://github.com/Flibio/EconomyLite/wiki
+[6]: http://flibio.weebly.com/support-me.html
