@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Statistics {
 
-	private final String USER_AGENT = "EconomyLite/1.0";
+	private final String USER_AGENT = "EconomyLite/2.0";
 	private String ip;
 	private boolean working = false;
 	
@@ -45,7 +45,7 @@ public class Statistics {
 							} catch(Exception e) {
 								EconomyLite.access.logger.error(e.getMessage());
 							}
-						}).async().interval(1, TimeUnit.MINUTES).delay(1, TimeUnit.MINUTES).submit(EconomyLite.access);
+						}).async().interval(15, TimeUnit.MINUTES).delay(1, TimeUnit.MINUTES).submit(EconomyLite.access);
 					}
 				} catch(Exception e) {
 					EconomyLite.access.logger.error(e.getMessage());
