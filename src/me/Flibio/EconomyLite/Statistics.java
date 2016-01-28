@@ -40,12 +40,12 @@ public class Statistics {
 						accessKey = response;
 						EconomyLite.access.game.getScheduler().createTaskBuilder().execute(t -> {
 							try {
-								post("http://api.flibio.net/pinger.php","key="+accessKey+"&ip="+this.ip+"&pl="+
-										EconomyLite.access.game.getServer().getOnlinePlayers().size());
+								System.out.println(post("http://api.flibio.net/pinger.php","key="+accessKey+"&ip="+this.ip+"&pl="+
+										EconomyLite.access.game.getServer().getOnlinePlayers().size()));
 							} catch(Exception e) {
 								EconomyLite.access.logger.error(e.getMessage());
 							}
-						}).async().interval(15, TimeUnit.MINUTES).delay(1, TimeUnit.MINUTES).submit(EconomyLite.access);
+						}).async().interval(15, TimeUnit.MINUTES).delay(15, TimeUnit.MINUTES).submit(EconomyLite.access);
 					}
 				} catch(Exception e) {
 					EconomyLite.access.logger.error(e.getMessage());

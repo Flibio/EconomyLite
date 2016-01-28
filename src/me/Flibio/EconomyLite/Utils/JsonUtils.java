@@ -12,6 +12,7 @@ public class JsonUtils {
 	public String parseToUUID(String json) {
 		Gson gson = new GsonBuilder().create();
     	JsonPlayerData data = gson.fromJson(json, JsonPlayerData.class);
+    	if(data==null) return "";
     	if(data.getID()==null) return "";
     	String uuid = data.getID();
     	return insertDashUUID(uuid);
@@ -29,6 +30,7 @@ public class JsonUtils {
 	public String getUrl(String json) {
 		Gson gson = new GsonBuilder().create();
     	JsonGitHubData data = gson.fromJson(json, JsonGitHubData.class);
+    	if(data==null) return "";
     	if(data.getUrl()==null) return "";
     	String url = data.getUrl();
     	return url;
@@ -37,6 +39,7 @@ public class JsonUtils {
 	public boolean isPreRelease(String json) {
 		Gson gson = new GsonBuilder().create();
     	JsonGitHubData data = gson.fromJson(json, JsonGitHubData.class);
+    	if(data==null) return true;
     	boolean isPre = data.isPreRelease();
     	return isPre;
 	}
