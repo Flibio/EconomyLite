@@ -1,7 +1,6 @@
 package me.Flibio.EconomyLite.Listeners;
 
 import me.Flibio.EconomyLite.EconomyLite;
-import me.Flibio.EconomyLite.Runnables.UpdateRunnable;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.FileManager;
 import me.Flibio.EconomyLite.Utils.FileManager.FileType;
@@ -67,9 +66,7 @@ public class PlayerJoinListener {
 				player.setScoreboard(scoreboardUtils.createScoreboard("EconomyLite", displayName, objectiveValues));
 			}
 		}
-		
-		//Check if an update is available
-		taskBuilder.execute(new UpdateRunnable(player)).async().submit(EconomyLite.access);
+
 		//Check if the player has any invites
 		taskBuilder.execute(new Runnable() {
 			public void run() {

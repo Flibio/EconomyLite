@@ -36,6 +36,18 @@ public class TextUtils {
 		return balanceText;
 	}
 	
+	public Text playerBalanceText(int balance, String who) {
+        Text balanceText = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+        String label = EconomyLite.access.currencyPlural;
+        if(balance==1) label = EconomyLite.access.currencySingular;
+
+        balanceText = balanceText.toBuilder().append(basicText(who+"'s balance: ",TextColors.YELLOW)).build();
+        balanceText = balanceText.toBuilder().append(basicText(balance+" ",TextColors.GREEN)).build();
+        balanceText = balanceText.toBuilder().append(basicText(label+"!",TextColors.DARK_GREEN)).build();
+        
+        return balanceText;
+    }
+	
 	public Text businessBalanceText(String businessName, int balance) {
 		Text balanceText = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
 		String label = EconomyLite.access.currencyPlural;
@@ -154,6 +166,34 @@ public class TextUtils {
 		
 		return text;
 	}
+	
+	public Text payed(String from, int amount) {
+        Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+        String label = EconomyLite.access.currencyPlural;
+        if(amount==1) label = EconomyLite.access.currencySingular;
+        
+        text = text.toBuilder().append(basicText("You have received ",TextColors.YELLOW)).build();
+        text = text.toBuilder().append(basicText(amount+" ",TextColors.GREEN)).build();
+        text = text.toBuilder().append(basicText(label,TextColors.DARK_GREEN)).build();
+        text = text.toBuilder().append(basicText(" from ",TextColors.YELLOW)).build();
+        text = text.toBuilder().append(basicText(from+"!",TextColors.GREEN)).build();
+        
+        return text;
+    }
+	
+	public Text bPayed(String from, int amount, String business) {
+        Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+        String label = EconomyLite.access.currencyPlural;
+        if(amount==1) label = EconomyLite.access.currencySingular;
+        
+        text = text.toBuilder().append(basicText(business+" has received ",TextColors.YELLOW)).build();
+        text = text.toBuilder().append(basicText(amount+" ",TextColors.GREEN)).build();
+        text = text.toBuilder().append(basicText(label,TextColors.DARK_GREEN)).build();
+        text = text.toBuilder().append(basicText(" from ",TextColors.YELLOW)).build();
+        text = text.toBuilder().append(basicText(from+"!",TextColors.GREEN)).build();
+        
+        return text;
+    }
 	
 	public Text leaveSuccess(String business) {
 		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();

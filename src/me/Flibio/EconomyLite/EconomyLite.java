@@ -14,6 +14,7 @@ import me.Flibio.EconomyLite.Commands.BusinessRegisterCommand;
 import me.Flibio.EconomyLite.Commands.BusinessTransferCommand;
 import me.Flibio.EconomyLite.Commands.PayCommand;
 import me.Flibio.EconomyLite.Commands.PayOverrideCommand;
+import me.Flibio.EconomyLite.Commands.PlayerBalanceCommand;
 import me.Flibio.EconomyLite.Commands.RemoveCommand;
 import me.Flibio.EconomyLite.Commands.SetCommand;
 import me.Flibio.EconomyLite.Listeners.BalanceChangeListener;
@@ -21,10 +22,9 @@ import me.Flibio.EconomyLite.Listeners.PlayerJoinListener;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.FileManager;
 import me.Flibio.EconomyLite.Utils.FileManager.FileType;
-import me.Flibio.EconomyLite.Utils.HttpUtils;
-import me.Flibio.EconomyLite.Utils.JsonUtils;
 import me.Flibio.EconomyLite.Utils.MySQLManager;
-import me.Flibio.EconomyLite.Utils.TextUtils;
+import me.flibio.updatifier.Updatifier;
+import net.minecrell.mcstats.SpongeStatsLite;
 import ninja.leaping.configurate.ConfigurationNode;
 
 import org.slf4j.Logger;
@@ -33,7 +33,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
@@ -45,7 +44,8 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.4")
+@Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v1.1.5")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.5")
 public class EconomyLite {
 	
 	@Inject
@@ -54,6 +54,8 @@ public class EconomyLite {
 	@Inject
 	public Game game;
 	
+	@Inject
+    private SpongeStatsLite statsLite;
 	private FileManager fileManager;
 	private BusinessManager businessManager;
 	private static EconomyService economyService;
@@ -75,6 +77,7 @@ public class EconomyLite {
 	@Listener
 	public void onServerInitialize(GameInitializationEvent event) {
 		logger.info("EconomyLite v"+version+" by Flibio initializing!");
+		this.statsLite.start();
 		//Set the access
 		access = this;
 
@@ -102,13 +105,6 @@ public class EconomyLite {
 		economyService = new LiteEconomyService();
 		game.getServiceManager().setProvider(this, EconomyService.class, economyService);
 		logger.info("API registered successfully!");
-		//Start Metrics
-		if(optionEnabled("statistics")) {
-			logger.info("Started EconomyLite Statistics!");
-			game.getEventManager().registerListeners(this, new Statistics());
-		} else {
-			logger.info("EconomyLite Statistics are disabled!");
-		}
 		//Reset business confirmations
 		game.getScheduler().createTaskBuilder().execute(new Runnable() {
 			public void run() {
@@ -119,42 +115,6 @@ public class EconomyLite {
 				}
 			}
 		}).async().submit(this);
-	}
-	
-	@Listener
-	public void onServerStarted(GameStartedServerEvent event) {
-		if(optionEnabled("updates")) {
-			Thread thread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					HttpUtils httpUtils = new HttpUtils();
-					JsonUtils jsonUtils = new JsonUtils();
-					TextUtils textUtils = new TextUtils();
-					//Check for an update
-					String latest = httpUtils.requestData("https://api.github.com/repos/Flibio/EconomyLite/releases/latest");
-					String version = jsonUtils.getVersion(latest).replace("v", "");
-					String changes = httpUtils.requestData("https://flibio.github.io/EconomyLite/changelogs/"+version.replaceAll("\\.", "-")+".txt");
-					String[] iChanges = changes.split(";");
-					String url = jsonUtils.getUrl(latest);
-					boolean prerelease = jsonUtils.isPreRelease(latest);
-					//Make sure the latest update is not a prerelease
-					if(!prerelease) {
-						//Check if the latest update is newer than the current one
-						String currentVersion = EconomyLite.access.version;
-						if(textUtils.versionCompare(version, currentVersion)>0) {
-							logger.info("EconomyLite v"+version+" is now available to download!");
-							logger.info(url);
-							for(String change : iChanges) {
-								if(!change.trim().isEmpty()) {
-									logger.info("+ "+change);
-								}
-							}
-						}
-					}
-				}	
-			});
-			thread.start();
-		}
 	}
 	
 	private void registerEvents() {
@@ -169,6 +129,12 @@ public class EconomyLite {
 			    .executor(new BalanceCommand())
 			    .build();
 		game.getCommandManager().register(this, balanceCommand, "balance", "bal");
+		CommandSpec pBalanceCommand = CommandSpec.builder()
+                .description(Text.of("View EconomyLite balance of another player"))
+                .arguments(GenericArguments.string(Text.of("player")))
+                .executor(new PlayerBalanceCommand())
+                .build();
+		game.getCommandManager().register(this, pBalanceCommand, "playerbalance", "pbal");
 		//Add Child Command
 		CommandSpec addCommand = CommandSpec.builder()
 			    .description(Text.of("Add currency to a player's balance"))
@@ -292,7 +258,6 @@ public class EconomyLite {
 		fileManager.testDefault("Scoreboard", "disabled");
 		fileManager.testDefault("Businesses", "enabled");
 		fileManager.testDefault("Plugin-Statistics", "enabled");
-		fileManager.testDefault("Update-Notifications", "enabled");
 		fileManager.testDefault("MySQL.Enabled", "disabled");
 		fileManager.testDefault("MySQL.Hostname", "hostname");
 		fileManager.testDefault("MySQL.Port", 3306);
@@ -311,7 +276,6 @@ public class EconomyLite {
 		configOptions.put("scoreboard", fileManager.getConfigValue("Scoreboard"));
 		configOptions.put("businesses", fileManager.getConfigValue("Businesses"));
 		configOptions.put("statistics", fileManager.getConfigValue("Plugin-Statistics"));
-		configOptions.put("updates", fileManager.getConfigValue("Update-Notifications"));
 		configOptions.put("mysql.enabled", fileManager.getConfigValue("MySQL.Enabled"));
 		configOptions.put("mysql.hostname", fileManager.getConfigValue("MySQL.Hostname"));
 		configOptions.put("mysql.port", fileManager.getConfigValue("MySQL.Port"));

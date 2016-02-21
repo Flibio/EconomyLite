@@ -5,6 +5,7 @@ import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.PlayerManager;
 import me.Flibio.EconomyLite.Utils.TextUtils;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -130,6 +131,13 @@ public class PayOverrideCommand implements CommandExecutor{
 							businessManager.setBusinessBalance(businessName, newBalance)) {
 						//Success
 						player.sendMessage(textUtils.paySuccess(businessName, amount));
+						for(String owner : businessManager.getBusinessOwners(businessName)) {
+						    Sponge.getServer().getOnlinePlayers().forEach(p -> {
+						        if(p.getName().equalsIgnoreCase(owner)) {
+						            p.sendMessage(textUtils.bPayed(player.getName(), amount, businessName));
+						        }
+						    });
+						}
 						return;
 					} else {
 						//Error
@@ -169,6 +177,11 @@ public class PayOverrideCommand implements CommandExecutor{
 							targetAccount.setBalance(currency,BigDecimal.valueOf(newBalance),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)) {
 						//Success
 						player.sendMessage(textUtils.paySuccess(playerName, amount));
+                        for(Player oPlayer : Sponge.getServer().getOnlinePlayers()) {
+                            if(oPlayer.getUniqueId().toString().equals(targetUUID)) {
+                                oPlayer.sendMessage(textUtils.payed(player.getName(),amount));
+                            }
+                        }
 						return;
 					} else {
 						//Error
