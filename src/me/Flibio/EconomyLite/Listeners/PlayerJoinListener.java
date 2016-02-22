@@ -2,11 +2,8 @@ package me.Flibio.EconomyLite.Listeners;
 
 import me.Flibio.EconomyLite.EconomyLite;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
-import me.Flibio.EconomyLite.Utils.FileManager;
-import me.Flibio.EconomyLite.Utils.FileManager.FileType;
 import me.Flibio.EconomyLite.Utils.ScoreboardUtils;
 import me.Flibio.EconomyLite.Utils.TextUtils;
-import ninja.leaping.configurate.ConfigurationNode;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -22,11 +19,9 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.UUID;
 
 public class PlayerJoinListener {
 
-	private FileManager fileManager = new FileManager();
 	private ScoreboardUtils scoreboardUtils = new ScoreboardUtils();
 	private EconomyService economyService = EconomyLite.getService();
 	private Currency currency = EconomyLite.getService().getDefaultCurrency();
@@ -35,22 +30,8 @@ public class PlayerJoinListener {
 	@Listener
 	public void onPlayerJoin(ClientConnectionEvent.Join event) {
 		Player player = (Player) event.getTargetEntity();
-		String uuid = player.getUniqueId().toString();
 		
-		if(EconomyLite.access.sqlEnabled) {
-			//Use MySQL
-			EconomyLite.getMySQL().newPlayer(uuid);
-		} else {
-			//Use local file
-			fileManager.loadFile(FileType.DATA);
-			ConfigurationNode root = fileManager.getFile(FileType.DATA);
-			
-			if(!root.getChildrenMap().containsKey(uuid)) {
-				//Doesn't contain UUID, add it
-				root.getNode(uuid).getNode("balance").setValue(0);
-				fileManager.saveFile(FileType.DATA, root);
-			}
-		}
+		economyService.createAccount(player.getUniqueId());
 		
 		//Show scoreboard if it is enabled
 		if(EconomyLite.optionEnabled("scoreboard")) {
@@ -58,7 +39,7 @@ public class PlayerJoinListener {
 			Text balanceLabel = Text.builder("Balance: ").color(TextColors.GREEN).build();
 			
 			HashMap<Text, Integer> objectiveValues = new HashMap<Text, Integer>();
-			Optional<UniqueAccount> uOpt = economyService.getAccount(UUID.fromString(uuid));
+			Optional<UniqueAccount> uOpt = economyService.getAccount(player.getUniqueId());
 			if(uOpt.isPresent()) {
 				UniqueAccount account = uOpt.get();
 				objectiveValues.put(balanceLabel, account.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue());
@@ -76,7 +57,7 @@ public class PlayerJoinListener {
 				ArrayList<String> businesses = manager.getAllBusinesses();
 				for(String business : businesses) {
 					if(manager.businessExists(business)) {
-						if(manager.isInvited(business, uuid)) {
+						if(manager.isInvited(business, player.getUniqueId().toString())) {
 							//Tell player that he/she is invited
 							player.sendMessage(textUtils.invited(manager.getCorrectBusinessName(business)));
 							player.sendMessage(textUtils.clickToContinue("/business inviteAccept "+business));

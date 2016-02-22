@@ -44,8 +44,8 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v1.1.5")
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.5")
+@Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v1.1.6")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.6")
 public class EconomyLite {
 	
 	@Inject
@@ -257,7 +257,7 @@ public class EconomyLite {
 		fileManager.testDefault("Currency-Plural", "Coins");
 		fileManager.testDefault("Scoreboard", "disabled");
 		fileManager.testDefault("Businesses", "enabled");
-		fileManager.testDefault("Plugin-Statistics", "enabled");
+		fileManager.testDefault("Default-Currency", 0);
 		fileManager.testDefault("MySQL.Enabled", "disabled");
 		fileManager.testDefault("MySQL.Hostname", "hostname");
 		fileManager.testDefault("MySQL.Port", 3306);
@@ -275,7 +275,7 @@ public class EconomyLite {
 		currencyPlural = configOptions.get("currencyPlural");
 		configOptions.put("scoreboard", fileManager.getConfigValue("Scoreboard"));
 		configOptions.put("businesses", fileManager.getConfigValue("Businesses"));
-		configOptions.put("statistics", fileManager.getConfigValue("Plugin-Statistics"));
+		configOptions.put("defaultCurrency", fileManager.getConfigValue("Default-Currency"));
 		configOptions.put("mysql.enabled", fileManager.getConfigValue("MySQL.Enabled"));
 		configOptions.put("mysql.hostname", fileManager.getConfigValue("MySQL.Hostname"));
 		configOptions.put("mysql.port", fileManager.getConfigValue("MySQL.Port"));
@@ -295,6 +295,15 @@ public class EconomyLite {
 	public static String getOption(String optionName) {
 		if(!configOptions.containsKey(optionName)) return "";
 		return configOptions.get(optionName);
+	}
+	
+	public static int getOptionInteger(String optionName) {
+	    if(!configOptions.containsKey(optionName)) return 0;
+	    try {
+	        return Integer.parseInt(configOptions.get(optionName));
+	    } catch(Exception e) {
+	        return 0;
+	    }
 	}
 	
 	public static Currency getCurrency() {

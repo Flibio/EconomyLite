@@ -31,7 +31,7 @@ public class LiteEconomyService implements EconomyService {
 		if(playerManager.playerExists(uuid.toString())) {
 			return Optional.of(new LiteUniqueAccount(uuid));
 		} else {
-			if(playerManager.registerPlayer(uuid.toString(),0)) {
+			if(playerManager.registerPlayer(uuid.toString(),EconomyLite.getOptionInteger("defaultCurrency"))) {
 				return Optional.of(new LiteUniqueAccount(uuid));
 			} else {
 				return Optional.empty();
