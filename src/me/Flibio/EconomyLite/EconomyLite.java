@@ -44,8 +44,8 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v1.1.6")
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.6")
+@Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v1.1.7")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.7")
 public class EconomyLite {
 	
 	@Inject
