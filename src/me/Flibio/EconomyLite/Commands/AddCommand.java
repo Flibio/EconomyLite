@@ -47,7 +47,7 @@ public class AddCommand implements CommandExecutor {
 					//Get the players UUID
 					String uuid = playerManager.getUUID(playerName);
 					if(!uuid.isEmpty()) {
-						Optional<UniqueAccount> uOpt = economyService.getAccount(UUID.fromString(uuid));
+						Optional<UniqueAccount> uOpt = economyService.getOrCreateAccount(UUID.fromString(uuid));
 						if(!uOpt.isPresent()) {
 							//Account is not present
 							source.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));

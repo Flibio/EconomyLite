@@ -161,9 +161,9 @@ public class LiteUniqueAccount implements UniqueAccount {
 		return this.uuid.toString();
 	}
 
-	@Override
-	public UUID getUUID() {
-		return this.uuid;
-	}
+    @Override
+    public UUID getUniqueId() {
+        return this.uuid;
+    }
 
 }

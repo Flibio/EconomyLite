@@ -33,6 +33,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
@@ -44,8 +45,8 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v1.1.8")
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.8", dependencies = "after: Updatifier")
+@Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v1.1.9")
+@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.1.9", dependencies = @Dependency(id = "Updatifier", optional = true))
 public class EconomyLite {
 	
 	@Inject

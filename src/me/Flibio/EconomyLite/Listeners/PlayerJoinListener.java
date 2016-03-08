@@ -31,7 +31,7 @@ public class PlayerJoinListener {
 	public void onPlayerJoin(ClientConnectionEvent.Join event) {
 		Player player = (Player) event.getTargetEntity();
 		
-		economyService.createAccount(player.getUniqueId());
+		economyService.getOrCreateAccount(player.getUniqueId());
 		
 		//Show scoreboard if it is enabled
 		if(EconomyLite.optionEnabled("scoreboard")) {
@@ -39,7 +39,7 @@ public class PlayerJoinListener {
 			Text balanceLabel = Text.builder("Balance: ").color(TextColors.GREEN).build();
 			
 			HashMap<Text, Integer> objectiveValues = new HashMap<Text, Integer>();
-			Optional<UniqueAccount> uOpt = economyService.getAccount(player.getUniqueId());
+			Optional<UniqueAccount> uOpt = economyService.getOrCreateAccount(player.getUniqueId());
 			if(uOpt.isPresent()) {
 				UniqueAccount account = uOpt.get();
 				objectiveValues.put(balanceLabel, account.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue());

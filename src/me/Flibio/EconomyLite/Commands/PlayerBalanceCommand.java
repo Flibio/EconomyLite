@@ -44,7 +44,7 @@ public class PlayerBalanceCommand implements CommandExecutor {
                     //Player wants to view another player's balance
                     String targetName = target.get();
                     String uuid = playerManager.getUUID(targetName);
-                    Optional<UniqueAccount> oAct = economyService.getAccount(UUID.fromString(uuid));
+                    Optional<UniqueAccount> oAct = economyService.getOrCreateAccount(UUID.fromString(uuid));
                     if(oAct.isPresent()) {
                         int balance = oAct.get().getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue();
                         if(balance<0) {

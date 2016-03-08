@@ -75,7 +75,7 @@ public class PayCommand implements CommandExecutor{
 						//Get the UUID and check if it exists
 						String targetUuid = playerManager.getUUID(who);
 						//Check if the uuid is a registered player
-						if(economyService.getAccount(UUID.fromString(targetUuid)).isPresent()) {
+						if(economyService.getOrCreateAccount(UUID.fromString(targetUuid)).isPresent()) {
 							//It is a player, is it also a business?
 							if(businessManager.businessExists(who)) {
 								//Present them with an option
@@ -115,7 +115,7 @@ public class PayCommand implements CommandExecutor{
 	}
 	
 	private void payBusiness(String uuid, int amount, Player player, String businessName) {
-		UniqueAccount account = economyService.getAccount(UUID.fromString(uuid)).get();
+		UniqueAccount account = economyService.getOrCreateAccount(UUID.fromString(uuid)).get();
 		int balance = account.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue();
 		//Check for an error
 		if(balance>-1) {
@@ -160,8 +160,8 @@ public class PayCommand implements CommandExecutor{
 	}
 	
 	private void payPlayer(String uuid, int amount, Player player, String playerName, String targetUUID) {
-		UniqueAccount account = economyService.getAccount(UUID.fromString(uuid)).get();
-		UniqueAccount targetAccount = economyService.getAccount(UUID.fromString(targetUUID)).get();
+		UniqueAccount account = economyService.getOrCreateAccount(UUID.fromString(uuid)).get();
+		UniqueAccount targetAccount = economyService.getOrCreateAccount(UUID.fromString(targetUUID)).get();
 		int balance = account.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue();
 		//Check for an error
 		if(balance>-1) {

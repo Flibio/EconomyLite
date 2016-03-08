@@ -51,7 +51,7 @@ public class BusinessTransferCommand implements CommandExecutor{
 					int amount = rawAmount.get();
 					String businessName = rawBusiness.get().trim();
 					String correctName = businessManager.getCorrectBusinessName(businessName);
-					Optional<UniqueAccount> uOpt = economyService.getAccount(player.getUniqueId());
+					Optional<UniqueAccount> uOpt = economyService.getOrCreateAccount(player.getUniqueId());
 					if(!uOpt.isPresent()) {
 						//Account is not present
 						source.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));

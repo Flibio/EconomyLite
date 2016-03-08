@@ -77,7 +77,7 @@ public class BalanceCommand implements CommandExecutor{
 					}
 				} else {
 					//Player wants to view their balance
-					Optional<UniqueAccount> uOpt = economyService.getAccount(player.getUniqueId());
+					Optional<UniqueAccount> uOpt = economyService.getOrCreateAccount(player.getUniqueId());
 					if(!uOpt.isPresent()) {
 						//Account is not present
 						source.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));

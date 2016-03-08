@@ -88,7 +88,7 @@ public class BusinessDeleteCommand implements CommandExecutor {
 									player.sendMessage(textUtils.deleteSuccess(correctName));
 									//Distribute funds to all owners
 									for(String uuid : owners) {
-										Optional<UniqueAccount> uOpt = economyService.getAccount(UUID.fromString(uuid));
+										Optional<UniqueAccount> uOpt = economyService.getOrCreateAccount(UUID.fromString(uuid));
 										if(!uOpt.isPresent()) {
 											//Account is not present
 											source.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));

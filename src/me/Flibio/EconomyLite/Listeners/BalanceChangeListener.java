@@ -34,7 +34,7 @@ public class BalanceChangeListener {
 			Text balanceLabel = Text.builder("Balance: ").color(TextColors.GREEN).build();
 			
 			HashMap<Text, Integer> objectiveValues = new HashMap<Text, Integer>();
-			Optional<UniqueAccount> uOpt = economyService.getAccount(uuid);
+			Optional<UniqueAccount> uOpt = economyService.getOrCreateAccount(uuid);
 			if(uOpt.isPresent()) {
 				UniqueAccount account = uOpt.get();
 				objectiveValues.put(balanceLabel, account.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue());

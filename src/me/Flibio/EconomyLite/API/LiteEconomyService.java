@@ -9,7 +9,6 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
-import org.spongepowered.api.service.economy.account.VirtualAccount;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -27,7 +26,7 @@ public class LiteEconomyService implements EconomyService {
 	}
 
 	@Override
-	public Optional<UniqueAccount> createAccount(UUID uuid) {
+	public Optional<UniqueAccount> getOrCreateAccount(UUID uuid) {
 		if(playerManager.playerExists(uuid.toString())) {
 			return Optional.of(new LiteUniqueAccount(uuid));
 		} else {
@@ -40,7 +39,7 @@ public class LiteEconomyService implements EconomyService {
 	}
 
 	@Override
-	public Optional<VirtualAccount> createVirtualAccount(String id) {
+	public Optional<Account> getOrCreateAccount(String id) {
 		if(businessManager.businessExists(id)) {
 			return Optional.of(new LiteVirtualAccount(id));
 		} else {
@@ -49,24 +48,6 @@ public class LiteEconomyService implements EconomyService {
 			} else {
 				return Optional.empty();
 			}
-		}
-	}
-
-	@Override
-	public Optional<UniqueAccount> getAccount(UUID uuid) {
-		if(playerManager.playerExists(uuid.toString())) {
-			return Optional.of(new LiteUniqueAccount(uuid));
-		} else {
-			return Optional.empty();
-		}
-	}
-
-	@Override
-	public Optional<Account> getAccount(String id) {
-		if(businessManager.businessExists(id)) {
-			return Optional.of(new LiteVirtualAccount(id));
-		} else {
-			return Optional.empty();
 		}
 	}
 
@@ -81,5 +62,15 @@ public class LiteEconomyService implements EconomyService {
 	public Currency getDefaultCurrency() {
 		return EconomyLite.getCurrency();
 	}
+
+    @Override
+    public boolean hasAccount(UUID uuid) {
+        return playerManager.playerExists(uuid.toString());
+    }
+
+    @Override
+    public boolean hasAccount(String id) {
+        return businessManager.businessExists(id);
+    }
 
 }
