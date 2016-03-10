@@ -1,10 +1,5 @@
 package me.Flibio.EconomyLite.Commands;
 
-import me.Flibio.EconomyLite.EconomyLite;
-import me.Flibio.EconomyLite.Utils.BusinessManager;
-import me.Flibio.EconomyLite.Utils.PlayerManager;
-import me.Flibio.EconomyLite.Utils.TextUtils;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -25,9 +20,13 @@ import java.math.RoundingMode;
 import java.util.Optional;
 import java.util.UUID;
 
+import me.Flibio.EconomyLite.EconomyLite;
+import me.Flibio.EconomyLite.Utils.BusinessManager;
+import me.Flibio.EconomyLite.Utils.PlayerManager;
+import me.Flibio.EconomyLite.Utils.TextUtils;
+
 public class PayOverrideCommand implements CommandExecutor{
-	
-	private TextUtils textUtils = new TextUtils();
+
 	private EconomyService economyService = EconomyLite.getService();
 	private Currency currency = EconomyLite.getService().getDefaultCurrency();
 	private PlayerManager playerManager = new PlayerManager();
@@ -37,74 +36,64 @@ public class PayOverrideCommand implements CommandExecutor{
 	@Override
 	public CommandResult execute(CommandSource source, CommandContext args)
 			throws CommandException {
-		//Run in a seperate thread
-		taskBuilder.execute(new Runnable() {
-			public void run() {
-				//Make sure the source is a player
-				if(!(source instanceof Player)) {
-					source.sendMessage(textUtils.basicText("You must be a player to use /pay!", TextColors.RED));
-					return;
-				}
-				
-				Player player = (Player) source;
-				
-				String uuid = player.getUniqueId().toString();
-				if(!playerManager.playerExists(uuid)) {
-					player.sendMessage(textUtils.basicText("An internal error has occurred!", TextColors.RED));
-					return;
-				}
-				
-				Optional<String> rawWhoType = args.<String>getOne("whoType");
-				Optional<Integer> rawAmount = args.<Integer>getOne("amount");
-				Optional<String> rawWho = args.<String>getOne("who");
-				if(rawWhoType.isPresent()&&rawWho.isPresent()&&rawAmount.isPresent()) {
-					//Both parameters are present
-					String whoType = rawWhoType.get();
-					int amount = rawAmount.get();
-					String who = rawWho.get();
-					
-					if(whoType.equalsIgnoreCase("player")) {
-						//Who is a player
-						if(who.equalsIgnoreCase(player.getName())) {
-							player.sendMessage(textUtils.basicText("Why would you pay yourself!?", TextColors.RED));
-							return;
-						}
-						String playerName = who;
-						String playerUUID = playerManager.getUUID(playerName);
-						if(playerManager.playerExists(playerUUID)) {
-							//Pay player
-							payPlayer(uuid, amount, player, playerName, playerUUID);
-							return;
-						} else {
-							//Player not found
-							player.sendMessage(textUtils.basicText("That player could not be found!", TextColors.RED));
-							return;
-						}
-					} else if(whoType.equalsIgnoreCase("business")) {
-						//Who is a business
-						String businessName = who;
-						if(businessManager.businessExists(businessName)) {
-							//Pay business
-							payBusiness(uuid, amount, player, businessName);
-							return;
-						} else {
-							//Business not found
-							player.sendMessage(textUtils.basicText("That business could not be found!", TextColors.RED));
-							return;
-						}
-					} else {
-						//An error occured
-						player.sendMessage(textUtils.basicText("An internal error has occured!", TextColors.RED));
-						return;
-					}
-				} else {
-					//An error occured
-					player.sendMessage(textUtils.basicText("An internal error has occured!pp", TextColors.RED));
-					return;
-				}
+		//Run in a separate thread
+		taskBuilder.execute(() -> {
+            //Make sure the source is a player
+            if(!(source instanceof Player)) {
+                source.sendMessage(TextUtils.basicText("You must be a player to use /pay!", TextColors.RED));
+                return;
+            }
 
-			}
-		}).async().submit(EconomyLite.access);
+            Player player = (Player) source;
+
+            String uuid = player.getUniqueId().toString();
+            if(!playerManager.playerExists(uuid)) {
+                player.sendMessage(TextUtils.basicText("An internal error has occurred!", TextColors.RED));
+                return;
+            }
+
+            Optional<String> rawWhoType = args.<String>getOne("whoType");
+            Optional<Integer> rawAmount = args.<Integer>getOne("amount");
+            Optional<String> rawWho = args.<String>getOne("who");
+            if(rawWhoType.isPresent()&&rawWho.isPresent()&&rawAmount.isPresent()) {
+                //Both parameters are present
+                String whoType = rawWhoType.get();
+                int amount = rawAmount.get();
+                String who = rawWho.get();
+
+                if(whoType.equalsIgnoreCase("player")) {
+                    //Who is a player
+                    if(who.equalsIgnoreCase(player.getName())) {
+                        player.sendMessage(TextUtils.basicText("Why would you pay yourself!?", TextColors.RED));
+                        return;
+                    }
+					String playerUUID = playerManager.getUUID(who); //Who is a player name
+                    if(playerManager.playerExists(playerUUID)) {
+                        //Pay player
+                        payPlayer(uuid, amount, player, who/*Who is a player name*/, playerUUID);
+                    } else {
+                        //Player not found
+                        player.sendMessage(TextUtils.basicText("That player could not be found!", TextColors.RED));
+                    }
+                } else if(whoType.equalsIgnoreCase("business")) {
+                    //Who is a business
+					if(businessManager.businessExists(who /*Who is a business*/)) {
+                        //Pay business
+                        payBusiness(uuid, amount, player, who);
+                    } else {
+                        //Business not found
+                        player.sendMessage(TextUtils.basicText("That business could not be found!", TextColors.RED));
+                    }
+                } else {
+                    //An error occurred
+                    player.sendMessage(TextUtils.basicText("An internal error has occurred!", TextColors.RED));
+                }
+            } else {
+                //An error occurred
+                player.sendMessage(TextUtils.basicText("An internal error has occurred!", TextColors.RED));
+            }
+
+        }).async().submit(EconomyLite.access);
 		return CommandResult.success();
 	}
 	
@@ -116,40 +105,35 @@ public class PayOverrideCommand implements CommandExecutor{
 			//Check if the player has enough money
 			if(amount>balance) {
 				//Player doesn't have enough funds
-				player.sendMessage(textUtils.basicText("You don't have enough money to pay!", TextColors.RED));
-				return;
+				player.sendMessage(TextUtils.basicText("You don't have enough money to pay!", TextColors.RED));
 			} else {
 				//Check if the new balance is within parameters
 				int newBalance = businessManager.getBusinessBalance(businessName) + amount;
 				if(newBalance<0||newBalance>1000000) {
 					//Out of range
-					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
-					return;
+					player.sendMessage(TextUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
 				} else {
 					//Process transaction
 					if(account.withdraw(currency,BigDecimal.valueOf(amount),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)&&
 							businessManager.setBusinessBalance(businessName, newBalance)) {
 						//Success
-						player.sendMessage(textUtils.paySuccess(businessName, amount));
+						player.sendMessage(TextUtils.paySuccess(businessName, amount));
 						for(String owner : businessManager.getBusinessOwners(businessName)) {
 						    Sponge.getServer().getOnlinePlayers().forEach(p -> {
 						        if(p.getName().equalsIgnoreCase(owner)) {
-						            p.sendMessage(textUtils.bPayed(player.getName(), amount, businessName));
+						            p.sendMessage(TextUtils.bPayed(player.getName(), amount, businessName));
 						        }
 						    });
 						}
-						return;
 					} else {
 						//Error
-						player.sendMessage(textUtils.basicText("An internal error has occurred!", TextColors.RED));
-						return;
+						player.sendMessage(TextUtils.basicText("An internal error has occurred!", TextColors.RED));
 					}
 				}
 			}
 		} else {
 			//Error
-			player.sendMessage(textUtils.basicText("An internal error has occurred!", TextColors.RED));
-			return;
+			player.sendMessage(TextUtils.basicText("An internal error has occurred!", TextColors.RED));
 		}
 	}
 	
@@ -162,38 +146,31 @@ public class PayOverrideCommand implements CommandExecutor{
 			//Check if the player has enough money
 			if(amount>balance) {
 				//Player doesn't have enough funds
-				player.sendMessage(textUtils.basicText("You don't have enough money to pay!", TextColors.RED));
-				return;
+				player.sendMessage(TextUtils.basicText("You don't have enough money to pay!", TextColors.RED));
 			} else {
 				//Check if the new balance is within parameters
 				int newBalance = targetAccount.getBalance(currency).setScale(0, RoundingMode.HALF_UP).intValue() + amount;
 				if(newBalance<0||newBalance>1000000) {
 					//Out of range
-					player.sendMessage(textUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
-					return;
+					player.sendMessage(TextUtils.basicText("The new balance must be in-between 0 and 1,000,000 "+EconomyLite.access.currencyPlural+"!", TextColors.RED));
 				} else {
 					//Process transaction
 					if(account.withdraw(currency,BigDecimal.valueOf(amount),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)&&
 							targetAccount.setBalance(currency,BigDecimal.valueOf(newBalance),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)) {
 						//Success
-						player.sendMessage(textUtils.paySuccess(playerName, amount));
-                        for(Player oPlayer : Sponge.getServer().getOnlinePlayers()) {
-                            if(oPlayer.getUniqueId().toString().equals(targetUUID)) {
-                                oPlayer.sendMessage(textUtils.payed(player.getName(),amount));
-                            }
-                        }
-						return;
+						player.sendMessage(TextUtils.paySuccess(playerName, amount));
+						Sponge.getServer().getOnlinePlayers().stream().filter(oPlayer -> oPlayer.getUniqueId().toString().equals(targetUUID)).forEach(oPlayer -> {
+							oPlayer.sendMessage(TextUtils.payed(player.getName(), amount));
+						});
 					} else {
 						//Error
-						player.sendMessage(textUtils.basicText("An internal error has occurred!", TextColors.RED));
-						return;
+						player.sendMessage(TextUtils.basicText("An internal error has occurred!", TextColors.RED));
 					}
 				}
 			}
 		} else {
 			//Error
-			player.sendMessage(textUtils.basicText("An internal error has occurred!", TextColors.RED));
-			return;
+			player.sendMessage(TextUtils.basicText("An internal error has occurred!", TextColors.RED));
 		}
 	}
 	

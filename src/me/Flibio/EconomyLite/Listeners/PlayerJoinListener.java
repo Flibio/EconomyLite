@@ -1,10 +1,5 @@
 package me.Flibio.EconomyLite.Listeners;
 
-import me.Flibio.EconomyLite.EconomyLite;
-import me.Flibio.EconomyLite.Utils.BusinessManager;
-import me.Flibio.EconomyLite.Utils.ScoreboardUtils;
-import me.Flibio.EconomyLite.Utils.TextUtils;
-
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -20,6 +15,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
+import me.Flibio.EconomyLite.EconomyLite;
+import me.Flibio.EconomyLite.Utils.BusinessManager;
+import me.Flibio.EconomyLite.Utils.ScoreboardUtils;
+import me.Flibio.EconomyLite.Utils.TextUtils;
+
 public class PlayerJoinListener {
 
 	private ScoreboardUtils scoreboardUtils = new ScoreboardUtils();
@@ -29,7 +29,7 @@ public class PlayerJoinListener {
 	
 	@Listener
 	public void onPlayerJoin(ClientConnectionEvent.Join event) {
-		Player player = (Player) event.getTargetEntity();
+		Player player = event.getTargetEntity();
 		
 		economyService.getOrCreateAccount(player.getUniqueId());
 		
@@ -38,7 +38,7 @@ public class PlayerJoinListener {
 			Text displayName = Text.builder("EconomyLite").color(TextColors.YELLOW).build();
 			Text balanceLabel = Text.builder("Balance: ").color(TextColors.GREEN).build();
 			
-			HashMap<Text, Integer> objectiveValues = new HashMap<Text, Integer>();
+			HashMap<Text, Integer> objectiveValues = new HashMap<>();
 			Optional<UniqueAccount> uOpt = economyService.getOrCreateAccount(player.getUniqueId());
 			if(uOpt.isPresent()) {
 				UniqueAccount account = uOpt.get();
@@ -49,23 +49,17 @@ public class PlayerJoinListener {
 		}
 
 		//Check if the player has any invites
-		taskBuilder.execute(new Runnable() {
-			public void run() {
-				BusinessManager manager = new BusinessManager();
-				TextUtils textUtils = new TextUtils();
-				
-				ArrayList<String> businesses = manager.getAllBusinesses();
-				for(String business : businesses) {
-					if(manager.businessExists(business)) {
-						if(manager.isInvited(business, player.getUniqueId().toString())) {
-							//Tell player that he/she is invited
-							player.sendMessage(textUtils.invited(manager.getCorrectBusinessName(business)));
-							player.sendMessage(textUtils.clickToContinue("/business inviteAccept "+business));
-						}
-					}
-				}
-			}
-		}).async().submit(EconomyLite.access);
+		taskBuilder.execute(() -> {
+            BusinessManager manager = new BusinessManager();
+
+            ArrayList<String> businesses = manager.getAllBusinesses();
+			//Tell player that he/she is invited
+			businesses.stream().filter(manager::businessExists).filter(business -> manager.isInvited(business, player.getUniqueId().toString())).forEach(business -> {
+				//Tell player that he/she is invited
+				player.sendMessage(TextUtils.invited(manager.getCorrectBusinessName(business)));
+				player.sendMessage(TextUtils.clickToContinue("/business inviteAccept " + business));
+			});
+        }).async().submit(EconomyLite.access);
 	}
 	
 }
