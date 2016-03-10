@@ -1,7 +1,5 @@
 package me.Flibio.EconomyLite.Utils;
 
-import me.Flibio.EconomyLite.EconomyLite;
-
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
@@ -10,22 +8,23 @@ import org.spongepowered.api.text.format.TextColors;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import me.Flibio.EconomyLite.EconomyLite;
+
 public class TextUtils {
-	
-	public TextUtils() {
-		
+    
+	private TextUtils() {
 	}
 	
-	public Text basicText(String text, TextColor color) {
+	public static Text basicText(String text, TextColor color) {
 		return Text.builder(text).color(color).build();
 	}
 	
-	public Text basicText(String text) {
+	public static Text basicText(String text) {
 		return Text.builder(text).build();
 	}
 	
-	public Text playerBalanceText(int balance) {
-		Text balanceText = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text playerBalanceText(int balance) {
+		Text balanceText = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		String label = EconomyLite.access.currencyPlural;
 		if(balance==1) label = EconomyLite.access.currencySingular;
 
@@ -36,8 +35,8 @@ public class TextUtils {
 		return balanceText;
 	}
 	
-	public Text playerBalanceText(int balance, String who) {
-        Text balanceText = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text playerBalanceText(int balance, String who) {
+        Text balanceText = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
         String label = EconomyLite.access.currencyPlural;
         if(balance==1) label = EconomyLite.access.currencySingular;
 
@@ -48,8 +47,8 @@ public class TextUtils {
         return balanceText;
     }
 	
-	public Text businessBalanceText(String businessName, int balance) {
-		Text balanceText = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text businessBalanceText(String businessName, int balance) {
+		Text balanceText = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		String label = EconomyLite.access.currencyPlural;
 		if(balance==1) label = EconomyLite.access.currencySingular;
 
@@ -60,8 +59,8 @@ public class TextUtils {
 		return balanceText;
 	}
 	
-	public Text successfulBalanceChangeText(String playerName, int balance) {
-		Text balanceText = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text successfulBalanceChangeText(String playerName, int balance) {
+		Text balanceText = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		String label = EconomyLite.access.currencyPlural;
 		if(balance==1) label = EconomyLite.access.currencySingular;
 		
@@ -74,8 +73,8 @@ public class TextUtils {
 		return balanceText;
 	}
 	
-	public Text successfulBusinessRegister(String businessName) {
-		Text balanceText = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text successfulBusinessRegister(String businessName) {
+		Text balanceText = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		
 		balanceText = balanceText.toBuilder().append(basicText("Successfully registered ",TextColors.YELLOW)).build();
 		balanceText = balanceText.toBuilder().append(basicText(businessName,TextColors.GREEN)).build();
@@ -84,7 +83,7 @@ public class TextUtils {
 		return balanceText;
 	}
 	
-	public Text updateAvailable(String version, String url) {
+	public static Text updateAvailable(String version, String url) {
 		Text text = Text.builder("EconomyLite").color(TextColors.GREEN).build();
 		text = text.toBuilder().append(basicText(" v"+version,TextColors.LIGHT_PURPLE)).build();
 		text = text.toBuilder().append(basicText(" is now available to download! ",TextColors.YELLOW)).build();
@@ -95,8 +94,8 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text editingBalance(String player) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text editingBalance(String player) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		
 		text = text.toBuilder().append(basicText("Changing ",TextColors.YELLOW)).build();
 		text = text.toBuilder().append(basicText(player+"'s ",TextColors.GREEN)).build();
@@ -106,7 +105,7 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text payOptionPlayer(String playerName, int amount) {
+	public static Text payOptionPlayer(String playerName, int amount) {
 		Text text = Text.builder("[").color(TextColors.GRAY).build();
 		
 		text = text.toBuilder().append(basicText("Pay ", TextColors.YELLOW)).build();
@@ -123,7 +122,7 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text payOptionBusiness(String businessName, int amount) {
+	public static Text payOptionBusiness(String businessName, int amount) {
 		Text text = Text.builder("[").color(TextColors.GRAY).build();
 		
 		text = text.toBuilder().append(basicText("Pay ", TextColors.YELLOW)).build();
@@ -140,8 +139,8 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text payOption(String who) {
-		Text balanceText = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text payOption(String who) {
+		Text balanceText = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		
 		balanceText = balanceText.toBuilder().append(basicText(who,TextColors.GREEN)).build();
 		balanceText = balanceText.toBuilder().append(basicText(" is both a ",TextColors.YELLOW)).build();
@@ -153,8 +152,8 @@ public class TextUtils {
 		return balanceText;
 	}
 	
-	public Text paySuccess(String who, int amount) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text paySuccess(String who, int amount) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		String label = EconomyLite.access.currencyPlural;
 		if(amount==1) label = EconomyLite.access.currencySingular;
 		
@@ -167,8 +166,8 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text payed(String from, int amount) {
-        Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text payed(String from, int amount) {
+        Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
         String label = EconomyLite.access.currencyPlural;
         if(amount==1) label = EconomyLite.access.currencySingular;
         
@@ -181,8 +180,8 @@ public class TextUtils {
         return text;
     }
 	
-	public Text bPayed(String from, int amount, String business) {
-        Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text bPayed(String from, int amount, String business) {
+        Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
         String label = EconomyLite.access.currencyPlural;
         if(amount==1) label = EconomyLite.access.currencySingular;
         
@@ -195,8 +194,8 @@ public class TextUtils {
         return text;
     }
 	
-	public Text leaveSuccess(String business) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text leaveSuccess(String business) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		
 		text = text.toBuilder().append(basicText("Successfully left ",TextColors.YELLOW)).build();
 		text = text.toBuilder().append(basicText(business+"!",TextColors.GREEN)).build();
@@ -204,8 +203,8 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text leaveOnlyOwner(String business) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text leaveOnlyOwner(String business) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		
 		text = text.toBuilder().append(basicText("Since you are the only owner of ",TextColors.YELLOW)).build();
 		text = text.toBuilder().append(basicText(business,TextColors.GREEN)).build();
@@ -215,7 +214,7 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text clickToContinue(String command) {
+	public static Text clickToContinue(String command) {
 		Text text = basicText("[",TextColors.GRAY);
 		text = text.toBuilder().append(basicText("CLICK TO CONTINUE",TextColors.GREEN)).build();
 		text = text.toBuilder().append(basicText("]",TextColors.GRAY)).build();
@@ -229,8 +228,8 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text deleteSuccess(String what) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text deleteSuccess(String what) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		text = text.toBuilder().append(basicText("Sucessfully ",TextColors.YELLOW)).build();
 		text = text.toBuilder().append(basicText("deleted ",TextColors.RED)).build();
 		text = text.toBuilder().append(basicText(what+"!",TextColors.GREEN)).build();
@@ -238,8 +237,8 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text invited(String what) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text invited(String what) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		text = text.toBuilder().append(basicText("You have been invited to join ",TextColors.YELLOW)).build();
 		text = text.toBuilder().append(basicText(what+"!",TextColors.GREEN)).build();
 		text = text.toBuilder().append(basicText(" Click continue to accept!",TextColors.YELLOW)).build();
@@ -247,16 +246,16 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text inviteAccept(String what) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text inviteAccept(String what) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		text = text.toBuilder().append(basicText("You are now an owner of ",TextColors.YELLOW)).build();
 		text = text.toBuilder().append(basicText(what+"!",TextColors.GREEN)).build();
 		
 		return text;
 	}
 	
-	public Text successfulInvite(String what, String who) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text successfulInvite(String what, String who) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		text = text.toBuilder().append(basicText("Successfully invited ",TextColors.YELLOW)).build();
 		text = text.toBuilder().append(basicText(who,TextColors.GREEN)).build();
 		text = text.toBuilder().append(basicText(" to join ",TextColors.YELLOW)).build();
@@ -265,8 +264,8 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text aboutToDelete(String what) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text aboutToDelete(String what) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		text = text.toBuilder().append(basicText(what,TextColors.GREEN)).build();
 		text = text.toBuilder().append(basicText(" is about to be ",TextColors.YELLOW)).build();
 		text = text.toBuilder().append(basicText("deleted. ",TextColors.RED)).build();
@@ -275,8 +274,8 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text transferSuccess(String businessName, int amount) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text transferSuccess(String businessName, int amount) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		String label = EconomyLite.access.currencyPlural;
 		if(amount==1) label = EconomyLite.access.currencySingular;
 		
@@ -290,8 +289,8 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text ownersTitle(String businessName) {
-		Text text = Text.builder("EconomyLite » ").color(TextColors.GOLD).build();
+	public static Text ownersTitle(String businessName) {
+		Text text = Text.builder("EconomyLite ï¿½ ").color(TextColors.GOLD).build();
 		
 		text = text.toBuilder().append(basicText("Owners of ",TextColors.YELLOW)).build();
 		text = text.toBuilder().append(basicText(businessName+":",TextColors.GREEN)).build();
@@ -299,7 +298,7 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text owner(String owner) {
+	public static Text owner(String owner) {
 		Text text = Text.builder(" + ").color(TextColors.YELLOW).build();
 		
 		text = text.toBuilder().append(basicText(owner,TextColors.GREEN)).build();
@@ -307,7 +306,7 @@ public class TextUtils {
 		return text;
 	}
 	
-	public Text change(String change) {
+	public static Text change(String change) {
 		Text text = Text.builder(" + ").color(TextColors.YELLOW).build();
 		
 		text = text.toBuilder().append(basicText(change,TextColors.GREEN)).build();
