@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>EconomyLite</groupId>
   <artifactId>EconomyLite</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
   <packaging>jar</packaging>
   <name>EconomyLite</name>
   <description>An economy plugin for Sponge</description>
@@ -29,6 +29,18 @@
             <goals>
               <goal>shade</goal>
             </goals>
+            <configuration>
+              <relocations>
+                <relocation>
+                  <pattern>net.minecrell.mcstats</pattern>
+                  <shadedPattern>me.Flibio.EconomyLite.mcstats</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>me.flibio.updatifier</pattern>
+                  <shadedPattern>me.Flibio.EconomyLite.updatifier</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -67,7 +79,8 @@
         <groupId>com.github.Flibio</groupId>
         <artifactId>Updatifier</artifactId>
         <version>RELEASE</version>
-        <scope>provided</scope>
+        <classifier>api</classifier>
+        <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>net.minecrell.mcstats</groupId>
