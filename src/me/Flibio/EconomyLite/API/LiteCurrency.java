@@ -49,4 +49,13 @@ public class LiteCurrency implements Currency {
 		}
 	}
 
+	@Override
+	public String getId() {
+		return "economylite:currency";
+	}
+
+	@Override
+	public String getName() {
+		return "EconomyLite Currency";
+	}
 }

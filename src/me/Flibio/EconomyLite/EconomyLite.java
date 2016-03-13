@@ -46,7 +46,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 @Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v1.2.0")
-@Plugin(id = "EconomyLite", name = "EconomyLite", version = "1.2.0", dependencies = @Dependency(id = "Updatifier", optional = true))
+@Plugin(id = "me.flibio.economylite.economylite", name = "EconomyLite", version = "1.2.0", description = "EconmyLite provides simple economy handling.", dependencies = @Dependency(id = "Updatifier", optional = true))
 public class EconomyLite {
 	
 	@Inject

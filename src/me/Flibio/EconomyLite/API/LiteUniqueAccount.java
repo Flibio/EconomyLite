@@ -89,8 +89,10 @@ public class LiteUniqueAccount implements UniqueAccount {
 	}
 
 	@Override
-	public TransactionResult resetBalances(Cause cause, Set<Context> contexts) {
-		return resetBalance(liteCurrency,cause,contexts);
+	public Map<Currency, TransactionResult> resetBalances(Cause cause, Set<Context> contexts) {
+		Map<Currency, TransactionResult> map = new HashMap<>();
+		map.put(liteCurrency, resetBalance(liteCurrency,cause,contexts));
+		return map;
 	}
 
 	@Override

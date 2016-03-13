@@ -13,6 +13,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.scheduler.Task.Builder;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
@@ -127,7 +128,7 @@ public class PayOverrideCommand implements CommandExecutor{
 					return;
 				} else {
 					//Process transaction
-					if(account.withdraw(currency,BigDecimal.valueOf(amount),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)&&
+					if(account.withdraw(currency,BigDecimal.valueOf(amount),Cause.of(NamedCause.owner(EconomyLite.access))).getResult().equals(ResultType.SUCCESS)&&
 							businessManager.setBusinessBalance(businessName, newBalance)) {
 						//Success
 						player.sendMessage(textUtils.paySuccess(businessName, amount));
@@ -173,8 +174,8 @@ public class PayOverrideCommand implements CommandExecutor{
 					return;
 				} else {
 					//Process transaction
-					if(account.withdraw(currency,BigDecimal.valueOf(amount),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)&&
-							targetAccount.setBalance(currency,BigDecimal.valueOf(newBalance),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)) {
+					if(account.withdraw(currency,BigDecimal.valueOf(amount),Cause.of(NamedCause.owner(EconomyLite.access))).getResult().equals(ResultType.SUCCESS)&&
+							targetAccount.setBalance(currency,BigDecimal.valueOf(newBalance),Cause.of(NamedCause.owner(EconomyLite.access))).getResult().equals(ResultType.SUCCESS)) {
 						//Success
 						player.sendMessage(textUtils.paySuccess(playerName, amount));
                         for(Player oPlayer : Sponge.getServer().getOnlinePlayers()) {

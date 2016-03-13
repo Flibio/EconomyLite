@@ -10,6 +10,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.scheduler.Task.Builder;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
@@ -64,7 +65,7 @@ public class RemoveCommand implements CommandExecutor {
 								return;
 							}
 							//Set the player's balance
-							if(account.setBalance(currency,BigDecimal.valueOf(newAmount),Cause.of("EconomyLite")).getResult().equals(ResultType.SUCCESS)) {
+							if(account.setBalance(currency,BigDecimal.valueOf(newAmount),Cause.of(NamedCause.owner(EconomyLite.access))).getResult().equals(ResultType.SUCCESS)) {
 								//Successful
 								source.sendMessage(textUtils.successfulBalanceChangeText(playerName, newAmount));
 								return;
