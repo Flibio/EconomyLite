@@ -19,6 +19,7 @@ import me.Flibio.EconomyLite.Commands.RemoveCommand;
 import me.Flibio.EconomyLite.Commands.SetCommand;
 import me.Flibio.EconomyLite.Listeners.BalanceChangeListener;
 import me.Flibio.EconomyLite.Listeners.PlayerJoinListener;
+import me.Flibio.EconomyLite.Registry.CurrencyRegistryModule;
 import me.Flibio.EconomyLite.Utils.BusinessManager;
 import me.Flibio.EconomyLite.Utils.FileManager;
 import me.Flibio.EconomyLite.Utils.FileManager.FileType;
@@ -60,6 +61,7 @@ public class EconomyLite {
 	private BusinessManager businessManager;
 	private static EconomyService economyService;
 	private static Currency currency;
+	private static CurrencyRegistryModule currencyRegistryModule;
 	
 	public static EconomyLite access;
 	
@@ -104,6 +106,8 @@ public class EconomyLite {
 		game.getServiceManager().setProvider(this, EconomyLiteAPI.class, new EconomyLiteAPI());
 		economyService = new LiteEconomyService();
 		game.getServiceManager().setProvider(this, EconomyService.class, economyService);
+		currencyRegistryModule = new CurrencyRegistryModule();
+		game.getRegistry().registerModule(Currency.class, currencyRegistryModule);
 		logger.info("API registered successfully!");
 		//Reset business confirmations
 		game.getScheduler().createTaskBuilder().execute(new Runnable() {

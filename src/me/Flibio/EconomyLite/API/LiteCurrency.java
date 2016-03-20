@@ -58,4 +58,11 @@ public class LiteCurrency implements Currency {
 	public String getName() {
 		return "EconomyLite Currency";
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		if(!(other instanceof Currency))
+			return false;
+		return this.getId().equals( ((Currency) other).getId() );
+	}
 }
