@@ -45,8 +45,8 @@ import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v1.2.1")
-@Plugin(id = "me.flibio.economylite", name = "EconomyLite", version = "1.2.1", description = "Sponge economy plugin.")
+@Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v1.2.2")
+@Plugin(id = "me.flibio.economylite", name = "EconomyLite", version = "1.2.2", description = "Sponge economy plugin.")
 public class EconomyLite {
 	
 	@Inject
