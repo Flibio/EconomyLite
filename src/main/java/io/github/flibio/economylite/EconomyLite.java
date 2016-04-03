@@ -43,6 +43,7 @@ import com.google.inject.Inject;
 import io.github.flibio.economylite.api.CurrencyEconService;
 import io.github.flibio.economylite.api.PlayerEconService;
 import io.github.flibio.economylite.api.VirtualEconService;
+import io.github.flibio.economylite.commands.MigrateCommand;
 import io.github.flibio.economylite.commands.PayCommand;
 import io.github.flibio.economylite.commands.admin.AddCommand;
 import io.github.flibio.economylite.commands.admin.EconCommand;
@@ -136,7 +137,8 @@ public class EconomyLite {
                 new PayCommand(),
                 new BalTopCommand(),
                 new VirtualBalanceCommand(),
-                new VirtualSetCommand()
+                new VirtualSetCommand(),
+                new MigrateCommand()
                 );
         // Register currency registry
         game.getRegistry().registerModule(Currency.class, new CurrencyRegistryModule());
