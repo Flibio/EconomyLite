@@ -105,10 +105,10 @@ public interface PlayerEconService {
     public void clearCurrency(Currency currency);
 
     /**
-     * Gets all unique accounts registered in the EconomyLite system.
+     * Gets the top unique accounts registered in the EconomyLite system.
      * 
-     * @return All unique accounts registered in the EconomyLite system.
+     * @return The top unique accounts registered in the EconomyLite system.
      */
-    public List<UniqueAccount> getAllAccounts();
+    public List<UniqueAccount> getTopAccounts();
 
 }

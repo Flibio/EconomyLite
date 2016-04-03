@@ -104,10 +104,10 @@ public interface VirtualEconService {
     public void clearCurrency(Currency currency);
 
     /**
-     * Gets all virtual accounts registered in the EconomyLite system.
+     * Gets the top virtual accounts registered in the EconomyLite system.
      * 
-     * @return All virtual accounts registered in the EconomyLite system.
+     * @return The top virtual accounts registered in the EconomyLite system.
      */
-    public List<VirtualAccount> getAllAccounts();
+    public List<VirtualAccount> getTopAccounts();
 
 }

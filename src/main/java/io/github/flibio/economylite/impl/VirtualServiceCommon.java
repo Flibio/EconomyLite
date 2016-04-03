@@ -81,11 +81,11 @@ public class VirtualServiceCommon implements VirtualEconService {
         manager.executeUpdate("DELETE FROM economylitevirts WHERE currency = ?", currency.getId());
     }
 
-    public List<VirtualAccount> getAllAccounts() {
+    public List<VirtualAccount> getTopAccounts() {
         ArrayList<VirtualAccount> accounts = new ArrayList<>();
         List<String> ids =
-                manager.queryTypeList("id", String.class, "SELECT id FROM economylitevirts WHERE currency = ?", EconomyLite.getEconomyService()
-                        .getDefaultCurrency().getId());
+                manager.queryTypeList("id", String.class, "SELECT id FROM economylitevirts WHERE currency = ? ORDER BY balance DESC LIMIT 3",
+                        EconomyLite.getEconomyService().getDefaultCurrency().getId());
         EconomyService ecoService = EconomyLite.getEconomyService();
         for (String id : ids) {
             Optional<Account> vOpt = ecoService.getOrCreateAccount(id);

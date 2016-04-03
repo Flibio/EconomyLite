@@ -59,10 +59,9 @@ public class BalTopCommand extends BaseCommandExecutor<CommandSource> {
         src.sendMessage(EconomyLite.getMessageStorage().getMessage("command.baltop.head"));
         Currency current = EconomyLite.getEconomyService().getDefaultCurrency();
         TreeMap<String, BigDecimal> bals = new TreeMap<>();
-        for (UniqueAccount account : EconomyLite.getPlayerService().getAllAccounts()) {
+        for (UniqueAccount account : EconomyLite.getPlayerService().getTopAccounts()) {
             bals.put(account.getDisplayName().toPlain(), account.getBalance(current));
         }
-
         bals.entrySet().stream().sorted(Map.Entry.<String, BigDecimal>comparingByValue().reversed()).limit(3).forEachOrdered(e -> {
             Text label = current.getPluralDisplayName();
             if (e.getValue().equals(BigDecimal.ONE)) {

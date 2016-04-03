@@ -67,7 +67,7 @@ public class LiteUniqueAccount implements UniqueAccount {
         if (nOpt.isPresent()) {
             this.name = nOpt.get();
         } else {
-            this.name = "error";
+            this.name = uuid.toString();
         }
     }
 

@@ -81,11 +81,11 @@ public class PlayerServiceCommon implements PlayerEconService {
         manager.executeUpdate("DELETE FROM economyliteplayers WHERE currency = ?", currency.getId());
     }
 
-    public List<UniqueAccount> getAllAccounts() {
+    public List<UniqueAccount> getTopAccounts() {
         ArrayList<UniqueAccount> accounts = new ArrayList<>();
         List<String> uuids =
-                manager.queryTypeList("uuid", String.class, "SELECT uuid FROM economyliteplayers WHERE currency = ?", EconomyLite.getEconomyService()
-                        .getDefaultCurrency().getId());
+                manager.queryTypeList("uuid", String.class, "SELECT uuid FROM economyliteplayers WHERE currency = ? ORDER BY balance DESC LIMIT 3",
+                        EconomyLite.getEconomyService().getDefaultCurrency().getId());
         EconomyService ecoService = EconomyLite.getEconomyService();
         for (String uuid : uuids) {
             Optional<UniqueAccount> uOpt = ecoService.getOrCreateAccount(UUID.fromString(uuid));

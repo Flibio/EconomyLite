@@ -79,6 +79,7 @@ public class MigrateCommand extends BaseCommandExecutor<CommandSource> {
                             if (root.getNode(uuid.toString()).getNode("balance") != null) {
                                 int balance = root.getNode(uuid.toString()).getNode("balance").getInt();
                                 playerService.setBalance(uuid, BigDecimal.valueOf(balance), EconomyLite.getEconomyService().getDefaultCurrency());
+                                logger.debug(uuid.toString() + ": " + balance);
                             }
                         }
                     });
@@ -92,6 +93,7 @@ public class MigrateCommand extends BaseCommandExecutor<CommandSource> {
                             if (root.getNode(name).getNode("balance") != null) {
                                 int balance = root.getNode(name).getNode("balance").getInt();
                                 virtualService.setBalance(name, BigDecimal.valueOf(balance), EconomyLite.getEconomyService().getDefaultCurrency());
+                                logger.debug(name + ": " + balance);
                             }
                         }
                     });
