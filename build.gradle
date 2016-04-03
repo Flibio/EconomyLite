@@ -1,0 +1,83 @@
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'maven'
+    id 'com.github.hierynomus.license' version '0.12.1'
+    id 'net.ellune.blossom' version '1.0.1'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+group 'io.github.flibio'
+version '2.0.0'
+
+defaultTasks 'licenseFormat', 'clean', 'build'
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        name 'Sponge API repo'
+        url 'http://repo.spongepowered.org/maven'
+    }
+    maven {
+        name = 'minecrell'
+        url = 'http://repo.minecrell.net/releases'
+    }
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    compile 'org.spongepowered:spongeapi:4.1.0-SNAPSHOT'
+    compile 'com.github.flibio:updatifier:v1.4.0:api'
+    compile 'net.minecrell.mcstats:statslite-sponge:0.2.2'
+    compile 'com.github.flibiostudio:utils:1.5.1'
+}
+
+shadowJar {
+    dependencies {
+        include dependency('net.minecrell.mcstats:statslite-sponge')
+        include dependency('com.github.flibio:updatifier')
+        include dependency('com.github.flibiostudio:utils')
+    }
+    
+    relocate 'me.flibio.updatifier', 'io.github.flibio.economylite.updatifier'
+    relocate 'net.minecrell.mcstats', 'io.github.flibio.economylite.statslite'
+    relocate 'io.github.flibio.utils', 'io.github.flibio.economylite.utils'
+}
+
+artifacts {
+    archives shadowJar
+}
+
+license {
+
+    // The project properties to use
+    ext.name = project.name
+    ext.owner = project.owner
+    ext.inceptionYear = project.inceptionYear
+    ext.currentYear = project.currentYear
+
+    // The file that contains the license header
+    header file('HEADER.txt')
+
+    // The source sets to apply the license to
+    sourceSets = project.sourceSets
+
+    ignoreFailures false
+    strictCheck true
+
+    mapping {
+        java = 'SLASHSTAR_STYLE'
+    }
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.11'
+}
+
+blossom {
+    replaceToken '@project.version@', project.version, 'src/main/java/io/github/flibio/economylite/PluginInfo.java'
+}

@@ -1,27 +1,31 @@
 ![EconomyLite](http://i.imgur.com/MsuOo9w.png)
 
+[![Downloads](https://img.shields.io/github/downloads/flibio/economylite/total.svg?style=flat-square)](https://github.com/Flibio/EconomyLite/releases)
+[![Issues](https://img.shields.io/github/issues/flibio/economylite.svg?style=flat-square)](http://www.github.com/Flibio/EconomyLite/issues/)
+[![Gitter](https://img.shields.io/badge/chat-on_gitter-3F51B5.svg?style=flat-square)](https://gitter.im/Flibio/EconomyLite)
+
 EconomyLite is a lightweight, yet advanced economy plugin for your Sponge server. The plugin is built to be customizable, and you can enable and disable features at your will.
 
 ###Features
 
 - Drag & Drop Installation
- - Just drop EconomyLite into your "mods" folder with Sponge and start your server
+  - Just drop EconomyLite into your "mods" folder with Sponge and start your server
 - Multi-Threaded
- - EconomyLite is multi-threaded for the best possible performance
+  -  EconomyLite is multi-threaded for the best possible performance
 - Multiple Storage Options
- - Store your data however you like, MySQL or on a local file
-- Modular
- - Almost every aspect of EconomyLite can be changed to suit your needs
-- Username Changes
- - Any player can change their name, and EconomyLite can handle it
-- Businesses
- - EconomyLite has full support for creating businesses
-- Administration
- - Built-in commands used to interact with EconomyLite
+  - Store your data however you like, locally or on a MySQL database
+- Customizable
+  - Much of EconomyLite can be changed to suit your needs
+- Username Change Support
+  - Any player can change their name, and EconomyLite can handle it 
+- Virtual Management
+  - EconomyLite includes commands to manage virtual accounts
+- Multiple Currencies
+  - EconomyLite has built-in support for multiple currencies
 
 ###Installation
 
-Drag and drop EconomyLite into your "mods" folder along with Sponge and start your server. The configuration file can be found in `config/EconomyLite/config.conf`.
+Drag and drop EconomyLite into your "mods" folder along with Sponge and start your server. The configuration files can be found in `config/EconomyLite`.
 
 ---
 
