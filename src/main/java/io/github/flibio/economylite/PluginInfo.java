@@ -32,7 +32,7 @@ public class PluginInfo {
     private PluginInfo() {
     }
 
-    public static final String ID = "economylite";
+    public static final String ID = "io.github.flibio.economylite";
     public static final String NAME = "EconomyLite";
     public static final String VERSION = "@project.version@";
     public static final String DESCRIPTION = "An economy plugin for Sponge.";

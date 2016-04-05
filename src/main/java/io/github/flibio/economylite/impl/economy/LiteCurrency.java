@@ -29,6 +29,7 @@ import org.spongepowered.api.text.Text;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Locale;
 
 public class LiteCurrency implements Currency {
 
@@ -73,7 +74,7 @@ public class LiteCurrency implements Currency {
 
     @Override
     public Text format(BigDecimal amount, int digits) {
-        return Text.of(amount.setScale(digits, RoundingMode.HALF_UP));
+        return Text.of(String.format(Locale.ENGLISH, "%,.2f", amount.setScale(digits, RoundingMode.HALF_UP)));
     }
 
     @Override

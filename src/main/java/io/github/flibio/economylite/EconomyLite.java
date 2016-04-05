@@ -164,7 +164,10 @@ public class EconomyLite {
         configManager.setDefault("currencies.conf", "coin.singular", String.class, "Coin");
         configManager.setDefault("currencies.conf", "coin.plural", String.class, "Coins");
         configManager.setDefault("currencies.conf", "coin.symbol", String.class, "C");
-        Currency defaultCurrency = new LiteCurrency("Coin", "Coins", "C", true, 2);
+        Currency defaultCurrency =
+                new LiteCurrency(configManager.getValue("currencies.conf", "coin.singular", String.class).get(), configManager.getValue(
+                        "currencies.conf", "coin.plural", String.class).get(), configManager.getValue("currencies.conf", "coin.symbol", String.class)
+                        .get(), true, 2);
         currencyEconService = new CurrencyService(defaultCurrency);
         // Load all of the currencies
         Optional<ConfigurationNode> fOpt = configManager.getFile("currencies.conf");

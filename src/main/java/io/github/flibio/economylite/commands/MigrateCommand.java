@@ -67,8 +67,8 @@ public class MigrateCommand extends BaseCommandExecutor<CommandSource> {
     @Override
     public void run(CommandSource src, CommandContext args) {
         if (args.getOne("confirm").isPresent()) {
-            File file = new File("config/economylite/data.conf");
-            File bFile = new File("config/economylite/businesses.conf");
+            File file = new File("config/EconomyLite/data.conf");
+            File bFile = new File("config/EconomyLite/businesses.conf");
             try {
                 if (file.exists()) {
                     ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(file).build();

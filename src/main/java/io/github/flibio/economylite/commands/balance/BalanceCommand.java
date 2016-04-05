@@ -48,7 +48,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 @AsyncCommand
-@Command(aliases = {"balance", "bal"}, permission = "economylite.balance")
+@Command(aliases = {"balance", "money", "bal"}, permission = "economylite.balance")
 public class BalanceCommand extends BaseCommandExecutor<CommandSource> {
 
     private MessageStorage messageStorage = EconomyLite.getMessageStorage();
