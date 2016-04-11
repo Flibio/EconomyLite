@@ -64,24 +64,28 @@ public class PayCommand extends BaseCommandExecutor<Player> {
     public void run(Player src, CommandContext args) {
         if (args.getOne("player").isPresent() && args.getOne("amount").isPresent()) {
             BigDecimal amount = BigDecimal.valueOf(args.<Double>getOne("amount").get());
-            User target = args.<User>getOne("player").get();
-            String targetName = target.getName();
-            if (!target.getUniqueId().equals(src.getUniqueId())) {
-                Optional<UniqueAccount> uOpt = ecoService.getOrCreateAccount(src.getUniqueId());
-                Optional<UniqueAccount> tOpt = ecoService.getOrCreateAccount(target.getUniqueId());
-                if (uOpt.isPresent() && tOpt.isPresent()) {
-                    if (uOpt.get()
-                            .transfer(tOpt.get(), ecoService.getDefaultCurrency(), amount, Cause.of(NamedCause.owner(EconomyLite.getInstance())))
-                            .getResult().equals(ResultType.SUCCESS)) {
-                        src.sendMessage(messageStorage.getMessage("command.pay.success", "target", targetName));
+            if (amount.compareTo(BigDecimal.ONE) == -1) {
+                src.sendMessage(messageStorage.getMessage("command.pay.invalid"));
+            } else {
+                User target = args.<User>getOne("player").get();
+                String targetName = target.getName();
+                if (!target.getUniqueId().equals(src.getUniqueId())) {
+                    Optional<UniqueAccount> uOpt = ecoService.getOrCreateAccount(src.getUniqueId());
+                    Optional<UniqueAccount> tOpt = ecoService.getOrCreateAccount(target.getUniqueId());
+                    if (uOpt.isPresent() && tOpt.isPresent()) {
+                        if (uOpt.get()
+                                .transfer(tOpt.get(), ecoService.getDefaultCurrency(), amount, Cause.of(NamedCause.owner(EconomyLite.getInstance())))
+                                .getResult().equals(ResultType.SUCCESS)) {
+                            src.sendMessage(messageStorage.getMessage("command.pay.success", "target", targetName));
+                        } else {
+                            src.sendMessage(messageStorage.getMessage("command.pay.failed", "target", targetName));
+                        }
                     } else {
-                        src.sendMessage(messageStorage.getMessage("command.pay.failed", "target", targetName));
+                        src.sendMessage(messageStorage.getMessage("command.error"));
                     }
                 } else {
-                    src.sendMessage(messageStorage.getMessage("command.error"));
+                    src.sendMessage(messageStorage.getMessage("command.pay.notyou"));
                 }
-            } else {
-                src.sendMessage(messageStorage.getMessage("command.pay.notyou"));
             }
         } else {
             src.sendMessage(messageStorage.getMessage("command.error"));
