@@ -44,8 +44,10 @@ public class VirtualServiceCommon implements VirtualEconService {
 
     public VirtualServiceCommon(SqlManager manager) {
         this.manager = manager;
-        if (isWorking())
+        if (isWorking()) {
             manager.executeUpdate("CREATE TABLE IF NOT EXISTS economylitevirts(id VARCHAR(36), balance DECIMAL(11,2), currency VARCHAR(1024))");
+            manager.executeUpdate("ALTER TABLE `economylitevirts` CHANGE `id` `id` VARCHAR(1024)");
+        }
     }
 
     public boolean isWorking() {
