@@ -24,6 +24,13 @@
  */
 package io.github.flibio.economylite.impl.economy.account;
 
+import io.github.flibio.economylite.EconomyLite;
+import io.github.flibio.economylite.api.CurrencyEconService;
+import io.github.flibio.economylite.api.VirtualEconService;
+import io.github.flibio.economylite.impl.economy.event.LiteEconomyTransactionEvent;
+import io.github.flibio.economylite.impl.economy.result.LiteTransactionResult;
+import io.github.flibio.economylite.impl.economy.result.LiteTransferResult;
+import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.context.Context;
@@ -37,13 +44,6 @@ import org.spongepowered.api.service.economy.transaction.TransactionTypes;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
 import org.spongepowered.api.text.Text;
 
-import io.github.flibio.economylite.EconomyLite;
-import io.github.flibio.economylite.api.CurrencyEconService;
-import io.github.flibio.economylite.api.VirtualEconService;
-import io.github.flibio.economylite.impl.economy.event.LiteEconomyTransactionEvent;
-import io.github.flibio.economylite.impl.economy.result.LiteTransactionResult;
-import io.github.flibio.economylite.impl.economy.result.LiteTransferResult;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +53,7 @@ import java.util.Set;
 
 public class LiteVirtualAccount implements VirtualAccount {
 
+    private Logger logger = EconomyLite.getInstance().getLogger();
     private VirtualEconService virtualService = EconomyLite.getVirtualService();
     private CurrencyEconService currencyService = EconomyLite.getCurrencyService();
 
@@ -100,6 +101,8 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransactionResult setBalance(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
+        logger.debug("Attempting to set balance of " + name + " to " + amount.toString() + " on currency " + currency.getName() + " caused by "
+                + cause.toString());
         // Check if the new balance is in bounds
         if (amount.compareTo(BigDecimal.ZERO) == -1 || amount.compareTo(BigDecimal.valueOf(1000000)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT);
@@ -113,6 +116,7 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public Map<Currency, TransactionResult> resetBalances(Cause cause, Set<Context> contexts) {
+        logger.debug("Attempting to reset all balances of " + name + " caused by " + cause.toString());
         HashMap<Currency, TransactionResult> results = new HashMap<>();
         for (Currency currency : currencyService.getCurrencies()) {
             if (virtualService.accountExists(name, currency)) {
@@ -128,6 +132,7 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransactionResult resetBalance(Currency currency, Cause cause, Set<Context> contexts) {
+        logger.debug("Attempting to reset balance of " + name + " on currency " + currency.getName() + " caused by " + cause.toString());
         if (virtualService.setBalance(name, getDefaultBalance(currency), currency)) {
             return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW);
         } else {
@@ -137,6 +142,8 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransactionResult deposit(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
+        logger.debug("Attempting to deposit to " + name + " adding " + amount.toString() + " on currency " + currency.getName() + " caused by "
+                + cause.toString());
         BigDecimal newBal = getBalance(currency).add(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(1000000)) == 1) {
@@ -151,6 +158,8 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
+        logger.debug("Attempting to withdraw from " + name + " removing " + amount.toString() + " on currency " + currency.getName() + " caused by "
+                + cause.toString());
         BigDecimal newBal = getBalance(currency).subtract(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(1000000)) == 1) {
@@ -165,6 +174,8 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
+        logger.debug("Attempting to transfer from " + name + " to " + to.getDisplayName().toPlain() + " moving " + amount.toString()
+                + " on currency " + currency.getName() + " caused by " + cause.toString());
         BigDecimal newBal = to.getBalance(currency).add(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(1000000)) == 1) {

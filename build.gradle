@@ -11,7 +11,7 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 group 'io.github.flibio'
-version '2.0.5'
+version '2.0.6'
 
 defaultTasks 'licenseFormat', 'clean', 'build'
 

@@ -24,19 +24,18 @@
  */
 package io.github.flibio.economylite.impl.economy;
 
-import org.spongepowered.api.service.context.ContextCalculator;
-import org.spongepowered.api.service.economy.Currency;
-import org.spongepowered.api.service.economy.EconomyService;
-import org.spongepowered.api.service.economy.account.Account;
-import org.spongepowered.api.service.economy.account.UniqueAccount;
-import org.spongepowered.api.service.economy.account.VirtualAccount;
-
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.CurrencyEconService;
 import io.github.flibio.economylite.api.PlayerEconService;
 import io.github.flibio.economylite.api.VirtualEconService;
 import io.github.flibio.economylite.impl.economy.account.LiteUniqueAccount;
 import io.github.flibio.economylite.impl.economy.account.LiteVirtualAccount;
+import org.spongepowered.api.service.context.ContextCalculator;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.service.economy.account.Account;
+import org.spongepowered.api.service.economy.account.UniqueAccount;
+import org.spongepowered.api.service.economy.account.VirtualAccount;
 
 import java.util.Optional;
 import java.util.Set;

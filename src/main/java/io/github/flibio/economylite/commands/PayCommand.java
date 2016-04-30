@@ -77,6 +77,14 @@ public class PayCommand extends BaseCommandExecutor<Player> {
                                 .transfer(tOpt.get(), ecoService.getDefaultCurrency(), amount, Cause.of(NamedCause.owner(EconomyLite.getInstance())))
                                 .getResult().equals(ResultType.SUCCESS)) {
                             src.sendMessage(messageStorage.getMessage("command.pay.success", "target", targetName));
+                            if (target instanceof Player) {
+                                Text label = ecoService.getDefaultCurrency().getPluralDisplayName();
+                                if (amount.equals(BigDecimal.ONE)) {
+                                    label = ecoService.getDefaultCurrency().getDisplayName();
+                                }
+                                ((Player) target).sendMessage(messageStorage.getMessage("command.pay.target", "amountandlabel",
+                                        Text.of(amount + " ").toBuilder().append(label).build(), "sender", uOpt.get().getDisplayName()));
+                            }
                         } else {
                             src.sendMessage(messageStorage.getMessage("command.pay.failed", "target", targetName));
                         }
