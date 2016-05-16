@@ -104,7 +104,7 @@ public class LiteVirtualAccount implements VirtualAccount {
         logger.debug("Attempting to set balance of " + name + " to " + amount.toString() + " on currency " + currency.getName() + " caused by "
                 + cause.toString());
         // Check if the new balance is in bounds
-        if (amount.compareTo(BigDecimal.ZERO) == -1 || amount.compareTo(BigDecimal.valueOf(1000000)) == 1) {
+        if (amount.compareTo(BigDecimal.ZERO) == -1 || amount.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT);
         }
         if (virtualService.setBalance(name, amount, currency)) {
@@ -146,7 +146,7 @@ public class LiteVirtualAccount implements VirtualAccount {
                 + cause.toString());
         BigDecimal newBal = getBalance(currency).add(amount);
         // Check if the new balance is in bounds
-        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(1000000)) == 1) {
+        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT);
         }
         if (virtualService.deposit(name, amount, currency)) {
@@ -162,7 +162,7 @@ public class LiteVirtualAccount implements VirtualAccount {
                 + cause.toString());
         BigDecimal newBal = getBalance(currency).subtract(amount);
         // Check if the new balance is in bounds
-        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(1000000)) == 1) {
+        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.WITHDRAW);
         }
         if (virtualService.withdraw(name, amount, currency)) {
@@ -178,7 +178,7 @@ public class LiteVirtualAccount implements VirtualAccount {
                 + " on currency " + currency.getName() + " caused by " + cause.toString());
         BigDecimal newBal = to.getBalance(currency).add(amount);
         // Check if the new balance is in bounds
-        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(1000000)) == 1) {
+        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, to);
         }
         // Check if the account has enough funds
