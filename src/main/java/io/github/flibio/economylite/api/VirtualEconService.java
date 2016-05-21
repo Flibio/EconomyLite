@@ -106,8 +106,10 @@ public interface VirtualEconService {
     /**
      * Gets the top virtual accounts registered in the EconomyLite system.
      * 
+     * @param start The starting account to get.
+     * @param end The ending account to get.
      * @return The top virtual accounts registered in the EconomyLite system.
      */
-    public List<VirtualAccount> getTopAccounts();
+    public List<VirtualAccount> getTopAccounts(int start, int end);
 
 }

@@ -107,8 +107,10 @@ public interface PlayerEconService {
     /**
      * Gets the top unique accounts registered in the EconomyLite system.
      * 
+     * @param start The starting account to get.
+     * @param end The ending account to get.
      * @return The top unique accounts registered in the EconomyLite system.
      */
-    public List<UniqueAccount> getTopAccounts();
+    public List<UniqueAccount> getTopAccounts(int start, int end);
 
 }

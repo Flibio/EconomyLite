@@ -64,10 +64,14 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     public LiteUniqueAccount(UUID uuid) {
         this.uuid = uuid;
-        Optional<String> nOpt = NameUtils.getName(uuid);
-        if (nOpt.isPresent()) {
-            this.name = nOpt.get();
-        } else {
+        try {
+            Optional<String> nOpt = NameUtils.getName(uuid);
+            if (nOpt.isPresent()) {
+                this.name = nOpt.get();
+            } else {
+                this.name = uuid.toString();
+            }
+        } catch (Exception e) {
             this.name = uuid.toString();
         }
     }

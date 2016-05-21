@@ -28,7 +28,6 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.VirtualAccount;
-
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.VirtualEconService;
 import io.github.flibio.utils.sql.SqlManager;
@@ -83,11 +82,13 @@ public class VirtualServiceCommon implements VirtualEconService {
         manager.executeUpdate("DELETE FROM economylitevirts WHERE currency = ?", currency.getId());
     }
 
-    public List<VirtualAccount> getTopAccounts() {
+    public List<VirtualAccount> getTopAccounts(int start, int end) {
+        int offset = start - 1;
+        int limit = end - offset;
         ArrayList<VirtualAccount> accounts = new ArrayList<>();
         List<String> ids =
-                manager.queryTypeList("id", String.class, "SELECT id FROM economylitevirts WHERE currency = ? ORDER BY balance DESC LIMIT 3",
-                        EconomyLite.getEconomyService().getDefaultCurrency().getId());
+                manager.queryTypeList("id", String.class, "SELECT id FROM economylitevirts WHERE currency = ? ORDER BY balance DESC LIMIT ?, ?",
+                        EconomyLite.getEconomyService().getDefaultCurrency().getId(), String.valueOf(offset), String.valueOf(limit));
         EconomyService ecoService = EconomyLite.getEconomyService();
         for (String id : ids) {
             Optional<Account> vOpt = ecoService.getOrCreateAccount(id);
@@ -97,5 +98,4 @@ public class VirtualServiceCommon implements VirtualEconService {
         }
         return accounts;
     }
-
 }
