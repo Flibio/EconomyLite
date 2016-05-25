@@ -24,22 +24,8 @@
  */
 package io.github.flibio.economylite;
 
-import me.flibio.updatifier.Updatifier;
-import net.minecrell.mcstats.SpongeStatsLite;
-import ninja.leaping.configurate.ConfigurationNode;
-
-import org.slf4j.Logger;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.service.economy.Currency;
-import org.spongepowered.api.service.economy.EconomyService;
-import org.spongepowered.api.text.serializer.TextSerializers;
-
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-
 import io.github.flibio.economylite.api.CurrencyEconService;
 import io.github.flibio.economylite.api.PlayerEconService;
 import io.github.flibio.economylite.api.VirtualEconService;
@@ -55,7 +41,10 @@ import io.github.flibio.economylite.commands.currency.CurrencyCommand;
 import io.github.flibio.economylite.commands.currency.CurrencyCreateCommand;
 import io.github.flibio.economylite.commands.currency.CurrencyDeleteCommand;
 import io.github.flibio.economylite.commands.currency.CurrencySetCommand;
+import io.github.flibio.economylite.commands.virtual.VirtualAddCommand;
 import io.github.flibio.economylite.commands.virtual.VirtualBalanceCommand;
+import io.github.flibio.economylite.commands.virtual.VirtualEconCommand;
+import io.github.flibio.economylite.commands.virtual.VirtualRemoveCommand;
 import io.github.flibio.economylite.commands.virtual.VirtualSetCommand;
 import io.github.flibio.economylite.impl.CurrencyService;
 import io.github.flibio.economylite.impl.PlayerDataService;
@@ -68,6 +57,17 @@ import io.github.flibio.economylite.modules.sql.SqlModule;
 import io.github.flibio.utils.commands.CommandLoader;
 import io.github.flibio.utils.file.ConfigManager;
 import io.github.flibio.utils.message.MessageStorage;
+import me.flibio.updatifier.Updatifier;
+import net.minecrell.mcstats.SpongeStatsLite;
+import ninja.leaping.configurate.ConfigurationNode;
+import org.slf4j.Logger;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.List;
 import java.util.Optional;
@@ -137,7 +137,10 @@ public class EconomyLite {
                 new PayCommand(),
                 new BalTopCommand(),
                 new VirtualBalanceCommand(),
+                new VirtualEconCommand(),
+                new VirtualAddCommand(),
                 new VirtualSetCommand(),
+                new VirtualRemoveCommand(),
                 new MigrateCommand()
                 );
         // Register currency registry
