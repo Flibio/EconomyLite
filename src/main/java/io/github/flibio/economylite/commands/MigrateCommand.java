@@ -24,10 +24,11 @@
  */
 package io.github.flibio.economylite.commands;
 
+import io.github.flibio.economylite.CauseFactory;
+
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
-
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
@@ -35,7 +36,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.text.Text;
-
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.PlayerEconService;
 import io.github.flibio.economylite.api.VirtualEconService;
@@ -78,7 +78,8 @@ public class MigrateCommand extends BaseCommandExecutor<CommandSource> {
                             UUID uuid = UUID.fromString((String) raw);
                             if (root.getNode(uuid.toString()).getNode("balance") != null) {
                                 int balance = root.getNode(uuid.toString()).getNode("balance").getInt();
-                                playerService.setBalance(uuid, BigDecimal.valueOf(balance), EconomyLite.getEconomyService().getDefaultCurrency());
+                                playerService.setBalance(uuid, BigDecimal.valueOf(balance), EconomyLite.getEconomyService().getDefaultCurrency(),
+                                        CauseFactory.create("Migration"));
                                 logger.debug(uuid.toString() + ": " + balance);
                             }
                         }
@@ -92,7 +93,8 @@ public class MigrateCommand extends BaseCommandExecutor<CommandSource> {
                             String name = (String) raw;
                             if (root.getNode(name).getNode("balance") != null) {
                                 int balance = root.getNode(name).getNode("balance").getInt();
-                                virtualService.setBalance(name, BigDecimal.valueOf(balance), EconomyLite.getEconomyService().getDefaultCurrency());
+                                virtualService.setBalance(name, BigDecimal.valueOf(balance), EconomyLite.getEconomyService().getDefaultCurrency(),
+                                        CauseFactory.create("Migration"));
                                 logger.debug(name + ": " + balance);
                             }
                         }

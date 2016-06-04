@@ -24,6 +24,7 @@
  */
 package io.github.flibio.economylite.impl.economy.account;
 
+import io.github.flibio.economylite.CauseFactory;
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.CurrencyEconService;
 import io.github.flibio.economylite.api.PlayerEconService;
@@ -31,7 +32,6 @@ import io.github.flibio.economylite.impl.economy.event.LiteEconomyTransactionEve
 import io.github.flibio.economylite.impl.economy.result.LiteTransactionResult;
 import io.github.flibio.economylite.impl.economy.result.LiteTransferResult;
 import io.github.flibio.utils.player.NameUtils;
-import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.context.Context;
@@ -55,7 +55,6 @@ import java.util.UUID;
 
 public class LiteUniqueAccount implements UniqueAccount {
 
-    private Logger logger = EconomyLite.getInstance().getLogger();
     private PlayerEconService playerService = EconomyLite.getPlayerService();
     private CurrencyEconService currencyService = EconomyLite.getCurrencyService();
 
@@ -93,20 +92,20 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     @Override
     public boolean hasBalance(Currency currency, Set<Context> contexts) {
-        return playerService.accountExists(uuid, currency);
+        return playerService.accountExists(uuid, currency, CauseFactory.create("Has Balance"));
     }
 
     @Override
     public BigDecimal getBalance(Currency currency, Set<Context> contexts) {
-        return playerService.getBalance(uuid, currency);
+        return playerService.getBalance(uuid, currency, CauseFactory.create("Get Balance"));
     }
 
     @Override
     public Map<Currency, BigDecimal> getBalances(Set<Context> contexts) {
         HashMap<Currency, BigDecimal> balances = new HashMap<Currency, BigDecimal>();
         for (Currency currency : currencyService.getCurrencies()) {
-            if (playerService.accountExists(uuid, currency)) {
-                balances.put(currency, playerService.getBalance(uuid, currency));
+            if (playerService.accountExists(uuid, currency, CauseFactory.create("Get Balances"))) {
+                balances.put(currency, playerService.getBalance(uuid, currency, CauseFactory.create("Get Balances Put")));
             }
         }
         return balances;
@@ -114,13 +113,11 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     @Override
     public TransactionResult setBalance(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to set balance of " + name + " to " + amount.toString() + " on currency " + currency.getName() + " caused by "
-                + cause.toString());
         // Check if the new balance is in bounds
         if (amount.compareTo(BigDecimal.ZERO) == -1 || amount.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT);
         }
-        if (playerService.setBalance(uuid, amount, currency)) {
+        if (playerService.setBalance(uuid, amount, currency, cause)) {
             return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT);
         } else {
             return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT);
@@ -129,11 +126,10 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     @Override
     public Map<Currency, TransactionResult> resetBalances(Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to reset all balances of " + name + " caused by " + cause.toString());
         HashMap<Currency, TransactionResult> results = new HashMap<>();
         for (Currency currency : currencyService.getCurrencies()) {
-            if (playerService.accountExists(uuid, currency)) {
-                if (playerService.setBalance(uuid, getDefaultBalance(currency), currency)) {
+            if (playerService.accountExists(uuid, currency, cause)) {
+                if (playerService.setBalance(uuid, getDefaultBalance(currency), currency, cause)) {
                     results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW));
                 } else {
                     results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.FAILED, TransactionTypes.WITHDRAW));
@@ -145,8 +141,7 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     @Override
     public TransactionResult resetBalance(Currency currency, Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to reset balance of " + name + " on currency " + currency.getName() + " caused by " + cause.toString());
-        if (playerService.setBalance(uuid, getDefaultBalance(currency), currency)) {
+        if (playerService.setBalance(uuid, getDefaultBalance(currency), currency, cause)) {
             return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW);
         } else {
             return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.FAILED, TransactionTypes.WITHDRAW);
@@ -155,14 +150,12 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     @Override
     public TransactionResult deposit(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to deposit to " + name + " adding " + amount.toString() + " on currency " + currency.getName() + " caused by "
-                + cause.toString());
         BigDecimal newBal = getBalance(currency).add(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT);
         }
-        if (playerService.deposit(uuid, amount, currency)) {
+        if (playerService.deposit(uuid, amount, currency, cause)) {
             return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT);
         } else {
             return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT);
@@ -171,14 +164,12 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     @Override
     public TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to withdraw from " + name + " removing " + amount.toString() + " on currency " + currency.getName() + " caused by "
-                + cause.toString());
         BigDecimal newBal = getBalance(currency).subtract(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.WITHDRAW);
         }
-        if (playerService.withdraw(uuid, amount, currency)) {
+        if (playerService.withdraw(uuid, amount, currency, cause)) {
             return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW);
         } else {
             return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.WITHDRAW);
@@ -187,8 +178,6 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     @Override
     public TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to transfer from " + name + " to " + to.getDisplayName().toPlain() + " moving " + amount.toString()
-                + " on currency " + currency.getName() + " caused by " + cause.toString());
         BigDecimal newBal = to.getBalance(currency).add(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {

@@ -65,6 +65,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -81,6 +82,8 @@ public class EconomyLite {
     @Inject private Game game;
 
     @Inject private SpongeStatsLite statsLite;
+
+    @Inject private PluginContainer container;
 
     private static ConfigManager configManager;
     private static MessageStorage messageStorage;
@@ -217,6 +220,10 @@ public class EconomyLite {
 
     public Game getGame() {
         return game;
+    }
+
+    public PluginContainer getPluginContainer() {
+        return container;
     }
 
     public static ConfigManager getConfigManager() {

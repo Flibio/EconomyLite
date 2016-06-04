@@ -24,13 +24,13 @@
  */
 package io.github.flibio.economylite.impl.economy.account;
 
+import io.github.flibio.economylite.CauseFactory;
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.CurrencyEconService;
 import io.github.flibio.economylite.api.VirtualEconService;
 import io.github.flibio.economylite.impl.economy.event.LiteEconomyTransactionEvent;
 import io.github.flibio.economylite.impl.economy.result.LiteTransactionResult;
 import io.github.flibio.economylite.impl.economy.result.LiteTransferResult;
-import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.context.Context;
@@ -53,7 +53,6 @@ import java.util.Set;
 
 public class LiteVirtualAccount implements VirtualAccount {
 
-    private Logger logger = EconomyLite.getInstance().getLogger();
     private VirtualEconService virtualService = EconomyLite.getVirtualService();
     private CurrencyEconService currencyService = EconomyLite.getCurrencyService();
 
@@ -80,20 +79,20 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public boolean hasBalance(Currency currency, Set<Context> contexts) {
-        return virtualService.accountExists(name, currency);
+        return virtualService.accountExists(name, currency, CauseFactory.create("Has Balance"));
     }
 
     @Override
     public BigDecimal getBalance(Currency currency, Set<Context> contexts) {
-        return virtualService.getBalance(name, currency);
+        return virtualService.getBalance(name, currency, CauseFactory.create("Get Balance"));
     }
 
     @Override
     public Map<Currency, BigDecimal> getBalances(Set<Context> contexts) {
         HashMap<Currency, BigDecimal> balances = new HashMap<Currency, BigDecimal>();
         for (Currency currency : currencyService.getCurrencies()) {
-            if (virtualService.accountExists(name, currency)) {
-                balances.put(currency, virtualService.getBalance(name, currency));
+            if (virtualService.accountExists(name, currency, CauseFactory.create("Get Balances"))) {
+                balances.put(currency, virtualService.getBalance(name, currency, CauseFactory.create("Get Balances Put")));
             }
         }
         return balances;
@@ -101,13 +100,11 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransactionResult setBalance(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to set balance of " + name + " to " + amount.toString() + " on currency " + currency.getName() + " caused by "
-                + cause.toString());
         // Check if the new balance is in bounds
         if (amount.compareTo(BigDecimal.ZERO) == -1 || amount.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT);
         }
-        if (virtualService.setBalance(name, amount, currency)) {
+        if (virtualService.setBalance(name, amount, currency, cause)) {
             return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT);
         } else {
             return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT);
@@ -116,11 +113,10 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public Map<Currency, TransactionResult> resetBalances(Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to reset all balances of " + name + " caused by " + cause.toString());
         HashMap<Currency, TransactionResult> results = new HashMap<>();
         for (Currency currency : currencyService.getCurrencies()) {
-            if (virtualService.accountExists(name, currency)) {
-                if (virtualService.setBalance(name, getDefaultBalance(currency), currency)) {
+            if (virtualService.accountExists(name, currency, cause)) {
+                if (virtualService.setBalance(name, getDefaultBalance(currency), currency, cause)) {
                     results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW));
                 } else {
                     results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.FAILED, TransactionTypes.WITHDRAW));
@@ -132,8 +128,7 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransactionResult resetBalance(Currency currency, Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to reset balance of " + name + " on currency " + currency.getName() + " caused by " + cause.toString());
-        if (virtualService.setBalance(name, getDefaultBalance(currency), currency)) {
+        if (virtualService.setBalance(name, getDefaultBalance(currency), currency, cause)) {
             return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW);
         } else {
             return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.FAILED, TransactionTypes.WITHDRAW);
@@ -142,14 +137,12 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransactionResult deposit(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to deposit to " + name + " adding " + amount.toString() + " on currency " + currency.getName() + " caused by "
-                + cause.toString());
         BigDecimal newBal = getBalance(currency).add(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT);
         }
-        if (virtualService.deposit(name, amount, currency)) {
+        if (virtualService.deposit(name, amount, currency, cause)) {
             return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT);
         } else {
             return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT);
@@ -158,14 +151,12 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to withdraw from " + name + " removing " + amount.toString() + " on currency " + currency.getName() + " caused by "
-                + cause.toString());
         BigDecimal newBal = getBalance(currency).subtract(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.WITHDRAW);
         }
-        if (virtualService.withdraw(name, amount, currency)) {
+        if (virtualService.withdraw(name, amount, currency, cause)) {
             return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW);
         } else {
             return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.WITHDRAW);
@@ -174,8 +165,6 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        logger.debug("Attempting to transfer from " + name + " to " + to.getDisplayName().toPlain() + " moving " + amount.toString()
-                + " on currency " + currency.getName() + " caused by " + cause.toString());
         BigDecimal newBal = to.getBalance(currency).add(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {

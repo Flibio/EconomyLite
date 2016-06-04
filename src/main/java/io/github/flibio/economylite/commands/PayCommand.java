@@ -36,7 +36,6 @@ import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.text.Text;
-
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.utils.commands.AsyncCommand;
 import io.github.flibio.utils.commands.BaseCommandExecutor;
@@ -44,6 +43,7 @@ import io.github.flibio.utils.commands.Command;
 import io.github.flibio.utils.message.MessageStorage;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.Optional;
 
 @AsyncCommand
@@ -83,7 +83,8 @@ public class PayCommand extends BaseCommandExecutor<Player> {
                                     label = ecoService.getDefaultCurrency().getDisplayName();
                                 }
                                 ((Player) target).sendMessage(messageStorage.getMessage("command.pay.target", "amountandlabel",
-                                        Text.of(amount + " ").toBuilder().append(label).build(), "sender", uOpt.get().getDisplayName()));
+                                        Text.of(String.format(Locale.ENGLISH, "%,.2f", amount) + " ").toBuilder().append(label).build(), "sender",
+                                        uOpt.get().getDisplayName()));
                             }
                         } else {
                             src.sendMessage(messageStorage.getMessage("command.pay.failed", "target", targetName));

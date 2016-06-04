@@ -24,10 +24,10 @@
  */
 package io.github.flibio.economylite.impl;
 
-import org.spongepowered.api.service.economy.Currency;
-
+import io.github.flibio.economylite.CauseFactory;
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.CurrencyEconService;
+import org.spongepowered.api.service.economy.Currency;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -74,8 +74,8 @@ public class CurrencyService implements CurrencyEconService {
     @Override
     public void deleteCurrency(Currency currency) {
         if (currency != defaultCurrency) {
-            EconomyLite.getPlayerService().clearCurrency(currency);
-            EconomyLite.getVirtualService().clearCurrency(currency);
+            EconomyLite.getPlayerService().clearCurrency(currency, CauseFactory.create("Currency deletion"));
+            EconomyLite.getVirtualService().clearCurrency(currency, CauseFactory.create("Currency deletion"));
             currencies.remove(currency);
             EconomyLite.getConfigManager().deleteValue("currencies.conf", currency.getId().replaceAll("economylite:", ""));
         }

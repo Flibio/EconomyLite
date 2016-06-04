@@ -24,16 +24,13 @@
  */
 package io.github.flibio.economylite;
 
-/**
- * General information about the {@link EconomyLite} plugin
- */
-public class PluginInfo {
+import org.spongepowered.api.event.cause.NamedCause;
 
-    private PluginInfo() {
+import org.spongepowered.api.event.cause.Cause;
+
+public class CauseFactory {
+
+    public static Cause create(String reason) {
+        return Cause.of(NamedCause.of(reason, EconomyLite.getInstance().getPluginContainer()));
     }
-
-    public static final String ID = "economylite";
-    public static final String NAME = "EconomyLite";
-    public static final String VERSION = "@project.version@";
-    public static final String DESCRIPTION = "An economy plugin for Sponge.";
 }

@@ -24,6 +24,7 @@
  */
 package io.github.flibio.economylite.commands.balance;
 
+import io.github.flibio.economylite.CauseFactory;
 import com.google.common.collect.ImmutableMap;
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.utils.commands.AsyncCommand;
@@ -42,6 +43,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -82,7 +84,7 @@ public class BalTopCommand extends BaseCommandExecutor<CommandSource> {
             start = ((pageNumber - 1) * 5) + 1;
             end = pageNumber * 10;
         }
-        for (UniqueAccount account : EconomyLite.getPlayerService().getTopAccounts(start, end + 1)) {
+        for (UniqueAccount account : EconomyLite.getPlayerService().getTopAccounts(start, end + 1, CauseFactory.create("Baltop command."))) {
             bals.put(account.getDisplayName().toPlain(), account.getBalance(current));
         }
         boolean nextPage = true;
@@ -103,7 +105,7 @@ public class BalTopCommand extends BaseCommandExecutor<CommandSource> {
             src.sendMessage(messages.getMessage(
                     "command.baltop.data",
                     ImmutableMap.of("position", Text.of(count), "name", Text.of(e.getKey()), "balance",
-                            current.format(e.getValue()), "label", label)));
+                            Text.of(String.format(Locale.ENGLISH, "%,.2f", e.getValue())), "label", label)));
             count++;
         });
         Text toSend = Text.of();

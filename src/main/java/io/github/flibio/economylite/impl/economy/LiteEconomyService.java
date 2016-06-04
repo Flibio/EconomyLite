@@ -24,6 +24,7 @@
  */
 package io.github.flibio.economylite.impl.economy;
 
+import io.github.flibio.economylite.CauseFactory;
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.CurrencyEconService;
 import io.github.flibio.economylite.api.PlayerEconService;
@@ -54,13 +55,14 @@ public class LiteEconomyService implements EconomyService {
 
     @Override
     public Optional<UniqueAccount> getOrCreateAccount(UUID uuid) {
-        if (playerService.accountExists(uuid, getDefaultCurrency())) {
+        if (playerService.accountExists(uuid, getDefaultCurrency(), CauseFactory.create("New account check"))) {
             // Return the account
             return Optional.of(new LiteUniqueAccount(uuid));
         } else {
             // Make a new account
             UniqueAccount account = new LiteUniqueAccount(uuid);
-            if (playerService.setBalance(uuid, account.getDefaultBalance(getDefaultCurrency()), getDefaultCurrency())) {
+            if (playerService.setBalance(uuid, account.getDefaultBalance(getDefaultCurrency()), getDefaultCurrency(),
+                    CauseFactory.create("Creating account"))) {
                 return Optional.of(account);
             } else {
                 return Optional.empty();
@@ -70,13 +72,14 @@ public class LiteEconomyService implements EconomyService {
 
     @Override
     public Optional<Account> getOrCreateAccount(String id) {
-        if (virtualService.accountExists(id, getDefaultCurrency())) {
+        if (virtualService.accountExists(id, getDefaultCurrency(), CauseFactory.create("New account check"))) {
             // Return the account
             return Optional.of(new LiteVirtualAccount(id));
         } else {
             // Make a new account
             VirtualAccount account = new LiteVirtualAccount(id);
-            if (virtualService.setBalance(id, account.getDefaultBalance(getDefaultCurrency()), getDefaultCurrency())) {
+            if (virtualService.setBalance(id, account.getDefaultBalance(getDefaultCurrency()), getDefaultCurrency(),
+                    CauseFactory.create("Creating account"))) {
                 return Optional.of(account);
             } else {
                 return Optional.empty();
@@ -96,12 +99,12 @@ public class LiteEconomyService implements EconomyService {
 
     @Override
     public boolean hasAccount(UUID uuid) {
-        return playerService.accountExists(uuid);
+        return playerService.accountExists(uuid, CauseFactory.create("Checking account existance"));
     }
 
     @Override
     public boolean hasAccount(String identifier) {
-        return virtualService.accountExists(identifier);
+        return virtualService.accountExists(identifier, CauseFactory.create("Checking account existance"));
     }
 
 }

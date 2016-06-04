@@ -74,7 +74,11 @@ public class LiteCurrency implements Currency {
 
     @Override
     public Text format(BigDecimal amount, int digits) {
-        return Text.of(String.format(Locale.ENGLISH, "%,.2f", amount.setScale(digits, RoundingMode.HALF_UP)));
+        Text label = getPluralDisplayName();
+        if (amount.equals(BigDecimal.ONE)) {
+            label = getDisplayName();
+        }
+        return Text.of(String.format(Locale.ENGLISH, "%,.2f", amount.setScale(digits, RoundingMode.HALF_UP)) + " ", label);
     }
 
     @Override
