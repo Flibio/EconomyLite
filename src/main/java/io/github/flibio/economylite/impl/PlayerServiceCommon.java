@@ -46,7 +46,7 @@ public class PlayerServiceCommon implements PlayerEconService {
 
     public PlayerServiceCommon(SqlManager manager) {
         this.manager = manager;
-        if (isWorking())
+        if (manager.initialTestConnection())
             manager.executeUpdate("CREATE TABLE IF NOT EXISTS economyliteplayers(uuid VARCHAR(36), balance DECIMAL(11,2), currency VARCHAR(1024))");
     }
 
