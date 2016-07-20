@@ -11,7 +11,6 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 group 'io.github.flibio'
-version '2.2.3'
 
 defaultTasks 'licenseFormat', 'clean', 'build'
 
@@ -30,13 +29,15 @@ repositories {
 }
 
 dependencies {
-    compile 'org.spongepowered:spongeapi:4.1.0-SNAPSHOT'
+    compile 'org.spongepowered:spongeapi:${project.apiVersion}'
     compile 'com.github.flibio:updatifier:v1.4.0:api'
     compile 'net.minecrell.mcstats:statslite-sponge:0.2.2'
     compile 'com.github.flibiostudio:utils:1.6.7'
 }
 
 shadowJar {
+    archiveName = "EconomyLite-${project.apiVersion.minus("-SNAPSHOT")}-${version}.jar"
+
     dependencies {
         include dependency('net.minecrell.mcstats:statslite-sponge')
         include dependency('com.github.flibio:updatifier')
@@ -75,7 +76,7 @@ license {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.11'
+    gradleVersion = '2.11'
 }
 
 blossom {
