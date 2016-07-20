@@ -1,0 +1,16 @@
+# IntelliJ
+.idea/
+
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Eclipse
+bin/
+tmp/
+local.properties
+.settings/
+.project
+.factorypath
