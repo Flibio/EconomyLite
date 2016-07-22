@@ -32,7 +32,7 @@ dependencies {
     compile 'org.spongepowered:spongeapi:${project.apiVersion}'
     compile 'com.github.flibio:updatifier:v1.4.0:api'
     compile 'net.minecrell.mcstats:statslite-sponge:0.2.2'
-    compile 'com.github.flibiostudio:utils:1.6.7'
+    compile 'com.github.flibiostudio:utils:1.6.8'
 }
 
 shadowJar {
