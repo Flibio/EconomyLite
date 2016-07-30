@@ -44,7 +44,7 @@ public class PlayerServiceCommon implements PlayerEconService {
     private SqlManager manager;
     private Logger logger = EconomyLite.getInstance().getLogger();
 
-    public PlayerServiceCommon(SqlManager manager) {
+    public PlayerServiceCommon(SqlManager manager, boolean h2) {
         this.manager = manager;
         if (manager.initialTestConnection())
             manager.executeUpdate("CREATE TABLE IF NOT EXISTS economyliteplayers(uuid VARCHAR(36), balance DECIMAL(11,2), currency VARCHAR(1024))");

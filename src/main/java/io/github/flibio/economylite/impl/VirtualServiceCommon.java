@@ -44,11 +44,15 @@ public class VirtualServiceCommon implements VirtualEconService {
     private SqlManager manager;
     private Logger logger = EconomyLite.getInstance().getLogger();
 
-    public VirtualServiceCommon(SqlManager manager) {
+    public VirtualServiceCommon(SqlManager manager, boolean h2) {
         this.manager = manager;
         if (manager.initialTestConnection()) {
             manager.executeUpdate("CREATE TABLE IF NOT EXISTS economylitevirts(id VARCHAR(36), balance DECIMAL(11,2), currency VARCHAR(1024))");
-            manager.executeUpdate("ALTER TABLE `economylitevirts` CHANGE `id` `id` VARCHAR(1024)");
+            if (h2) {
+                manager.executeUpdate("ALTER TABLE `economylitevirts` ALTER COLUMN `id` VARCHAR(1024)");
+            } else {
+                manager.executeUpdate("ALTER TABLE `economylitevirts` CHANGE `id` `id` VARCHAR(1024)");
+            }
         }
     }
 
