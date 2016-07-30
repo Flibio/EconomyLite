@@ -31,7 +31,7 @@ import io.github.flibio.utils.sql.RemoteSqlManager;
 public class VirtualSqlService extends VirtualServiceCommon {
 
     public VirtualSqlService(String hostname, String port, String database, String username, String password) {
-        super(RemoteSqlManager.createInstance(EconomyLite.getInstance(), hostname, port, database, username, password).get());
+        super(RemoteSqlManager.createInstance(EconomyLite.getInstance(), hostname, port, database, username, password).get(), false);
     }
 
 }

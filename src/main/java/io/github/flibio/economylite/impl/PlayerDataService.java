@@ -30,7 +30,7 @@ import io.github.flibio.utils.sql.LocalSqlManager;
 public class PlayerDataService extends PlayerServiceCommon {
 
     public PlayerDataService() {
-        super(LocalSqlManager.createInstance(EconomyLite.getInstance(), "data").get());
+        super(LocalSqlManager.createInstance(EconomyLite.getInstance(), "data").get(), true);
     }
 
 }
