@@ -1,0 +1,11 @@
+language: java
+jdk:
+- oraclejdk8
+notifications:
+  email: false
+install:
+- 'chmod +x ./gradlew'
+script: gradle shadowJar
+after_success:
+- 'chmod +x ./continuum.sh'
+- './continuum.sh'
