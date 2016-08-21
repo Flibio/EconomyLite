@@ -153,7 +153,10 @@ public class LiteVirtualAccount implements VirtualAccount {
     public TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
         BigDecimal newBal = getBalance(currency).subtract(amount);
         // Check if the new balance is in bounds
-        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
+        if (newBal.compareTo(BigDecimal.ZERO) == -1) {
+            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, TransactionTypes.WITHDRAW);
+        }
+        if (newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.WITHDRAW);
         }
         if (virtualService.withdraw(name, amount, currency, cause)) {
