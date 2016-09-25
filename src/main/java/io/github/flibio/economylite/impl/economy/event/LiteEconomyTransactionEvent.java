@@ -24,13 +24,13 @@
  */
 package io.github.flibio.economylite.impl.economy.event;
 
+import io.github.flibio.economylite.EconomyLite;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.economy.EconomyTransactionEvent;
+import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 
-import io.github.flibio.economylite.EconomyLite;
-
-public class LiteEconomyTransactionEvent implements EconomyTransactionEvent {
+public class LiteEconomyTransactionEvent extends AbstractEvent implements EconomyTransactionEvent {
 
     private TransactionResult result;
 
