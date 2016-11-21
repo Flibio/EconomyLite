@@ -153,6 +153,7 @@ public class EconomyLite {
     private void initializeFiles() {
         configManager.setDefault("config.conf", "default-balance", Double.class, 0.0);
         configManager.setDefault("config.conf", "virt-default-balance", Double.class, 0.0);
+        configManager.setDefault("config.conf", "debug-logging", Boolean.class, true);
     }
 
     public static boolean isEnabled(String path) {

@@ -42,10 +42,12 @@ import java.util.UUID;
 public class PlayerServiceCommon implements PlayerEconService {
 
     private SqlManager manager;
+    private boolean log = true;
     private Logger logger = EconomyLite.getInstance().getLogger();
 
     public PlayerServiceCommon(SqlManager manager, boolean h2) {
         this.manager = manager;
+        this.log = EconomyLite.isEnabled("debug-logging");
         if (manager.initialTestConnection())
             manager.executeUpdate("CREATE TABLE IF NOT EXISTS economyliteplayers(uuid VARCHAR(36), balance DECIMAL(11,2), currency VARCHAR(1024))");
     }
@@ -59,7 +61,7 @@ public class PlayerServiceCommon implements PlayerEconService {
                 manager.queryType("balance", BigDecimal.class, "SELECT balance FROM economyliteplayers WHERE uuid = ? AND currency = ?",
                         uuid.toString(), currency.getId());
         BigDecimal result = (bOpt.isPresent()) ? bOpt.get() : BigDecimal.ZERO;
-        logger.debug("playercommon: Balance of '" + uuid.toString() + "' - " + cause.toString() + " = " + result.toPlainString());
+        debug("playercommon: Balance of '" + uuid.toString() + "' - " + cause.toString() + " = " + result.toPlainString());
         return result;
     }
 
@@ -67,13 +69,13 @@ public class PlayerServiceCommon implements PlayerEconService {
         if (accountExists(uuid, currency, cause)) {
             boolean result = manager.executeUpdate("UPDATE economyliteplayers SET balance = ? WHERE uuid = ? AND currency = ?", balance.toString(),
                     uuid.toString(), currency.getId());
-            logger.debug("playercommon: +Account Exists+ Setting balance of '" + uuid.toString() + "' to '" + balance.toPlainString() + "' with '"
+            debug("playercommon: +Account Exists+ Setting balance of '" + uuid.toString() + "' to '" + balance.toPlainString() + "' with '"
                     + currency.getId() + "' - " + cause.toString() + " = " + result);
             return result;
         } else {
             boolean result = manager.executeUpdate("INSERT INTO economyliteplayers (`uuid`, `balance`, `currency`) VALUES (?, ?, ?)",
                     uuid.toString(), balance.toString(), currency.getId());
-            logger.debug("playercommon: +Account Does Not Exist+ Setting balance of '" + uuid.toString() + "' to '" + balance.toPlainString()
+            debug("playercommon: +Account Does Not Exist+ Setting balance of '" + uuid.toString() + "' to '" + balance.toPlainString()
                     + "' with '" + currency.getId() + "' - " + cause.toString() + " = " + result);
             return result;
         }
@@ -81,25 +83,25 @@ public class PlayerServiceCommon implements PlayerEconService {
 
     public boolean accountExists(UUID uuid, Cause cause) {
         boolean result = manager.queryExists("SELECT uuid FROM economyliteplayers WHERE uuid = ?", uuid.toString());
-        logger.debug("playercommon: '" + uuid.toString() + "' exists - " + cause.toString() + " = " + result);
+        debug("playercommon: '" + uuid.toString() + "' exists - " + cause.toString() + " = " + result);
         return result;
     }
 
     public boolean accountExists(UUID uuid, Currency currency, Cause cause) {
         boolean result =
                 manager.queryExists("SELECT uuid FROM economyliteplayers WHERE uuid = ? AND currency = ?", uuid.toString(), currency.getId());
-        logger.debug("playercommon: Checking if '" + uuid.toString() + "' exists with '" + currency.getId() + "' - " + cause.toString() + " = "
+        debug("playercommon: Checking if '" + uuid.toString() + "' exists with '" + currency.getId() + "' - " + cause.toString() + " = "
                 + result);
         return result;
     }
 
     public void clearCurrency(Currency currency, Cause cause) {
         boolean result = manager.executeUpdate("DELETE FROM economyliteplayers WHERE currency = ?", currency.getId());
-        logger.debug("playercommon: Clearing currency '" + currency.getId() + "' - " + cause.toString() + " = " + result);
+        debug("playercommon: Clearing currency '" + currency.getId() + "' - " + cause.toString() + " = " + result);
     }
 
     public List<UniqueAccount> getTopAccounts(int start, int end, Cause cause) {
-        logger.debug("playercommon: Getting top accounts - " + cause.toString());
+        debug("playercommon: Getting top accounts - " + cause.toString());
         int offset = start - 1;
         int limit = end - offset;
         ArrayList<UniqueAccount> accounts = new ArrayList<>();
@@ -115,5 +117,11 @@ public class PlayerServiceCommon implements PlayerEconService {
             }
         }
         return accounts;
+    }
+
+    private void debug(String message) {
+        if (log) {
+            logger.debug(message);
+        }
     }
 }

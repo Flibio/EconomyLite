@@ -42,10 +42,12 @@ import java.util.Optional;
 public class VirtualServiceCommon implements VirtualEconService {
 
     private SqlManager manager;
+    private boolean log = true;
     private Logger logger = EconomyLite.getInstance().getLogger();
 
     public VirtualServiceCommon(SqlManager manager, boolean h2) {
         this.manager = manager;
+        this.log = EconomyLite.isEnabled("debug-logging");
         if (manager.initialTestConnection()) {
             manager.executeUpdate("CREATE TABLE IF NOT EXISTS economylitevirts(id VARCHAR(36), balance DECIMAL(11,2), currency VARCHAR(1024))");
             if (h2) {
@@ -65,7 +67,7 @@ public class VirtualServiceCommon implements VirtualEconService {
                 manager.queryType("balance", BigDecimal.class, "SELECT balance FROM economylitevirts WHERE id = ? AND currency = ?", id,
                         currency.getId());
         BigDecimal result = (bOpt.isPresent()) ? bOpt.get() : BigDecimal.ZERO;
-        logger.debug("virtcommon: Balance of '" + id + "' - " + cause.toString() + " = " + result.toPlainString());
+        debug("virtcommon: Balance of '" + id + "' - " + cause.toString() + " = " + result.toPlainString());
         return result;
     }
 
@@ -73,14 +75,14 @@ public class VirtualServiceCommon implements VirtualEconService {
         if (accountExists(id, currency, cause)) {
             boolean result = manager.executeUpdate("UPDATE economylitevirts SET balance = ? WHERE id = ? AND currency = ?", balance.toString(), id,
                     currency.getId());
-            logger.debug("virtcommon: +Account Exists+ Setting balance of '" + id + "' to '" + balance.toPlainString() + "' with '"
+            debug("virtcommon: +Account Exists+ Setting balance of '" + id + "' to '" + balance.toPlainString() + "' with '"
                     + currency.getId() + "' - " + cause.toString() + " = " + result);
             return result;
         } else {
             boolean result =
                     manager.executeUpdate("INSERT INTO economylitevirts (`id`, `balance`, `currency`) VALUES (?, ?, ?)", id, balance.toString(),
                             currency.getId());
-            logger.debug("virtcommon: +Account Does Not Exist+ Setting balance of '" + id + "' to '" + balance.toPlainString()
+            debug("virtcommon: +Account Does Not Exist+ Setting balance of '" + id + "' to '" + balance.toPlainString()
                     + "' with '" + currency.getId() + "' - " + cause.toString() + " = " + result);
             return result;
         }
@@ -88,24 +90,24 @@ public class VirtualServiceCommon implements VirtualEconService {
 
     public boolean accountExists(String id, Cause cause) {
         boolean result = manager.queryExists("SELECT id FROM economylitevirts WHERE id = ?", id);
-        logger.debug("virtcommon: '" + id + "' exists - " + cause.toString() + " = " + result);
+        debug("virtcommon: '" + id + "' exists - " + cause.toString() + " = " + result);
         return result;
     }
 
     public boolean accountExists(String id, Currency currency, Cause cause) {
         boolean result = manager.queryExists("SELECT id FROM economylitevirts WHERE id = ? AND currency = ?", id, currency.getId());
-        logger.debug("virtcommon: Checking if '" + id + "' exists with '" + currency.getId() + "' - " + cause.toString() + " = "
+        debug("virtcommon: Checking if '" + id + "' exists with '" + currency.getId() + "' - " + cause.toString() + " = "
                 + result);
         return result;
     }
 
     public void clearCurrency(Currency currency, Cause cause) {
         boolean result = manager.executeUpdate("DELETE FROM economylitevirts WHERE currency = ?", currency.getId());
-        logger.debug("virtcommon: Clearing currency '" + currency.getId() + "' - " + cause.toString() + " = " + result);
+        debug("virtcommon: Clearing currency '" + currency.getId() + "' - " + cause.toString() + " = " + result);
     }
 
     public List<VirtualAccount> getTopAccounts(int start, int end, Cause cause) {
-        logger.debug("virtcommon: Getting top accounts - " + cause.toString());
+        debug("virtcommon: Getting top accounts - " + cause.toString());
         int offset = start - 1;
         int limit = end - offset;
         ArrayList<VirtualAccount> accounts = new ArrayList<>();
@@ -120,5 +122,11 @@ public class VirtualServiceCommon implements VirtualEconService {
             }
         }
         return accounts;
+    }
+
+    private void debug(String message) {
+        if (log) {
+            logger.debug(message);
+        }
     }
 }
