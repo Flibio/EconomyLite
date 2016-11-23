@@ -32,9 +32,7 @@ import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.text.Text;
-
 import com.google.common.collect.ImmutableMap;
-
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.CurrencyEconService;
 import io.github.flibio.utils.commands.AsyncCommand;
@@ -43,6 +41,7 @@ import io.github.flibio.utils.commands.Command;
 import io.github.flibio.utils.message.MessageStorage;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.Optional;
 
 @AsyncCommand
@@ -73,7 +72,8 @@ public class VirtualBalanceCommand extends BaseCommandExecutor<CommandSource> {
                         label = currency.getDisplayName();
                     }
                     src.sendMessage(messageStorage.getMessage("command.balanceother",
-                            ImmutableMap.of("player", aOpt.get().getDisplayName(), "balance", currency.format(bal), "label", label)));
+                            ImmutableMap.of("player", aOpt.get().getDisplayName(), "balance", Text.of(String.format(Locale.ENGLISH, "%,.2f", bal)),
+                                    "label", label)));
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.error"));
                 }
@@ -84,5 +84,4 @@ public class VirtualBalanceCommand extends BaseCommandExecutor<CommandSource> {
             src.sendMessage(messageStorage.getMessage("command.error"));
         }
     }
-
 }

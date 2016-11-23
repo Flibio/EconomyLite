@@ -41,9 +41,11 @@ import io.github.flibio.economylite.commands.currency.CurrencyCommand;
 import io.github.flibio.economylite.commands.currency.CurrencyCreateCommand;
 import io.github.flibio.economylite.commands.currency.CurrencyDeleteCommand;
 import io.github.flibio.economylite.commands.currency.CurrencySetCommand;
+import io.github.flibio.economylite.commands.virtual.PayVirtualCommand;
 import io.github.flibio.economylite.commands.virtual.VirtualAddCommand;
 import io.github.flibio.economylite.commands.virtual.VirtualBalanceCommand;
 import io.github.flibio.economylite.commands.virtual.VirtualEconCommand;
+import io.github.flibio.economylite.commands.virtual.VirtualPayCommand;
 import io.github.flibio.economylite.commands.virtual.VirtualRemoveCommand;
 import io.github.flibio.economylite.commands.virtual.VirtualSetCommand;
 import io.github.flibio.economylite.impl.CurrencyService;
@@ -144,6 +146,8 @@ public class EconomyLite {
                 new VirtualAddCommand(),
                 new VirtualSetCommand(),
                 new VirtualRemoveCommand(),
+                new VirtualPayCommand(),
+                new PayVirtualCommand(),
                 new MigrateCommand()
                 );
         // Register currency registry
