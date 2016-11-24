@@ -20,6 +20,8 @@ EconomyLite is a lightweight, yet advanced economy plugin for your Sponge server
   - Any player can change their name, and EconomyLite can handle it 
 - Virtual Management
   - EconomyLite includes commands to manage virtual accounts
+- Loans
+  - Players can take out loans if they are running short on money
 - Multiple Currencies
   - EconomyLite has built-in support for multiple currencies
 
@@ -31,23 +33,23 @@ Drag and drop EconomyLite into your "mods" folder along with Sponge and start yo
 
 :inbox_tray: [**Download EconomyLite**][1]
 
-:bangbang: [**Issue Tracker**][2]
+:tools: [**Development Builds**][2]
 
-:memo: [**Feature Suggestions**][3]
+:speech_balloon: [**Issues & Suggestions**][3]
 
-:wrench: [**Source Code**][4]
+:newspaper: [**Forum Post**][4]
 
-:books: [**Wiki**][5]
+:books: [**Docs**][5]
 
 :heavy_dollar_sign: [**Support Me**][6]
 
 ---
 
-![EconomyLite Statistics](http://flibio.net/economylite/stats_img.php)
+![EconomyLite Statistics](http://i.mcstats.org/EconomyLite/Global+Statistics.png)
 
 [1]: https://github.com/Flibio/EconomyLite/releases
-[2]: https://github.com/Flibio/EconomyLite/issues
+[2]: http://continuum.flibio.net/project/EconomyLite
 [3]: https://github.com/Flibio/EconomyLite/issues
-[4]: https://github.com/Flibio/EconomyLite
-[5]: https://github.com/Flibio/EconomyLite/wiki
+[4]: https://forums.spongepowered.org/t/economylite/7045
+[5]: http://flibiostudio.github.io/EconomyLiteDocs/index.html
 [6]: http://flibio.weebly.com/support-me.html
