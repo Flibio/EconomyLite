@@ -33,7 +33,7 @@ Drag and drop EconomyLite into your "mods" folder along with Sponge and start yo
 
 :inbox_tray: [**Download EconomyLite**][1]
 
-:tools: [**Development Builds**][2]
+:wrench: [**Development Builds**][2]
 
 :speech_balloon: [**Issues & Suggestions**][3]
 
