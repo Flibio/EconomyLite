@@ -58,6 +58,14 @@ public class LoanModule implements Module {
         if (iOpt.isPresent() && mOpt.isPresent()) {
             interestRate = iOpt.get();
             maxLoan = mOpt.get();
+            if (interestRate < 1) {
+                logger.error("The interest rate must be greater than or equal to 1!");
+                return false;
+            }
+            if (maxLoan <= 0) {
+                logger.error("The interest rate must be greater than 0!");
+                return false;
+            }
             logger.info("Interest rate set to " + interestRate + "!");
             logger.info("Maximum loan balance set to " + maxLoan + "!");
         } else {
