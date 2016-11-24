@@ -115,12 +115,12 @@ public class LiteUniqueAccount implements UniqueAccount {
     public TransactionResult setBalance(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
         // Check if the new balance is in bounds
         if (amount.compareTo(BigDecimal.ZERO) == -1 || amount.compareTo(BigDecimal.valueOf(999999999)) == 1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT);
+            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT, cause);
         }
         if (playerService.setBalance(uuid, amount, currency, cause)) {
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT);
+            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT, cause);
         } else {
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT);
+            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT, cause);
         }
     }
 
@@ -130,9 +130,9 @@ public class LiteUniqueAccount implements UniqueAccount {
         for (Currency currency : currencyService.getCurrencies()) {
             if (playerService.accountExists(uuid, currency, cause)) {
                 if (playerService.setBalance(uuid, getDefaultBalance(currency), currency, cause)) {
-                    results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW));
+                    results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause));
                 } else {
-                    results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.FAILED, TransactionTypes.WITHDRAW));
+                    results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause));
                 }
             }
         }
@@ -142,9 +142,9 @@ public class LiteUniqueAccount implements UniqueAccount {
     @Override
     public TransactionResult resetBalance(Currency currency, Cause cause, Set<Context> contexts) {
         if (playerService.setBalance(uuid, getDefaultBalance(currency), currency, cause)) {
-            return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW);
+            return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause);
         } else {
-            return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.FAILED, TransactionTypes.WITHDRAW);
+            return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause);
         }
     }
 
@@ -153,12 +153,12 @@ public class LiteUniqueAccount implements UniqueAccount {
         BigDecimal newBal = getBalance(currency).add(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT);
+            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT, cause);
         }
         if (playerService.deposit(uuid, amount, currency, cause)) {
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT);
+            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT, cause);
         } else {
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT);
+            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT, cause);
         }
     }
 
@@ -167,15 +167,15 @@ public class LiteUniqueAccount implements UniqueAccount {
         BigDecimal newBal = getBalance(currency).subtract(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, TransactionTypes.WITHDRAW);
+            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, TransactionTypes.WITHDRAW, cause);
         }
         if (newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.WITHDRAW);
+            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.WITHDRAW, cause);
         }
         if (playerService.withdraw(uuid, amount, currency, cause)) {
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW);
+            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause);
         } else {
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.WITHDRAW);
+            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause);
         }
     }
 
@@ -184,17 +184,17 @@ public class LiteUniqueAccount implements UniqueAccount {
         BigDecimal newBal = to.getBalance(currency).add(amount);
         // Check if the new balance is in bounds
         if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, to);
+            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, to, cause);
         }
         // Check if the account has enough funds
         if (amount.compareTo(getBalance(currency)) == 1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, to);
+            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, to, cause);
         }
         if (withdraw(currency, amount, cause).getResult().equals(ResultType.SUCCESS)
                 && to.deposit(currency, amount, cause).getResult().equals(ResultType.SUCCESS)) {
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, to);
+            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, to, cause);
         } else {
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, to);
+            return resultAndEvent(this, amount, currency, ResultType.FAILED, to, cause);
         }
     }
 
@@ -209,15 +209,15 @@ public class LiteUniqueAccount implements UniqueAccount {
     }
 
     private TransactionResult resultAndEvent(Account account, BigDecimal amount, Currency currency, ResultType resultType,
-            TransactionType transactionType) {
+            TransactionType transactionType, Cause cause) {
         TransactionResult result = new LiteTransactionResult(account, amount, currency, resultType, transactionType);
-        Sponge.getEventManager().post(new LiteEconomyTransactionEvent(result));
+        Sponge.getEventManager().post(new LiteEconomyTransactionEvent(result, UUID.fromString(account.getIdentifier()), cause));
         return result;
     }
 
-    private TransferResult resultAndEvent(Account account, BigDecimal amount, Currency currency, ResultType resultType, Account toWho) {
+    private TransferResult resultAndEvent(Account account, BigDecimal amount, Currency currency, ResultType resultType, Account toWho, Cause cause) {
         TransferResult result = new LiteTransferResult(account, amount, currency, resultType, toWho);
-        Sponge.getEventManager().post(new LiteEconomyTransactionEvent(result));
+        Sponge.getEventManager().post(new LiteEconomyTransactionEvent(result, UUID.fromString(account.getIdentifier()), cause));
         return result;
     }
 

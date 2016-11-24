@@ -55,6 +55,7 @@ import io.github.flibio.economylite.impl.economy.LiteCurrency;
 import io.github.flibio.economylite.impl.economy.LiteEconomyService;
 import io.github.flibio.economylite.impl.economy.registry.CurrencyRegistryModule;
 import io.github.flibio.economylite.modules.Module;
+import io.github.flibio.economylite.modules.loan.LoanModule;
 import io.github.flibio.economylite.modules.sql.SqlModule;
 import io.github.flibio.utils.commands.CommandLoader;
 import io.github.flibio.utils.file.ConfigManager;
@@ -72,6 +73,7 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,14 +112,18 @@ public class EconomyLite {
         messageStorage = MessageStorage.createInstance(this);
         initializeMessage();
         // Load modules
+        List<Module> postInitModules = new ArrayList<>();
         getModules().forEach(m -> {
             m.initializeConfig();
             if (m.isEnabled()) {
                 if (m.initialize(logger, instance)) {
                     logger.info("Loaded the " + m.getName() + " module!");
+                    postInitModules.add(m);
                 } else {
                     logger.error("Failed to load the " + m.getName() + " module!");
                 }
+            } else {
+                logger.info("The " + m.getName() + " module is disabled!");
             }
         });
         // If the services have not been set, set them to default.
@@ -129,6 +135,11 @@ public class EconomyLite {
         economyService = new LiteEconomyService();
         // Register the Economy Service
         game.getServiceManager().setProvider(this, EconomyService.class, economyService);
+        // Post-initialize modules
+        postInitModules.forEach(module -> {
+            module.postInitialization(logger, instance);
+        });
+        // Register commands
         CommandLoader.registerCommands(this, TextSerializers.FORMATTING_CODE.serialize(messageStorage.getMessage("command.invalidsource")),
                 new CurrencyCommand(),
                 new CurrencySetCommand(),
@@ -260,7 +271,7 @@ public class EconomyLite {
     }
 
     public static List<Module> getModules() {
-        return ImmutableList.of(new SqlModule());
+        return ImmutableList.of(new SqlModule(), new LoanModule());
     }
 
     // Setters

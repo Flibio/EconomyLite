@@ -22,19 +22,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.flibio.economylite;
+package io.github.flibio.economylite.modules.loan.command;
 
-import org.spongepowered.api.event.cause.NamedCause;
+import io.github.flibio.economylite.EconomyLite;
+import io.github.flibio.utils.message.MessageStorage;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.command.spec.CommandSpec.Builder;
 
-import org.spongepowered.api.event.cause.Cause;
+import io.github.flibio.utils.commands.AsyncCommand;
+import io.github.flibio.utils.commands.BaseCommandExecutor;
+import io.github.flibio.utils.commands.Command;
+import org.spongepowered.api.command.CommandSource;
 
-public class CauseFactory {
+@AsyncCommand
+@Command(aliases = {"loan"}, permission = "economylite.loan")
+public class LoanCommand extends BaseCommandExecutor<CommandSource> {
 
-    public static Cause create(String reason) {
-        return Cause.of(NamedCause.of(reason, EconomyLite.getInstance().getPluginContainer()));
+    private MessageStorage messageStorage = EconomyLite.getMessageStorage();
+
+    @Override
+    public Builder getCommandSpecBuilder() {
+        return CommandSpec.builder()
+                .executor(this);
     }
 
-    public static Cause stringCause(String reason) {
-        return Cause.of(NamedCause.owner("economylite:" + reason.toLowerCase().replaceAll(" ", "_")));
+    @Override
+    public void run(CommandSource src, CommandContext args) {
+        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/loan", "subcommands", "balance | pay | take"));
     }
+
 }

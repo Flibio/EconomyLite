@@ -26,21 +26,34 @@ package io.github.flibio.economylite.impl.economy.event;
 
 import io.github.flibio.economylite.EconomyLite;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.economy.EconomyTransactionEvent;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 
+import java.util.UUID;
+
 public class LiteEconomyTransactionEvent extends AbstractEvent implements EconomyTransactionEvent {
 
     private TransactionResult result;
+    private Cause cause;
 
     public LiteEconomyTransactionEvent(TransactionResult result) {
         this.result = result;
     }
 
+    public LiteEconomyTransactionEvent(TransactionResult result, UUID user, Cause cause) {
+        this.result = result;
+        this.cause = cause.with(NamedCause.source(user));
+    }
+
     @Override
     public Cause getCause() {
-        return Cause.builder().owner(EconomyLite.getInstance()).build();
+        if (cause != null) {
+            return cause;
+        } else {
+            return Cause.builder().owner(EconomyLite.getInstance()).build();
+        }
     }
 
     @Override
