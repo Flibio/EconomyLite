@@ -24,6 +24,15 @@
  */
 package io.github.flibio.economylite.commands.currency;
 
+import io.github.flibio.economylite.EconomyLite;
+import io.github.flibio.economylite.api.CurrencyEconService;
+import io.github.flibio.economylite.impl.economy.LiteCurrency;
+import io.github.flibio.utils.commands.AsyncCommand;
+import io.github.flibio.utils.commands.BaseCommandExecutor;
+import io.github.flibio.utils.commands.Command;
+import io.github.flibio.utils.commands.ParentCommand;
+import io.github.flibio.utils.file.FileManager;
+import io.github.flibio.utils.message.MessageStorage;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -32,16 +41,6 @@ import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.text.Text;
 
-import io.github.flibio.economylite.EconomyLite;
-import io.github.flibio.economylite.api.CurrencyEconService;
-import io.github.flibio.economylite.impl.economy.LiteCurrency;
-import io.github.flibio.utils.commands.AsyncCommand;
-import io.github.flibio.utils.commands.BaseCommandExecutor;
-import io.github.flibio.utils.commands.Command;
-import io.github.flibio.utils.commands.ParentCommand;
-import io.github.flibio.utils.file.ConfigManager;
-import io.github.flibio.utils.message.MessageStorage;
-
 @AsyncCommand
 @ParentCommand(parentCommand = CurrencyCommand.class)
 @Command(aliases = {"create"}, permission = "economylite.admin.currency.create")
@@ -49,7 +48,7 @@ public class CurrencyCreateCommand extends BaseCommandExecutor<CommandSource> {
 
     private MessageStorage messageStorage = EconomyLite.getMessageStorage();
     private CurrencyEconService currencyService = EconomyLite.getCurrencyService();
-    private ConfigManager configManager = EconomyLite.getConfigManager();
+    private FileManager configManager = EconomyLite.getFileManager();
 
     @Override
     public Builder getCommandSpecBuilder() {

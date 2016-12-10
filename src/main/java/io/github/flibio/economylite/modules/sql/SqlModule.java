@@ -24,17 +24,16 @@
  */
 package io.github.flibio.economylite.modules.sql;
 
-import org.slf4j.Logger;
-
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.modules.Module;
-import io.github.flibio.utils.file.ConfigManager;
+import io.github.flibio.utils.file.FileManager;
+import org.slf4j.Logger;
 
 import java.util.Optional;
 
 public class SqlModule implements Module {
 
-    private ConfigManager configManager = EconomyLite.getConfigManager();
+    private FileManager configManager = EconomyLite.getFileManager();
 
     @Override
     public boolean initialize(Logger logger, Object plugin) {

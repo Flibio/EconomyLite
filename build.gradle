@@ -21,18 +21,13 @@ repositories {
         name 'Sponge API repo'
         url 'http://repo.spongepowered.org/maven'
     }
-    maven {
-        name = 'minecrell'
-        url = 'http://repo.minecrell.net/releases'
-    }
     maven { url "https://jitpack.io" }
 }
 
 dependencies {
     compile 'org.spongepowered:spongeapi:${project.apiVersion}'
     compile 'com.github.flibio:updatifier:v1.4.0:api'
-    compile 'net.minecrell.mcstats:statslite-sponge:0.2.2'
-    compile 'com.github.flibiostudio:utils:f2f5a13'
+    compile 'com.github.flibiostudio:utils:1.8.1'
 }
 
 shadowJar {
@@ -46,7 +41,6 @@ shadowJar {
     }
     
     relocate 'me.flibio.updatifier', 'io.github.flibio.economylite.updatifier'
-    relocate 'net.minecrell.mcstats', 'io.github.flibio.economylite.statslite'
     relocate 'io.github.flibio.utils', 'io.github.flibio.economylite.utils'
 }
 

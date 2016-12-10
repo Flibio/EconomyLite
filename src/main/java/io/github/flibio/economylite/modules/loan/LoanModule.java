@@ -31,7 +31,7 @@ import io.github.flibio.economylite.modules.loan.command.LoanCommand;
 import io.github.flibio.economylite.modules.loan.command.LoanPayCommand;
 import io.github.flibio.economylite.modules.loan.command.LoanTakeCommand;
 import io.github.flibio.utils.commands.CommandLoader;
-import io.github.flibio.utils.file.ConfigManager;
+import io.github.flibio.utils.file.FileManager;
 import io.github.flibio.utils.message.MessageStorage;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -44,7 +44,7 @@ import java.util.UUID;
 public class LoanModule implements Module {
 
     private MessageStorage messages = EconomyLite.getMessageStorage();
-    private ConfigManager configManager = EconomyLite.getConfigManager();
+    private FileManager configManager = EconomyLite.getFileManager();
     private LoanManager loanManager;
     private double interestRate = 1.0;
     private double maxLoan = 1000.0;

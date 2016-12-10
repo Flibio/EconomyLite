@@ -63,7 +63,7 @@ public class CurrencyService implements CurrencyEconService {
     @Override
     public void setCurrentCurrency(Currency currency) {
         this.currentCurrency = currency;
-        EconomyLite.getConfigManager().setValue("currencies.conf", "current", String.class, currency.getId().replaceAll("economylite:", ""));
+        EconomyLite.getFileManager().setValue("currencies.conf", "current", String.class, currency.getId().replaceAll("economylite:", ""));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class CurrencyService implements CurrencyEconService {
             EconomyLite.getPlayerService().clearCurrency(currency, CauseFactory.create("Currency deletion"));
             EconomyLite.getVirtualService().clearCurrency(currency, CauseFactory.create("Currency deletion"));
             currencies.remove(currency);
-            EconomyLite.getConfigManager().deleteValue("currencies.conf", currency.getId().replaceAll("economylite:", ""));
+            EconomyLite.getFileManager().deleteValue("currencies.conf", currency.getId().replaceAll("economylite:", ""));
         }
     }
 }

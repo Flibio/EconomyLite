@@ -24,24 +24,24 @@
  */
 package io.github.flibio.economylite.commands.admin;
 
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.command.spec.CommandSpec.Builder;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.service.economy.account.UniqueAccount;
-import org.spongepowered.api.service.economy.transaction.ResultType;
-import org.spongepowered.api.text.Text;
-
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.utils.commands.AsyncCommand;
 import io.github.flibio.utils.commands.BaseCommandExecutor;
 import io.github.flibio.utils.commands.Command;
 import io.github.flibio.utils.commands.ParentCommand;
 import io.github.flibio.utils.message.MessageStorage;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.command.spec.CommandSpec.Builder;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.service.economy.account.UniqueAccount;
+import org.spongepowered.api.service.economy.transaction.ResultType;
+import org.spongepowered.api.text.Text;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -72,6 +72,7 @@ public class AddCommand extends BaseCommandExecutor<CommandSource> {
                 if (targetAccount.deposit(EconomyLite.getCurrencyService().getCurrentCurrency(), toAdd,
                         Cause.of(NamedCause.owner(EconomyLite.getInstance()))).getResult().equals(ResultType.SUCCESS)) {
                     src.sendMessage(messageStorage.getMessage("command.econ.addsuccess", "name", targetName));
+                    attemptNotify(target);
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.econ.addfail", "name", targetName));
                 }
@@ -80,6 +81,12 @@ public class AddCommand extends BaseCommandExecutor<CommandSource> {
             }
         } else {
             src.sendMessage(messageStorage.getMessage("command.error"));
+        }
+    }
+
+    private void attemptNotify(User target) {
+        if (target instanceof Player) {
+            ((Player) target).sendMessage(messageStorage.getMessage("command.econ.notify"));
         }
     }
 

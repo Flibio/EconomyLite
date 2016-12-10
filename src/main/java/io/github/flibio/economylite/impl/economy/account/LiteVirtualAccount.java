@@ -69,7 +69,7 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public BigDecimal getDefaultBalance(Currency currency) {
-        Optional<Double> bOpt = EconomyLite.getConfigManager().getValue("config.conf", "virt-default-balance", Double.class);
+        Optional<Double> bOpt = EconomyLite.getFileManager().getValue("config.conf", "virt-default-balance", Double.class);
         if (bOpt.isPresent()) {
             return BigDecimal.valueOf(bOpt.get());
         } else {

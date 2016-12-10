@@ -24,6 +24,8 @@
  */
 package io.github.flibio.economylite.commands.admin;
 
+import org.spongepowered.api.entity.living.player.Player;
+
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -35,7 +37,6 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.text.Text;
-
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.utils.commands.AsyncCommand;
 import io.github.flibio.utils.commands.BaseCommandExecutor;
@@ -72,6 +73,7 @@ public class RemoveCommand extends BaseCommandExecutor<CommandSource> {
                 if (targetAccount.withdraw(EconomyLite.getCurrencyService().getCurrentCurrency(), toRemove,
                         Cause.of(NamedCause.owner(EconomyLite.getInstance()))).getResult().equals(ResultType.SUCCESS)) {
                     src.sendMessage(messageStorage.getMessage("command.econ.removesuccess", "name", targetName));
+                    attemptNotify(target);
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.econ.removefail", "name", targetName));
                 }
@@ -80,6 +82,12 @@ public class RemoveCommand extends BaseCommandExecutor<CommandSource> {
             }
         } else {
             src.sendMessage(messageStorage.getMessage("command.error"));
+        }
+    }
+
+    private void attemptNotify(User target) {
+        if (target instanceof Player) {
+            ((Player) target).sendMessage(messageStorage.getMessage("command.econ.notify"));
         }
     }
 

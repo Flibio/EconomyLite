@@ -30,7 +30,7 @@ import io.github.flibio.utils.sql.LocalSqlManager;
 public class VirtualDataService extends VirtualServiceCommon {
 
     public VirtualDataService() {
-        super(LocalSqlManager.createInstance(EconomyLite.getInstance(), "data").get(), true);
+        super(LocalSqlManager.createInstance(EconomyLite.getInstance(), "data", EconomyLite.getInstance().getConfigDir()).get(), true);
     }
 
 }
