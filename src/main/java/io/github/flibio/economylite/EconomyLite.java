@@ -74,6 +74,7 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +108,11 @@ public class EconomyLite {
         logger.info("EconomyLite " + PluginInfo.VERSION + " is initializing!");
         instance = this;
         // File setup
-        fileManager = FileManager.createInstance(this, configDir.toString());
+        if (new File(configDir.toString()).isAbsolute()) {
+            fileManager = FileManager.createInstance(this, configDir.toString());
+        } else {
+            fileManager = FileManager.createInstance(this, "./" + configDir.toString());
+        }
         initializeFiles();
         initializeCurrencies();
         // Load Message Storage
