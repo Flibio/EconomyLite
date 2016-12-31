@@ -116,7 +116,7 @@ public class EconomyLite {
         initializeFiles();
         initializeCurrencies();
         // Load Message Storage
-        messageStorage = MessageStorage.createInstance(this);
+        messageStorage = MessageStorage.createInstance(this, configDir.toString());
         initializeMessage();
         // Load modules
         List<Module> postInitModules = new ArrayList<>();
