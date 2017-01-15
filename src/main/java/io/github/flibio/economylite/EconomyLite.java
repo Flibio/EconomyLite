@@ -67,7 +67,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.Currency;
@@ -85,6 +85,8 @@ import java.util.Optional;
 public class EconomyLite {
 
     @Inject @ConfigDir(sharedRoot = false) private Path configDir;
+
+    @Inject @ConfigDir(sharedRoot = true) private Path mainDir;
 
     @SuppressWarnings("unused") @Inject private Metrics metrics;
 
@@ -104,7 +106,7 @@ public class EconomyLite {
     public static CurrencyEconService currencyEconService;
 
     @Listener
-    public void onServerInitialize(GameInitializationEvent event) {
+    public void onServerInitialize(GamePreInitializationEvent event) {
         logger.info("EconomyLite " + PluginInfo.VERSION + " is initializing!");
         instance = this;
         // File setup
@@ -284,6 +286,10 @@ public class EconomyLite {
 
     public String getConfigDir() {
         return configDir.toString();
+    }
+
+    public String getMainDir() {
+        return mainDir.toString();
     }
 
     // Setters
