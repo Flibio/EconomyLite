@@ -1,7 +1,7 @@
 /*
  * This file is part of EconomyLite, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2015 - 2016 Flibio
+ * Copyright (c) 2015 - 2017 Flibio
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,8 +30,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.economy.EconomyTransactionEvent;
-import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.text.Text;
@@ -93,41 +91,24 @@ public class LoanListener {
                             player.sendMessage(messages.getMessage("module.loan.partial"));
                             player.sendMessage(messages.getMessage("module.loan.ask", "amount",
                                     Text.of(String.format(Locale.ENGLISH, "%,.2f", maxLoan)), "label", getPrefix(maxLoan, cur)));
+                            double total = maxLoan * intRate;
+                            player.sendMessage(messages.getMessage("module.loan.payment", "amount",
+                                    Text.of(String.format(Locale.ENGLISH, "%,.2f", total)), "label", getPrefix(total, cur)));
                             module.tableLoans.remove(uuid);
                             module.tableLoans.put(uuid, maxLoan);
                         } else {
                             // Ask the player if they want a full loan
                             player.sendMessage(messages.getMessage("module.loan.ask", "amount", Text.of(String.format(Locale.ENGLISH, "%,.2f", mis)),
                                     "label", getPrefix(mis.doubleValue(), cur)));
+                            BigDecimal total = mis.multiply(BigDecimal.valueOf(intRate));
+                            player.sendMessage(messages.getMessage("module.loan.payment", "amount",
+                                    Text.of(String.format(Locale.ENGLISH, "%,.2f", total)), "label", getPrefix(total.doubleValue(), cur)));
                             module.tableLoans.remove(uuid);
                             module.tableLoans.put(uuid, mis.doubleValue());
                         }
                     }
                 }
             }
-        }
-    }
-
-    @Listener
-    public void onPlayerChat(MessageChannelEvent.Chat event, @First Player player) {
-        String message = event.getRawMessage().toPlain().toLowerCase().trim();
-        UUID uuid = player.getUniqueId();
-        if (module.tableLoans.containsKey(uuid)) {
-            if (message.equals("no")) {
-                module.tableLoans.remove(uuid);
-                player.sendMessage(messages.getMessage("module.loan.no"));
-            } else if (message.equals("yes")) {
-                double amnt = module.tableLoans.get(uuid);
-                if (loans.addLoanBalance(uuid, amnt)) {
-                    module.tableLoans.remove(uuid);
-                    player.sendMessage(messages.getMessage("module.loan.yes"));
-                } else {
-                    player.sendMessage(messages.getMessage("module.loan.fail"));
-                }
-            } else {
-                player.sendMessage(messages.getMessage("module.loan.answer"));
-            }
-            event.setCancelled(true);
         }
     }
 

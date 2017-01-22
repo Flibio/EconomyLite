@@ -1,7 +1,7 @@
 /*
  * This file is part of EconomyLite, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2015 - 2016 Flibio
+ * Copyright (c) 2015 - 2017 Flibio
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -85,12 +85,18 @@ public class LoanTakeCommand extends BaseCommandExecutor<Player> {
                     src.sendMessage(messages.getMessage("module.loan.partial"));
                     src.sendMessage(messages.getMessage("module.loan.ask", "amount",
                             Text.of(String.format(Locale.ENGLISH, "%,.2f", maxLoan)), "label", getPrefix(maxLoan, cur)));
+                    double total = maxLoan * module.getInterestRate();
+                    src.sendMessage(messages.getMessage("module.loan.payment", "amount",
+                            Text.of(String.format(Locale.ENGLISH, "%,.2f", total)), "label", getPrefix(total, cur)));
                     module.tableLoans.remove(uuid);
                     module.tableLoans.put(uuid, maxLoan);
                 } else {
                     // Ask the player if they want a full loan
                     src.sendMessage(messages.getMessage("module.loan.ask", "amount", Text.of(String.format(Locale.ENGLISH, "%,.2f", loanAmount)),
                             "label", getPrefix(loanAmount, cur)));
+                    double total = loanAmount * module.getInterestRate();
+                    src.sendMessage(messages.getMessage("module.loan.payment", "amount",
+                            Text.of(String.format(Locale.ENGLISH, "%,.2f", total)), "label", getPrefix(total, cur)));
                     module.tableLoans.remove(uuid);
                     module.tableLoans.put(uuid, loanAmount);
                 }

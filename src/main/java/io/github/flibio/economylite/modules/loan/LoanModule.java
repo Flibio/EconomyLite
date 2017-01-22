@@ -1,7 +1,7 @@
 /*
  * This file is part of EconomyLite, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2015 - 2016 Flibio
+ * Copyright (c) 2015 - 2017 Flibio
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,8 +26,10 @@ package io.github.flibio.economylite.modules.loan;
 
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.modules.Module;
+import io.github.flibio.economylite.modules.loan.command.LoanAcceptCommand;
 import io.github.flibio.economylite.modules.loan.command.LoanBalanceCommand;
 import io.github.flibio.economylite.modules.loan.command.LoanCommand;
+import io.github.flibio.economylite.modules.loan.command.LoanDenyCommand;
 import io.github.flibio.economylite.modules.loan.command.LoanPayCommand;
 import io.github.flibio.economylite.modules.loan.command.LoanTakeCommand;
 import io.github.flibio.utils.commands.CommandLoader;
@@ -85,7 +87,9 @@ public class LoanModule implements Module {
                 new LoanCommand(),
                 new LoanBalanceCommand(this),
                 new LoanPayCommand(this),
-                new LoanTakeCommand(this)
+                new LoanTakeCommand(this),
+                new LoanAcceptCommand(this),
+                new LoanDenyCommand(this)
                 );
     }
 

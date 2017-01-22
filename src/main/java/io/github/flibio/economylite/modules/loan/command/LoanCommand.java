@@ -1,7 +1,7 @@
 /*
  * This file is part of EconomyLite, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2015 - 2016 Flibio
+ * Copyright (c) 2015 - 2017 Flibio
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -49,7 +49,7 @@ public class LoanCommand extends BaseCommandExecutor<CommandSource> {
 
     @Override
     public void run(CommandSource src, CommandContext args) {
-        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/loan", "subcommands", "balance | pay | take"));
+        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/loan", "subcommands", "balance | pay | take | accept | deny"));
     }
 
 }

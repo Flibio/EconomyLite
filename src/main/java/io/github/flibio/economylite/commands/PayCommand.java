@@ -1,7 +1,7 @@
 /*
  * This file is part of EconomyLite, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2015 - 2016 Flibio
+ * Copyright (c) 2015 - 2017 Flibio
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -76,12 +76,13 @@ public class PayCommand extends BaseCommandExecutor<Player> {
                         if (uOpt.get()
                                 .transfer(tOpt.get(), ecoService.getDefaultCurrency(), amount, Cause.of(NamedCause.owner(EconomyLite.getInstance())))
                                 .getResult().equals(ResultType.SUCCESS)) {
-                            src.sendMessage(messageStorage.getMessage("command.pay.success", "target", targetName));
+                            Text label = ecoService.getDefaultCurrency().getPluralDisplayName();
+                            if (amount.equals(BigDecimal.ONE)) {
+                                label = ecoService.getDefaultCurrency().getDisplayName();
+                            }
+                            src.sendMessage(messageStorage.getMessage("command.pay.success", "target", Text.of(targetName), "amountandlabel",
+                                    Text.of(String.format(Locale.ENGLISH, "%,.2f", amount) + " ").toBuilder().append(label).build()));
                             if (target instanceof Player) {
-                                Text label = ecoService.getDefaultCurrency().getPluralDisplayName();
-                                if (amount.equals(BigDecimal.ONE)) {
-                                    label = ecoService.getDefaultCurrency().getDisplayName();
-                                }
                                 ((Player) target).sendMessage(messageStorage.getMessage("command.pay.target", "amountandlabel",
                                         Text.of(String.format(Locale.ENGLISH, "%,.2f", amount) + " ").toBuilder().append(label).build(), "sender",
                                         uOpt.get().getDisplayName()));
