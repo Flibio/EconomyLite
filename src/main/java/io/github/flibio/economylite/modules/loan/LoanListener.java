@@ -103,6 +103,7 @@ public class LoanListener {
                             BigDecimal total = mis.multiply(BigDecimal.valueOf(intRate));
                             player.sendMessage(messages.getMessage("module.loan.payment", "amount",
                                     Text.of(String.format(Locale.ENGLISH, "%,.2f", total)), "label", getPrefix(total.doubleValue(), cur)));
+                            player.sendMessage(LoanTextUtils.yesOrNo("/loan accept", "/loan deny"));
                             module.tableLoans.remove(uuid);
                             module.tableLoans.put(uuid, mis.doubleValue());
                         }

@@ -26,6 +26,7 @@ package io.github.flibio.economylite.modules.loan.command;
 
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.modules.loan.LoanModule;
+import io.github.flibio.economylite.modules.loan.LoanTextUtils;
 import io.github.flibio.utils.commands.AsyncCommand;
 import io.github.flibio.utils.commands.BaseCommandExecutor;
 import io.github.flibio.utils.commands.Command;
@@ -97,6 +98,8 @@ public class LoanTakeCommand extends BaseCommandExecutor<Player> {
                     double total = loanAmount * module.getInterestRate();
                     src.sendMessage(messages.getMessage("module.loan.payment", "amount",
                             Text.of(String.format(Locale.ENGLISH, "%,.2f", total)), "label", getPrefix(total, cur)));
+
+                    src.sendMessage(LoanTextUtils.yesOrNo("/loan accept", "/loan deny"));
                     module.tableLoans.remove(uuid);
                     module.tableLoans.put(uuid, loanAmount);
                 }

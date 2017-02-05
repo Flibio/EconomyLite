@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Continuum Script v1.1.0 #
+# Report issues/suggestions on the repository #
+# https://github.com/FlibioWeb/Continuum #
+
 # Configuration #
 TARGET="http://continuum.flibio.net/api/"
 PROJECT="EconomyLite"
@@ -10,6 +14,13 @@ UPLOAD="${TRAVIS_BUILD_DIR}/build/libs/*.jar"
 
 if [[ "${TRAVIS_BRANCH}" != "${BRANCH}" ]]; then
     echo "Incorrect branch, stopping script!"
+    exit;
+fi
+
+# Make sure this is not a pull request #
+
+if [[ ${TRAVIS_PULL_REQUEST} != "false" ]]; then
+    echo "Pull request detected, stopping script!"
     exit;
 fi
 
@@ -34,8 +45,9 @@ if [[ ${BUILD} -gt 0 ]]; then
     # Upload the files #
     for f in $UPLOAD
     do
+        FILE_DISPLAY=${f/BUILD/$BUILD}
         echo "Attempting to add artifact ${f}"
-        echo $(curl -v -X POST --form "file=@${f};filename=${f}" --form "project=${PROJECT}" --form "build=${BUILD}" -u continuum:${CONTINUUM_TOKEN} "${TARGET}upload.php")
+        echo $(curl -v -X POST --form "file=@${f};filename=${FILE_DISPLAY}" --form "project=${PROJECT}" --form "build=${BUILD}" -u continuum:${CONTINUUM_TOKEN} "${TARGET}upload.php")
     done
 else
     echo "Failed to create a build!"

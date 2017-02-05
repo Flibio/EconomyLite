@@ -32,7 +32,11 @@ dependencies {
 
 shadowJar {
     def bVer = System.getenv("BUILD_NUMBER") ?: version
-    archiveName = "EconomyLite-${project.apiVersion.minus("-SNAPSHOT")}-${bVer}.jar"
+    def buildNumber = ''
+    if (System.getenv("TRAVIS") != null) {
+        buildNumber = '-BUILD'
+    }
+    archiveName = "EconomyLite-${project.apiVersion.minus("-SNAPSHOT")}-${bVer}${buildNumber}.jar"
 
     dependencies {
         include dependency('net.minecrell.mcstats:statslite-sponge')
