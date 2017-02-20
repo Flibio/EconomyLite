@@ -24,6 +24,7 @@
  */
 package io.github.flibio.economylite.modules.loan;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.modules.Module;
 import io.github.flibio.economylite.modules.loan.command.LoanAcceptCommand;
@@ -35,11 +36,13 @@ import io.github.flibio.economylite.modules.loan.command.LoanTakeCommand;
 import io.github.flibio.utils.commands.CommandLoader;
 import io.github.flibio.utils.file.FileManager;
 import io.github.flibio.utils.message.MessageStorage;
+import ninja.leaping.configurate.ConfigurationNode;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -98,6 +101,16 @@ public class LoanModule implements Module {
         configManager.setDefault("config.conf", "modules.loan.enabled", Boolean.class, false);
         configManager.setDefault("config.conf", "modules.loan.interest-rate", Double.class, 1.0);
         configManager.setDefault("config.conf", "modules.loan.max-loan-balance", Double.class, 1000.0);
+
+        Optional<ConfigurationNode> cOpt = configManager.getFile("config.conf");
+        if (cOpt.isPresent()) {
+            ConfigurationNode con = cOpt.get();
+            Map<String, Boolean> defaultPerms = ImmutableMap.of("reward.permission", true);
+            if (con.getNode("modules").getNode("loan").getNode("debtor-perms").isVirtual()) {
+                con.getNode("modules").getNode("loan").getNode("debtor-perms").setValue(defaultPerms);
+                configManager.saveFile("config.conf", con);
+            }
+        }
     }
 
     @Override
@@ -123,4 +136,18 @@ public class LoanModule implements Module {
         return interestRate;
     }
 
+    public Map<String, Boolean> getPermissions() {
+        Optional<ConfigurationNode> cOpt = configManager.getFile("config.conf");
+        Map<String, Boolean> perms = new HashMap<>();
+        if (cOpt.isPresent()) {
+            ConfigurationNode con = cOpt.get();
+
+            Map<Object, ? extends ConfigurationNode> map = con.getNode("modules").getNode("loan").getNode("debtor-perms").getChildrenMap();
+
+            map.keySet().forEach(perm -> {
+                perms.put(perm.toString(), map.get(perm).getBoolean());
+            });
+        }
+        return perms;
+    }
 }

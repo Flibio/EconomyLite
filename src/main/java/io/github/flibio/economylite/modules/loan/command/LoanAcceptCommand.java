@@ -25,7 +25,6 @@
 package io.github.flibio.economylite.modules.loan.command;
 
 import io.github.flibio.economylite.EconomyLite;
-
 import io.github.flibio.economylite.modules.loan.LoanManager;
 import io.github.flibio.economylite.modules.loan.LoanModule;
 import io.github.flibio.utils.commands.AsyncCommand;
@@ -68,6 +67,7 @@ public class LoanAcceptCommand extends BaseCommandExecutor<Player> {
         if (module.tableLoans.containsKey(uuid)) {
             double amnt = module.tableLoans.get(uuid);
             if (manager.addLoanBalance(uuid, amnt)) {
+                // Remove from the table
                 module.tableLoans.remove(uuid);
                 src.sendMessage(messages.getMessage("module.loan.yes"));
             } else {

@@ -24,6 +24,10 @@
  */
 package io.github.flibio.economylite.modules.loan;
 
+import org.spongepowered.api.util.Tristate;
+
+import org.spongepowered.api.service.permission.SubjectData;
+import io.github.flibio.economylite.modules.loan.event.LoanBalanceChangeEvent;
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.utils.message.MessageStorage;
 import org.spongepowered.api.Sponge;
@@ -108,6 +112,26 @@ public class LoanListener {
                             module.tableLoans.put(uuid, mis.doubleValue());
                         }
                     }
+                }
+            }
+        }
+    }
+
+    @Listener
+    public void onLoanChange(LoanBalanceChangeEvent event) {
+        UUID uuid = event.getUser();
+        for (Player player : Sponge.getServer().getOnlinePlayers()) {
+            if (player.getUniqueId().equals(uuid)) {
+                if (event.getNewBalance() == 0) {
+                    // Remove the debtor permissions
+                    module.getPermissions().forEach((perm, val) -> {
+                        player.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, perm, Tristate.fromBoolean(!val));
+                    });
+                } else {
+                    // Add the debtor permissions
+                    module.getPermissions().forEach((perm, val) -> {
+                        player.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, perm, Tristate.fromBoolean(val));
+                    });
                 }
             }
         }

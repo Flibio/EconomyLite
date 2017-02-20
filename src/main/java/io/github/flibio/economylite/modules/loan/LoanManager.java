@@ -26,7 +26,9 @@ package io.github.flibio.economylite.modules.loan;
 
 import io.github.flibio.economylite.CauseFactory;
 import io.github.flibio.economylite.EconomyLite;
+import io.github.flibio.economylite.modules.loan.event.LoanBalanceChangeEvent;
 import io.github.flibio.utils.file.FileManager;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
@@ -71,6 +73,8 @@ public class LoanManager {
         // Make sure balance is within parameters
         if (amount < 0 || amount > module.getMaxLoan())
             return false;
+        // Fire loan balance change event
+        Sponge.getEventManager().post(new LoanBalanceChangeEvent(amount, uuid));
         Currency cur = eco.getDefaultCurrency();
         return manager.setValue("player-loans.data", uuid.toString() + "." + cur.getId() + ".balance", Double.class, amount);
     }
