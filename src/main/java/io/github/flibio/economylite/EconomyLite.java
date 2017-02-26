@@ -67,6 +67,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -104,6 +105,11 @@ public class EconomyLite {
     private static VirtualEconService virtualEconService;
     private static PlayerEconService playerEconService;
     public static CurrencyEconService currencyEconService;
+
+    @Listener
+    public void onConstruct(GameConstructionEvent event) {
+        System.getProperties().setProperty("h2.bindAddress", "127.0.0.1");
+    }
 
     @Listener
     public void onServerInitialize(GamePreInitializationEvent event) {
