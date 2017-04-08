@@ -64,7 +64,7 @@ public class PayCommand extends BaseCommandExecutor<Player> {
     public void run(Player src, CommandContext args) {
         if (args.getOne("player").isPresent() && args.getOne("amount").isPresent()) {
             BigDecimal amount = BigDecimal.valueOf(args.<Double>getOne("amount").get());
-            if (amount.compareTo(BigDecimal.ONE) == -1) {
+            if (amount.doubleValue() <= 0) {
                 src.sendMessage(messageStorage.getMessage("command.pay.invalid"));
             } else {
                 User target = args.<User>getOne("player").get();

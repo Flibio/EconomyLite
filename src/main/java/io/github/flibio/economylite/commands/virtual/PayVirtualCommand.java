@@ -68,7 +68,7 @@ public class PayVirtualCommand extends BaseCommandExecutor<Player> {
             Optional<Account> aOpt = EconomyLite.getEconomyService().getOrCreateAccount(target);
             Optional<UniqueAccount> uOpt = EconomyLite.getEconomyService().getOrCreateAccount(src.getUniqueId());
             // Check for negative payments
-            if (amount.compareTo(BigDecimal.ONE) == -1) {
+            if (amount.doubleValue() <= 0) {
                 src.sendMessage(messageStorage.getMessage("command.pay.invalid"));
             } else {
                 if (aOpt.isPresent() && uOpt.isPresent()) {
