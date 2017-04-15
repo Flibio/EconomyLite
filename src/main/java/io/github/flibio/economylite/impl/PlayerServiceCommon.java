@@ -119,6 +119,13 @@ public class PlayerServiceCommon implements PlayerEconService {
         return accounts;
     }
 
+    public boolean setBalanceAll(BigDecimal balance, Currency currency, Cause cause) {
+        boolean result = manager.executeUpdate("UPDATE economyliteplayers SET balance = ? WHERE currency = ?", balance.toString(), currency.getId());
+        debug("playercommon: +Account Exists+ Setting balance of ALL to '" + balance.toPlainString() + "' with '"
+                + currency.getId() + "' - " + cause.toString() + " = " + result);
+        return result;
+    }
+
     private void debug(String message) {
         if (log) {
             logger.debug(message);

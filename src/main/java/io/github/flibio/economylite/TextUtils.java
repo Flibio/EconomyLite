@@ -22,35 +22,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.flibio.economylite.commands.admin;
+package io.github.flibio.economylite;
 
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.command.spec.CommandSpec.Builder;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColors;
 
-import io.github.flibio.economylite.EconomyLite;
-import io.github.flibio.utils.commands.AsyncCommand;
-import io.github.flibio.utils.commands.BaseCommandExecutor;
-import io.github.flibio.utils.commands.Command;
-import io.github.flibio.utils.message.MessageStorage;
+import java.util.function.Consumer;
 
-@AsyncCommand
-@Command(aliases = {"economy", "econ", "eco"}, permission = "economylite.admin.econ")
-public class EconCommand extends BaseCommandExecutor<CommandSource> {
+public class TextUtils {
 
-    private MessageStorage messageStorage = EconomyLite.getMessageStorage();
-
-    @Override
-    public Builder getCommandSpecBuilder() {
-        return CommandSpec.builder()
-                .executor(this);
+    public static Text yesOrNo(Consumer<CommandSource> yes, Consumer<CommandSource> no) {
+        Text accept =
+                Text.of(TextColors.DARK_GRAY, "[", TextColors.GREEN, "YES", TextColors.DARK_GRAY, "]").toBuilder()
+                        .onHover(TextActions.showText(Text.of(TextColors.GREEN, "Yes!")))
+                        .onClick(TextActions.executeCallback(yes))
+                        .build();
+        Text deny =
+                Text.of(TextColors.DARK_GRAY, "[", TextColors.RED, "NO", TextColors.DARK_GRAY, "]").toBuilder()
+                        .onHover(TextActions.showText(Text.of(TextColors.RED, "No!")))
+                        .onClick(TextActions.executeCallback(no))
+                        .build();
+        return accept.toBuilder().append(Text.of(" "), deny).build();
     }
-
-    @Override
-    public void run(CommandSource src, CommandContext args) {
-        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/econ", "subcommands", "add | set | remove <player> <amount>"));
-        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/econ", "subcommands", "setall <amount>"));
-    }
-
 }

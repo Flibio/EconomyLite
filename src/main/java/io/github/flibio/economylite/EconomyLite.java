@@ -35,6 +35,7 @@ import io.github.flibio.economylite.commands.PayCommand;
 import io.github.flibio.economylite.commands.admin.AddCommand;
 import io.github.flibio.economylite.commands.admin.EconCommand;
 import io.github.flibio.economylite.commands.admin.RemoveCommand;
+import io.github.flibio.economylite.commands.admin.SetAllCommand;
 import io.github.flibio.economylite.commands.admin.SetCommand;
 import io.github.flibio.economylite.commands.balance.BalTopCommand;
 import io.github.flibio.economylite.commands.balance.BalanceCommand;
@@ -163,6 +164,7 @@ public class EconomyLite {
                 new BalanceCommand(),
                 new EconCommand(),
                 new SetCommand(),
+                new SetAllCommand(),
                 new RemoveCommand(),
                 new AddCommand(),
                 new PayCommand(),
@@ -185,6 +187,7 @@ public class EconomyLite {
         fileManager.setDefault("config.conf", "virt-default-balance", Double.class, 0.0);
         fileManager.setDefault("config.conf", "debug-logging", Boolean.class, true);
         fileManager.setDefault("config.conf", "notify-on-admin-commands", Boolean.class, false);
+        fileManager.setDefault("config.conf", "confirm-offline-payments", Boolean.class, false);
     }
 
     public static boolean isEnabled(String path) {

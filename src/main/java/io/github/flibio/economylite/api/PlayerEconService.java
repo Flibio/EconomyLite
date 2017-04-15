@@ -122,4 +122,13 @@ public interface PlayerEconService {
      */
     public List<UniqueAccount> getTopAccounts(int start, int end, Cause cause);
 
+    /**
+     * Sets the balance of all players.
+     * 
+     * @param balance The new balance.
+     * @param currency The currency to use.
+     * @param cause What caused the balance change.
+     * @return If the balances were changed successfully.
+     */
+    public boolean setBalanceAll(BigDecimal balance, Currency currency, Cause cause);
 }
