@@ -130,12 +130,16 @@ public class MigrateCommand extends BaseCommandExecutor<CommandSource> {
                         root.getChildrenMap().keySet().forEach(raw -> {
                             if (raw instanceof String) {
                                 String uuid = (String) raw;
-                                ConfigurationNode sub = root.getNode(uuid).getNode("dollar-balance");
-                                if (!sub.isVirtual()) {
-                                    playerService.setBalance(UUID.fromString(uuid), BigDecimal.valueOf(sub.getDouble()),
-                                            EconomyLite.getEconomyService().getDefaultCurrency(), CauseFactory.create("Migration"));
-                                    logger.debug(uuid.toString() + ": " + sub.getDouble());
-                                }
+                                root.getNode(uuid).getChildrenMap().keySet().forEach(n -> {
+                                    if (n.toString().contains("balance")) {
+                                        ConfigurationNode sub = root.getNode(uuid).getNode(n.toString());
+                                        if (!sub.isVirtual()) {
+                                            playerService.setBalance(UUID.fromString(uuid), BigDecimal.valueOf(sub.getDouble()),
+                                                    EconomyLite.getEconomyService().getDefaultCurrency(), CauseFactory.create("Migration"));
+                                            logger.debug(uuid.toString() + ":migrate: " + sub.getDouble());
+                                        }
+                                    }
+                                });
                             }
                         });
                         src.sendMessage(messageStorage.getMessage("command.migrate.completed"));
