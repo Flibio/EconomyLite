@@ -6,7 +6,7 @@
 
 EconomyLite is a lightweight, yet advanced economy plugin for your Sponge server. The plugin is built to be customizable, and you can enable and disable features at your will.
 
-###Features
+### Features
 
 - Drag & Drop Installation
   - Just drop EconomyLite into your "mods" folder with Sponge and start your server
@@ -25,7 +25,7 @@ EconomyLite is a lightweight, yet advanced economy plugin for your Sponge server
 - Multiple Currencies
   - EconomyLite has built-in support for multiple currencies
 
-###Installation
+### Installation
 
 Drag and drop EconomyLite into your "mods" folder along with Sponge and start your server. The configuration files can be found in `config/EconomyLite`.
 
@@ -45,7 +45,7 @@ Drag and drop EconomyLite into your "mods" folder along with Sponge and start yo
 
 ---
 
-![EconomyLite Statistics](http://i.mcstats.org/EconomyLite/Global+Statistics.png)
+![EconomyLite Statistics](http://i.flibio.net/economylite.php)
 
 [1]: https://github.com/Flibio/EconomyLite/releases
 [2]: http://continuum.flibio.net/project/EconomyLite
