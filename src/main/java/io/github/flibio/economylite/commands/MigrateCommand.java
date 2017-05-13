@@ -28,6 +28,8 @@ import io.github.flibio.economylite.CauseFactory;
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.PlayerEconService;
 import io.github.flibio.economylite.api.VirtualEconService;
+import io.github.flibio.economylite.impl.PlayerDataService;
+import io.github.flibio.economylite.impl.PlayerServiceCommon;
 import io.github.flibio.utils.commands.AsyncCommand;
 import io.github.flibio.utils.commands.BaseCommandExecutor;
 import io.github.flibio.utils.commands.Command;
@@ -141,6 +143,33 @@ public class MigrateCommand extends BaseCommandExecutor<CommandSource> {
                                     }
                                 });
                             }
+                        });
+                        src.sendMessage(messageStorage.getMessage("command.migrate.completed"));
+                    } catch (Exception e) {
+                        logger.error(e.getMessage());
+                        src.sendMessage(messageStorage.getMessage("command.migrate.fail"));
+                    }
+                } else if (mode.equalsIgnoreCase("tomysql")) {
+                    try {
+                        // Migrate from H2 to MySQL
+                        if (EconomyLite.getPlayerService() instanceof PlayerDataService) {
+                            // MySQL is not setup
+                            src.sendMessage(messageStorage.getMessage("command.migrate.fail"));
+                            return;
+                        }
+                        // Get current MySQL service
+                        PlayerEconService s = EconomyLite.getPlayerService();
+                        if (!(s instanceof PlayerServiceCommon)) {
+                            src.sendMessage(messageStorage.getMessage("command.migrate.fail"));
+                            return;
+                        }
+                        PlayerServiceCommon sqlService = (PlayerServiceCommon) s;
+                        // Load the data service
+                        PlayerDataService dataService = new PlayerDataService();
+                        // Insert new data
+                        dataService.getAccountsMigration().forEach(r -> {
+                            String[] d = r.split("%-%");
+                            sqlService.setRawData(d[0], d[1], d[2]);
                         });
                         src.sendMessage(messageStorage.getMessage("command.migrate.completed"));
                     } catch (Exception e) {

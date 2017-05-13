@@ -24,6 +24,8 @@
  */
 package io.github.flibio.economylite.impl;
 
+import io.github.flibio.economylite.CauseFactory;
+
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.PlayerEconService;
 import io.github.flibio.utils.sql.SqlManager;
@@ -34,6 +36,7 @@ import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -124,6 +127,32 @@ public class PlayerServiceCommon implements PlayerEconService {
         debug("playercommon: +Account Exists+ Setting balance of ALL to '" + balance.toPlainString() + "' with '"
                 + currency.getId() + "' - " + cause.toString() + " = " + result);
         return result;
+    }
+
+    public List<String> getAccountsMigration() {
+        List<String> accounts = new ArrayList<>();
+        Optional<ResultSet> rOpt = manager.executeQuery("SELECT * FROM economyliteplayers");
+        if (rOpt.isPresent()) {
+            ResultSet rs = rOpt.get();
+            try {
+                while (rs.next()) {
+                    accounts.add(rs.getString("uuid") + "%-%" + rs.getDouble("balance") + "%-%" + rs.getString("currency"));
+                }
+                return accounts;
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                return accounts;
+            }
+        }
+        return accounts;
+    }
+
+    public void setRawData(String uuid, String bal, String currency) {
+        if (accountExists(UUID.fromString(uuid), CauseFactory.stringCause("Migration"))) {
+            manager.executeUpdate("UPDATE economyliteplayers SET balance = ? WHERE uuid = ? AND currency = ?", bal, uuid, currency);
+        } else {
+            manager.executeUpdate("INSERT INTO economyliteplayers (`uuid`, `balance`, `currency`) VALUES (?, ?, ?)", uuid, bal, currency);
+        }
     }
 
     private void debug(String message) {
