@@ -26,6 +26,7 @@ package io.github.flibio.economylite.modules.loan.event;
 
 import io.github.flibio.economylite.EconomyLite;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
 import java.util.UUID;
@@ -42,7 +43,7 @@ public class LoanBalanceChangeEvent extends AbstractEvent {
 
     @Override
     public Cause getCause() {
-        return Cause.builder().owner(EconomyLite.getInstance()).build();
+        return Cause.of(EventContext.empty(), EconomyLite.getInstance().getPluginContainer());
     }
 
     public UUID getUser() {

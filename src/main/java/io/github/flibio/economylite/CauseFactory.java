@@ -24,17 +24,17 @@
  */
 package io.github.flibio.economylite;
 
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContext;
 
 import org.spongepowered.api.event.cause.Cause;
 
 public class CauseFactory {
 
     public static Cause create(String reason) {
-        return Cause.of(NamedCause.of(reason, EconomyLite.getInstance().getPluginContainer()));
+        return Cause.of(EventContext.empty(), reason, EconomyLite.getInstance().getPluginContainer());
     }
 
     public static Cause stringCause(String reason) {
-        return Cause.of(NamedCause.owner("economylite:" + reason.toLowerCase().replaceAll(" ", "_")));
+        return Cause.of(EventContext.empty(),("economylite:" + reason.toLowerCase().replaceAll(" ", "_")));
     }
 }

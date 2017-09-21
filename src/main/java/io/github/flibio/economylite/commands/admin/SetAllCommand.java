@@ -36,7 +36,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.text.Text;
 
 import java.math.BigDecimal;
@@ -61,7 +61,7 @@ public class SetAllCommand extends BaseCommandExecutor<CommandSource> {
             String targetName = "all players";
             BigDecimal newBal = BigDecimal.valueOf(args.<Double>getOne("balance").get());
             if (EconomyLite.getPlayerService().setBalanceAll(newBal, EconomyLite.getCurrencyService().getCurrentCurrency(),
-                    Cause.of(NamedCause.owner(EconomyLite.getInstance())))) {
+                    Cause.of(EventContext.empty(),(EconomyLite.getInstance())))) {
                 src.sendMessage(messageStorage.getMessage("command.econ.setsuccess", "name", targetName));
             } else {
                 src.sendMessage(messageStorage.getMessage("command.econ.setfail", "name", targetName));

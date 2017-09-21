@@ -36,7 +36,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.text.Text;
@@ -67,7 +67,7 @@ public class VirtualRemoveCommand extends BaseCommandExecutor<CommandSource> {
             if (aOpt.isPresent()) {
                 Account targetAccount = aOpt.get();
                 if (targetAccount.withdraw(EconomyLite.getCurrencyService().getCurrentCurrency(), toRemove,
-                        Cause.of(NamedCause.owner(EconomyLite.getInstance()))).getResult().equals(ResultType.SUCCESS)) {
+                        Cause.of(EventContext.empty(),(EconomyLite.getInstance()))).getResult().equals(ResultType.SUCCESS)) {
                     src.sendMessage(messageStorage.getMessage("command.econ.removesuccess", "name", target));
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.econ.removefail", "name", target));
