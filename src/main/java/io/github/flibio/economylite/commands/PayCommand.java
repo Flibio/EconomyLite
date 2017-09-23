@@ -38,7 +38,7 @@ import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.ResultType;
@@ -96,7 +96,7 @@ public class PayCommand extends BaseCommandExecutor<Player> {
             Optional<UniqueAccount> tOpt = ecoService.getOrCreateAccount(target.getUniqueId());
             if (uOpt.isPresent() && tOpt.isPresent()) {
                 if (uOpt.get()
-                        .transfer(tOpt.get(), ecoService.getDefaultCurrency(), amount, Cause.of(NamedCause.owner(EconomyLite.getInstance())))
+                        .transfer(tOpt.get(), ecoService.getDefaultCurrency(), amount, Cause.of(EventContext.empty(),(EconomyLite.getInstance())))
                         .getResult().equals(ResultType.SUCCESS)) {
                     Text label = ecoService.getDefaultCurrency().getPluralDisplayName();
                     if (amount.equals(BigDecimal.ONE)) {

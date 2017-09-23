@@ -33,7 +33,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.text.Text;
@@ -71,7 +71,7 @@ public class RemoveCommand extends BaseCommandExecutor<CommandSource> {
             if (uOpt.isPresent()) {
                 UniqueAccount targetAccount = uOpt.get();
                 if (targetAccount.withdraw(EconomyLite.getCurrencyService().getCurrentCurrency(), toRemove,
-                        Cause.of(NamedCause.owner(EconomyLite.getInstance()))).getResult().equals(ResultType.SUCCESS)) {
+                        Cause.of(EventContext.empty(),(EconomyLite.getInstance()))).getResult().equals(ResultType.SUCCESS)) {
                     src.sendMessage(messageStorage.getMessage("command.econ.removesuccess", "name", targetName));
                     attemptNotify(target);
                 } else {

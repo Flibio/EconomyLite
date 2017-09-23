@@ -37,7 +37,7 @@ import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
@@ -79,7 +79,8 @@ public class VirtualPayCommand extends BaseCommandExecutor<CommandSource> {
                 if (aOpt.isPresent() && uOpt.isPresent()) {
                     Account payer = aOpt.get();
                     UniqueAccount receiver = uOpt.get();
-                    if (payer.transfer(receiver, ecoService.getDefaultCurrency(), amount, Cause.of(NamedCause.owner(EconomyLite.getInstance())))
+                    if (payer.transfer(receiver, ecoService.getDefaultCurrency(), amount, Cause.of(EventContext.empty(),EconomyLite.getInstance
+                            ()))
                             .getResult().equals(ResultType.SUCCESS)) {
                         src.sendMessage(messageStorage.getMessage("command.pay.success", "target", target.getName()));
                         if (target instanceof Player) {
