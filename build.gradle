@@ -52,15 +52,15 @@ license {
 
     // The project properties to use
     ext.name = project.name
-    ext.owner = project.owner
-    ext.inceptionYear = project.inceptionYear
-    ext.currentYear = project.currentYear
 
     // The file that contains the license header
     header file('HEADER.txt')
 
     // The source sets to apply the license to
     sourceSets = project.sourceSets
+
+    // Exclude properties files
+    exclude "**/*.properties"
 
     ignoreFailures false
     strictCheck true
