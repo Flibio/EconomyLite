@@ -1,7 +1,7 @@
 /*
  * This file is part of EconomyLite, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2015 - 2017 Flibio
+ * Copyright (c) 2015 - 2018 Flibio
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -62,7 +62,6 @@ import io.github.flibio.economylite.modules.sql.SqlModule;
 import io.github.flibio.utils.commands.CommandLoader;
 import io.github.flibio.utils.file.FileManager;
 import io.github.flibio.utils.message.MessageStorage;
-import me.flibio.updatifier.Updatifier;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -82,7 +81,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Updatifier(repoName = "EconomyLite", repoOwner = "Flibio", version = "v" + PluginInfo.VERSION)
 @Plugin(id = PluginInfo.ID, name = PluginInfo.NAME, version = PluginInfo.VERSION, description = PluginInfo.DESCRIPTION)
 public class EconomyLite {
 
@@ -177,7 +175,7 @@ public class EconomyLite {
                 new VirtualPayCommand(),
                 new PayVirtualCommand(),
                 new MigrateCommand()
-                );
+        );
         // Register currency registry
         game.getRegistry().registerModule(Currency.class, new CurrencyRegistryModule());
     }

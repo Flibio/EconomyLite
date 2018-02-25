@@ -1,6 +1,5 @@
 ![EconomyLite](http://i.imgur.com/MsuOo9w.png)
 
-[![Downloads](https://img.shields.io/github/downloads/flibio/economylite/total.svg?style=flat-square)](https://github.com/Flibio/EconomyLite/releases)
 [![Issues](https://img.shields.io/github/issues/flibio/economylite.svg?style=flat-square)](http://www.github.com/Flibio/EconomyLite/issues/)
 [![Gitter](https://img.shields.io/badge/chat-on_gitter-3F51B5.svg?style=flat-square)](https://gitter.im/Flibio/EconomyLite)
 
@@ -33,8 +32,6 @@ Drag and drop EconomyLite into your "mods" folder along with Sponge and start yo
 
 :inbox_tray: [**Download EconomyLite**][1]
 
-:wrench: [**Development Builds**][2]
-
 :speech_balloon: [**Issues & Suggestions**][3]
 
 :newspaper: [**Forum Post**][4]
@@ -47,9 +44,8 @@ Drag and drop EconomyLite into your "mods" folder along with Sponge and start yo
 
 ![EconomyLite Statistics](http://i.flibio.net/economylite.php)
 
-[1]: https://github.com/Flibio/EconomyLite/releases
-[2]: http://continuum.flibio.net/project/EconomyLite
+[1]: https://ore.spongepowered.org/Flibio/EconomyLite/versions
 [3]: https://github.com/Flibio/EconomyLite/issues
-[4]: https://forums.spongepowered.org/t/economylite/7045
+[4]: https://forums.spongepowered.org/t/economylite/16502
 [5]: http://flibiostudio.github.io/EconomyLiteDocs/index.html
 [6]: http://flibio.weebly.com/support-me.html
