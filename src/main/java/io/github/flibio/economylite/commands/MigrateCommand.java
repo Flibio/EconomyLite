@@ -73,47 +73,7 @@ public class MigrateCommand extends BaseCommandExecutor<CommandSource> {
             if (args.getOne("confirm").isPresent() && args.<Boolean>getOne("confirm").get()) {
                 // Attempt to migrate
                 String mode = args.<String>getOne("mode").get();
-                if (mode.equalsIgnoreCase("economylite1")) {
-                    // Migrate from EconomyLite 1
-                    File file = new File("config/EconomyLite/data.conf");
-                    File bFile = new File("config/EconomyLite/businesses.conf");
-                    try {
-                        if (file.exists()) {
-                            ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(file).build();
-                            ConfigurationNode root = manager.load();
-                            root.getChildrenMap().keySet().forEach(raw -> {
-                                if (raw instanceof String) {
-                                    UUID uuid = UUID.fromString((String) raw);
-                                    if (root.getNode(uuid.toString()).getNode("balance") != null) {
-                                        int balance = root.getNode(uuid.toString()).getNode("balance").getInt();
-                                        playerService.setBalance(uuid, BigDecimal.valueOf(balance),
-                                                EconomyLite.getEconomyService().getDefaultCurrency(), CauseFactory.create("Migration"));
-                                        logger.debug(uuid.toString() + ": " + balance);
-                                    }
-                                }
-                            });
-                        }
-                        if (bFile.exists()) {
-                            ConfigurationLoader<?> manager = HoconConfigurationLoader.builder().setFile(bFile).build();
-                            ConfigurationNode root = manager.load();
-                            root.getChildrenMap().keySet().forEach(raw -> {
-                                if (raw instanceof String) {
-                                    String name = (String) raw;
-                                    if (root.getNode(name).getNode("balance") != null) {
-                                        int balance = root.getNode(name).getNode("balance").getInt();
-                                        virtualService.setBalance(name, BigDecimal.valueOf(balance),
-                                                EconomyLite.getEconomyService().getDefaultCurrency(), CauseFactory.create("Migration"));
-                                        logger.debug(name + ": " + balance);
-                                    }
-                                }
-                            });
-                        }
-                        src.sendMessage(messageStorage.getMessage("command.migrate.completed"));
-                    } catch (Exception e) {
-                        logger.error(e.getMessage());
-                        src.sendMessage(messageStorage.getMessage("command.migrate.fail"));
-                    }
-                } else if (mode.equalsIgnoreCase("totaleconomy")) {
+                if (mode.equalsIgnoreCase("totaleconomy")) {
                     try {
                         // Migrate from TotalEconomy
                         String configDir = EconomyLite.getInstance().getMainDir();
