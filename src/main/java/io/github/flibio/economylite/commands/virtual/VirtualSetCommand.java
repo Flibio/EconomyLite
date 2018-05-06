@@ -47,10 +47,10 @@ public class VirtualSetCommand extends BaseCommandExecutor<CommandSource> {
             if (aOpt.isPresent()) {
                 Account targetAccount = aOpt.get();
                 if (targetAccount.setBalance(EconomyLite.getCurrencyService().getCurrentCurrency(), newBal,
-                        Cause.of(EventContext.empty(),(EconomyLite.getInstance()))).getResult().equals(ResultType.SUCCESS)) {
-                    src.sendMessage(messageStorage.getMessage("command.econ.setsuccess", "name", targetAccount.getDisplayName()));
+                        Cause.of(EventContext.empty(), (EconomyLite.getInstance()))).getResult().equals(ResultType.SUCCESS)) {
+                    src.sendMessage(messageStorage.getMessage("command.econ.setsuccess", "name", targetAccount.getDisplayName().toPlain()));
                 } else {
-                    src.sendMessage(messageStorage.getMessage("command.econ.setfail", "name", targetAccount.getDisplayName()));
+                    src.sendMessage(messageStorage.getMessage("command.econ.setfail", "name", targetAccount.getDisplayName().toPlain()));
                 }
             } else {
                 src.sendMessage(messageStorage.getMessage("command.error"));

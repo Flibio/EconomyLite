@@ -3,6 +3,7 @@
  */
 package io.github.flibio.economylite.modules.loan;
 
+import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
 
 import org.spongepowered.api.service.permission.SubjectData;
@@ -45,8 +46,9 @@ public class LoanListener {
             Optional<UUID> uOpt = event.getCause().first(UUID.class);
             Optional<String> sOpt = event.getCause().first(String.class);
             if (sOpt.isPresent()) {
-                if (sOpt.get().equalsIgnoreCase("economylite:loan"))
+                if (sOpt.get().equalsIgnoreCase("economylite:loan")) {
                     return;
+                }
             }
             if (uOpt.isPresent()) {
                 UUID uuid = uOpt.get();
@@ -64,28 +66,29 @@ public class LoanListener {
                         BigDecimal mis = event.getTransactionResult().getAmount().subtract(bal);
                         double misDouble = mis.doubleValue();
                         // Notify player of interest rate
-                        player.sendMessage(messages.getMessage("module.loan.interest", "rate", Text.of(intRate)));
+                        player.sendMessage(messages.getMessage("module.loan.interest", "rate", Double.toString(intRate)));
                         // Check how much loan they can take out
                         double maxLoan = (maxLoanBal - loanBalance) / intRate;
-                        if (maxLoan <= 0)
+                        if (maxLoan <= 0) {
                             return;
+                        }
                         if (maxLoan < misDouble) {
                             // Offer the player a smaller loan
                             player.sendMessage(messages.getMessage("module.loan.partial"));
                             player.sendMessage(messages.getMessage("module.loan.ask", "amount",
-                                    Text.of(String.format(Locale.ENGLISH, "%,.2f", maxLoan)), "label", getPrefix(maxLoan, cur)));
+                                    String.format(Locale.ENGLISH, "%,.2f", maxLoan), "label", getPrefix(maxLoan, cur)));
                             double total = maxLoan * intRate;
                             player.sendMessage(messages.getMessage("module.loan.payment", "amount",
-                                    Text.of(String.format(Locale.ENGLISH, "%,.2f", total)), "label", getPrefix(total, cur)));
+                                    String.format(Locale.ENGLISH, "%,.2f", total), "label", getPrefix(total, cur)));
                             module.tableLoans.remove(uuid);
                             module.tableLoans.put(uuid, maxLoan);
                         } else {
                             // Ask the player if they want a full loan
-                            player.sendMessage(messages.getMessage("module.loan.ask", "amount", Text.of(String.format(Locale.ENGLISH, "%,.2f", mis)),
+                            player.sendMessage(messages.getMessage("module.loan.ask", "amount", String.format(Locale.ENGLISH, "%,.2f", mis),
                                     "label", getPrefix(mis.doubleValue(), cur)));
                             BigDecimal total = mis.multiply(BigDecimal.valueOf(intRate));
                             player.sendMessage(messages.getMessage("module.loan.payment", "amount",
-                                    Text.of(String.format(Locale.ENGLISH, "%,.2f", total)), "label", getPrefix(total.doubleValue(), cur)));
+                                    String.format(Locale.ENGLISH, "%,.2f", total), "label", getPrefix(total.doubleValue(), cur)));
                             player.sendMessage(LoanTextUtils.yesOrNo("/loan accept", "/loan deny"));
                             module.tableLoans.remove(uuid);
                             module.tableLoans.put(uuid, mis.doubleValue());
@@ -116,11 +119,11 @@ public class LoanListener {
         }
     }
 
-    private Text getPrefix(double amnt, Currency cur) {
+    private String getPrefix(double amnt, Currency cur) {
         Text label = cur.getPluralDisplayName();
         if (amnt == 1.0) {
             label = cur.getDisplayName();
         }
-        return label;
+        return TextSerializers.FORMATTING_CODE.serialize(label);
     }
 }

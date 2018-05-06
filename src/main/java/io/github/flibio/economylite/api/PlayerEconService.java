@@ -19,7 +19,7 @@ public interface PlayerEconService {
 
     /**
      * Gets the balance of a player.
-     * 
+     *
      * @param uuid The UUID of the player to get the balance of.
      * @param currency The currency to use.
      * @param cause What is getting the balance.
@@ -29,7 +29,7 @@ public interface PlayerEconService {
 
     /**
      * Sets the balance of a player.
-     * 
+     *
      * @param uuid The UUID of the player to set the balance of.
      * @param balance The new balance of the uuid.
      * @param currency The currency to use.
@@ -40,7 +40,7 @@ public interface PlayerEconService {
 
     /**
      * Removes currency from a player's balance.
-     * 
+     *
      * @param uuid The UUID of the player to remove currency from.
      * @param amount The amount of currency to remove.
      * @param currency The currency to use.
@@ -53,7 +53,7 @@ public interface PlayerEconService {
 
     /**
      * Adds currency to a player's balance.
-     * 
+     *
      * @param uuid The UUID of the player to add currency to.
      * @param amount The amount of currency to add.
      * @param currency The currency to use.
@@ -65,17 +65,8 @@ public interface PlayerEconService {
     }
 
     /**
-     * Checks if a player exists in the system with any currency.
-     * 
-     * @param uuid The UUID of the player to check for.
-     * @param cause What is checking if the account exists.
-     * @return If the player exists or not.
-     */
-    public boolean accountExists(UUID uuid, Cause cause);
-
-    /**
      * Checks if a player exists in the system for the specified currency.
-     * 
+     *
      * @param uuid The UUID of the player to check for.
      * @param currency The currency to check against.
      * @param cause What is checking if the account exists.
@@ -85,7 +76,7 @@ public interface PlayerEconService {
 
     /**
      * Clears a currency from the database.
-     * 
+     *
      * @param currency The currency to clear.
      * @param cause What is clearing the balances.
      */
@@ -93,7 +84,7 @@ public interface PlayerEconService {
 
     /**
      * Gets the top unique accounts registered in the EconomyLite system.
-     * 
+     *
      * @param start The starting account to get.
      * @param end The ending account to get.
      * @param cause What is getting the accounts.
@@ -103,7 +94,7 @@ public interface PlayerEconService {
 
     /**
      * Sets the balance of all players.
-     * 
+     *
      * @param balance The new balance.
      * @param currency The currency to use.
      * @param cause What caused the balance change.

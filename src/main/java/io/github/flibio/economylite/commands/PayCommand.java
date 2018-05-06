@@ -10,6 +10,7 @@ import io.github.flibio.utils.commands.AsyncCommand;
 import io.github.flibio.utils.commands.BaseCommandExecutor;
 import io.github.flibio.utils.commands.Command;
 import io.github.flibio.utils.message.MessageStorage;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -49,7 +50,7 @@ public class PayCommand extends BaseCommandExecutor<Player> {
                 src.sendMessage(messageStorage.getMessage("command.pay.invalid"));
             } else {
                 User target = args.<User>getOne("player").get();
-                if (!EconomyLite.isEnabled("confirm-offline-payments") || target.isOnline()) {
+                if (!EconomyLite.getConfigManager().getValue(Boolean.class, false, "confirm-offline-payments") || target.isOnline()) {
                     // Complete the payment
                     pay(target, amount, src);
                 } else {
@@ -75,19 +76,20 @@ public class PayCommand extends BaseCommandExecutor<Player> {
             Optional<UniqueAccount> tOpt = ecoService.getOrCreateAccount(target.getUniqueId());
             if (uOpt.isPresent() && tOpt.isPresent()) {
                 if (uOpt.get()
-                        .transfer(tOpt.get(), ecoService.getDefaultCurrency(), amount, Cause.of(EventContext.empty(),(EconomyLite.getInstance())))
+                        .transfer(tOpt.get(), ecoService.getDefaultCurrency(), amount, Cause.of(EventContext.empty(), (EconomyLite.getInstance())))
                         .getResult().equals(ResultType.SUCCESS)) {
                     Text label = ecoService.getDefaultCurrency().getPluralDisplayName();
                     if (amount.equals(BigDecimal.ONE)) {
                         label = ecoService.getDefaultCurrency().getDisplayName();
                     }
-                    src.sendMessage(messageStorage.getMessage("command.pay.success", "target", Text.of(targetName), "amountandlabel",
-                            Text.of(String.format(Locale.ENGLISH, "%,.2f", amount) + " ").toBuilder().append(label).build()));
-                    if (target instanceof Player) {
-                        ((Player) target).sendMessage(messageStorage.getMessage("command.pay.target", "amountandlabel",
-                                Text.of(String.format(Locale.ENGLISH, "%,.2f", amount) + " ").toBuilder().append(label).build(), "sender",
-                                uOpt.get().getDisplayName()));
-                    }
+                    src.sendMessage(messageStorage.getMessage("command.pay.success", "target", targetName, "amountandlabel",
+                            String.format(Locale.ENGLISH, "%,.2f", amount) + " " + label.toPlain()));
+                    final Text curLabel = label;
+                    Sponge.getServer().getPlayer(target.getUniqueId()).ifPresent(p -> {
+                        p.sendMessage(messageStorage.getMessage("command.pay.target", "amountandlabel",
+                                String.format(Locale.ENGLISH, "%,.2f", amount) + " " + curLabel.toPlain(), "sender",
+                                uOpt.get().getDisplayName().toPlain()));
+                    });
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.pay.failed", "target", targetName));
                 }

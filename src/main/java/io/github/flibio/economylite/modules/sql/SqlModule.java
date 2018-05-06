@@ -5,14 +5,14 @@ package io.github.flibio.economylite.modules.sql;
 
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.modules.Module;
-import io.github.flibio.utils.file.FileManager;
+import io.github.flibio.utils.config.ConfigManager;
 import org.slf4j.Logger;
 
 import java.util.Optional;
 
 public class SqlModule implements Module {
 
-    private FileManager configManager = EconomyLite.getFileManager();
+    private ConfigManager configManager = EconomyLite.getConfigManager();
 
     @Override
     public boolean initialize(Logger logger, Object plugin) {
@@ -34,12 +34,12 @@ public class SqlModule implements Module {
 
     @Override
     public void initializeConfig() {
-        configManager.setDefault("config.conf", "modules.mysql.enabled", Boolean.class, false);
-        configManager.setDefault("config.conf", "modules.mysql.hostname", String.class, "hostname");
-        configManager.setDefault("config.conf", "modules.mysql.port", String.class, "3306");
-        configManager.setDefault("config.conf", "modules.mysql.database", String.class, "database");
-        configManager.setDefault("config.conf", "modules.mysql.username", String.class, "username");
-        configManager.setDefault("config.conf", "modules.mysql.password", String.class, "password");
+        configManager.setDefault(Boolean.class, false, "modules", "mysql", "enabled");
+        configManager.setDefault(String.class, "hostname", "modules", "mysql", "hostname");
+        configManager.setDefault(String.class, "3306", "modules", "mysql", "port");
+        configManager.setDefault(String.class, "database", "modules", "mysql", "database");
+        configManager.setDefault(String.class, "username", "modules", "mysql", "username");
+        configManager.setDefault(String.class, "password", "modules", "mysql", "password");
     }
 
     @Override
@@ -49,13 +49,11 @@ public class SqlModule implements Module {
 
     @Override
     public boolean isEnabled() {
-        Optional<Boolean> eOpt = configManager.getValue("config.conf", "modules.mysql.enabled", Boolean.class);
-        return (eOpt.isPresent()) ? eOpt.get() : false;
+        return configManager.getValue(Boolean.class, false, "modules", "mysql", "enabled");
     }
 
     private String getDetail(String name) {
-        Optional<String> vOpt = configManager.getValue("config.conf", "modules.mysql." + name, String.class);
-        return (vOpt.isPresent()) ? vOpt.get() : "";
+        return configManager.getValue("", String.class, "modules", "mysql", name);
     }
 
 }

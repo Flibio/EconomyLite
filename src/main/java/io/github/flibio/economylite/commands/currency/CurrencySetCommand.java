@@ -44,21 +44,23 @@ public class CurrencySetCommand extends BaseCommandExecutor<CommandSource> {
                 if (c.getDisplayName().toPlain().equalsIgnoreCase(currencyName)) {
                     currencyService.setCurrentCurrency(c);
                     found = true;
-                    src.sendMessage(messageStorage.getMessage("command.currency.changed", "currency", c.getDisplayName()));
+                    src.sendMessage(messageStorage.getMessage("command.currency.changed", "currency", c.getDisplayName().toPlain()));
                 }
             }
             if (!found) {
                 src.sendMessage(messageStorage.getMessage("command.currency.invalid"));
             }
         } else {
-            src.sendMessage(messageStorage.getMessage("command.currency.current", "currency", currencyService.getCurrentCurrency().getDisplayName()));
+            src.sendMessage(messageStorage.getMessage("command.currency.current", "currency", currencyService.getCurrentCurrency().getDisplayName()
+                    .toPlain()));
             src.sendMessage(messageStorage.getMessage("command.currency.selectnew"));
             currencyService.getCurrencies().forEach(currency -> {
                 src.sendMessage(Text.of(currency.getDisplayName()).toBuilder().onClick(TextActions.executeCallback(c -> {
-                    src.sendMessage(messageStorage.getMessage("command.currency.confirm", "currency", currency.getDisplayName()).toBuilder()
+                    src.sendMessage(messageStorage.getMessage("command.currency.confirm", "currency", currency.getDisplayName().toPlain()).toBuilder()
                             .onClick(TextActions.executeCallback(c2 -> {
                                 currencyService.setCurrentCurrency(currency);
-                                src.sendMessage(messageStorage.getMessage("command.currency.changed", "currency", currency.getDisplayName()));
+                                src.sendMessage(
+                                        messageStorage.getMessage("command.currency.changed", "currency", currency.getDisplayName().toPlain()));
                             })).build());
                 })).build());
             });

@@ -22,11 +22,14 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.command.spec.CommandSpec.Builder;
+import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.text.Text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @AsyncCommand
@@ -105,10 +108,17 @@ public class MigrateCommand extends BaseCommandExecutor<CommandSource> {
                         PlayerServiceCommon sqlService = (PlayerServiceCommon) s;
                         // Load the data service
                         PlayerDataService dataService = new PlayerDataService();
+                        // Get Currency Data
+                        Map<String, Currency> cIds = new HashMap<>();
+                        EconomyLite.getCurrencyService().getCurrencies().forEach(c -> {
+                            cIds.put(c.getId(), c);
+                        });
                         // Insert new data
                         dataService.getAccountsMigration().forEach(r -> {
                             String[] d = r.split("%-%");
-                            sqlService.setRawData(d[0], d[1], d[2]);
+                            if (cIds.get(d[2]) != null) {
+                                sqlService.setRawData(d[0], d[1], cIds.get(d[2]));
+                            }
                         });
                         src.sendMessage(messageStorage.getMessage("command.migrate.completed"));
                     } catch (Exception e) {

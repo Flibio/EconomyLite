@@ -50,9 +50,8 @@ public class VirtualBalanceCommand extends BaseCommandExecutor<CommandSource> {
                     if (bal.equals(BigDecimal.ONE)) {
                         label = currency.getDisplayName();
                     }
-                    src.sendMessage(messageStorage.getMessage("command.balanceother",
-                            ImmutableMap.of("player", aOpt.get().getDisplayName(), "balance", Text.of(String.format(Locale.ENGLISH, "%,.2f", bal)),
-                                    "label", label)));
+                    src.sendMessage(messageStorage.getMessage("command.balanceother", "player", aOpt.get().getDisplayName().toPlain(), "balance",
+                            String.format(Locale.ENGLISH, "%,.2f", bal), "label", label.toPlain()));
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.error"));
                 }

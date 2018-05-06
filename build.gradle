@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     compile "org.spongepowered:spongeapi:${project.apiVersion}"
-    compile 'com.github.flibiostudio:utils:5f41eac'
+    compile 'com.github.flibiostudio:utils:2115eae'
 }
 
 shadowJar {

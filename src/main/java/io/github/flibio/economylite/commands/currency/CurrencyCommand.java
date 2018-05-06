@@ -29,7 +29,7 @@ public class CurrencyCommand extends BaseCommandExecutor<CommandSource> {
     @Override
     public void run(CommandSource src, CommandContext args) {
         src.sendMessage(messageStorage.getMessage("command.currency.current", "currency", EconomyLite.getEconomyService().getDefaultCurrency()
-                .getDisplayName()));
+                .getDisplayName().toPlain()));
         src.sendMessage(messageStorage.getMessage("command.usage", "command", "/currency", "subcommands", "set | create | delete"));
     }
 }

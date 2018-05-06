@@ -10,6 +10,7 @@ import io.github.flibio.utils.commands.AsyncCommand;
 import io.github.flibio.utils.commands.BaseCommandExecutor;
 import io.github.flibio.utils.commands.Command;
 import io.github.flibio.utils.commands.ParentCommand;
+import io.github.flibio.utils.config.ConfigManager;
 import io.github.flibio.utils.file.FileManager;
 import io.github.flibio.utils.message.MessageStorage;
 import org.spongepowered.api.command.CommandSource;
@@ -27,7 +28,7 @@ public class CurrencyCreateCommand extends BaseCommandExecutor<CommandSource> {
 
     private MessageStorage messageStorage = EconomyLite.getMessageStorage();
     private CurrencyEconService currencyService = EconomyLite.getCurrencyService();
-    private FileManager configManager = EconomyLite.getFileManager();
+    private ConfigManager manager = EconomyLite.getCurrencyManager();
 
     @Override
     public Builder getCommandSpecBuilder() {
@@ -56,9 +57,10 @@ public class CurrencyCreateCommand extends BaseCommandExecutor<CommandSource> {
                 Currency currency = new LiteCurrency(singular, plural, symbol, false, 2);
                 currencyService.addCurrency(currency);
                 String configId = currency.getId().replaceAll("economylite:", "");
-                configManager.setValue("currencies.conf", configId + ".singular", String.class, currency.getDisplayName().toPlain());
-                configManager.setValue("currencies.conf", configId + ".plural", String.class, currency.getPluralDisplayName().toPlain());
-                configManager.setValue("currencies.conf", configId + ".symbol", String.class, currency.getSymbol().toPlain());
+                manager.forceValue(currency.getDisplayName().toPlain(), configId, ".singular");
+                manager.forceValue(currency.getPluralDisplayName().toPlain(), configId, ".plural");
+                manager.forceValue(currency.getSymbol().toPlain(), configId, ".symbol");
+                manager.save();
                 src.sendMessage(messageStorage.getMessage("command.currency.created", "currency", currency.getDisplayName().toPlain()));
             }
         } else {

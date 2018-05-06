@@ -11,7 +11,8 @@ import io.github.flibio.utils.sql.LocalSqlManager;
 public class VirtualDataService extends VirtualServiceCommon {
 
     public VirtualDataService() {
-        super(LocalSqlManager.createInstance(EconomyLite.getInstance(), "data", correctPath(EconomyLite.getInstance().getConfigDir())).get(), true);
+        super(LocalSqlManager.createInstance(EconomyLite.getInstance(), "data", correctPath(EconomyLite.getInstance().getConfigDir().toString()))
+                .get(), true);
     }
 
     private static String correctPath(String path) {

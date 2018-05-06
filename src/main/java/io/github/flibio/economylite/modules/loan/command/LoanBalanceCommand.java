@@ -16,6 +16,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -43,18 +44,18 @@ public class LoanBalanceCommand extends BaseCommandExecutor<Player> {
         Optional<Double> bOpt = module.getLoanManager().getLoanBalance(src.getUniqueId());
         if (bOpt.isPresent()) {
             Currency cur = EconomyLite.getEconomyService().getDefaultCurrency();
-            src.sendMessage(messages.getMessage("module.loan.balance", "balance", Text.of(String.format(Locale.ENGLISH, "%,.2f", bOpt.get())),
+            src.sendMessage(messages.getMessage("module.loan.balance", "balance", String.format(Locale.ENGLISH, "%,.2f", bOpt.get()),
                     "label", getPrefix(bOpt.get(), cur)));
         } else {
             src.sendMessage(messages.getMessage("command.error"));
         }
     }
 
-    private Text getPrefix(double amnt, Currency cur) {
+    private String getPrefix(double amnt, Currency cur) {
         Text label = cur.getPluralDisplayName();
         if (amnt == 1.0) {
             label = cur.getDisplayName();
         }
-        return label;
+        return TextSerializers.FORMATTING_CODE.serialize(label);
     }
 }

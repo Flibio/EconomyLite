@@ -78,12 +78,12 @@ public class LiteEconomyService implements EconomyService {
 
     @Override
     public boolean hasAccount(UUID uuid) {
-        return playerService.accountExists(uuid, CauseFactory.create("Checking account existance"));
+        return playerService.accountExists(uuid, getDefaultCurrency(), CauseFactory.create("Checking account existance"));
     }
 
     @Override
     public boolean hasAccount(String identifier) {
-        return virtualService.accountExists(identifier, CauseFactory.create("Checking account existance"));
+        return virtualService.accountExists(identifier, getDefaultCurrency(), CauseFactory.create("Checking account existance"));
     }
 
 }

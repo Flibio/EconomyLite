@@ -13,10 +13,10 @@ EconomyLite is a lightweight, yet advanced economy plugin for your Sponge server
   -  EconomyLite is multi-threaded for the best possible performance
 - Multiple Storage Options
   - Store your data however you like, locally or on a MySQL database
+- Migration
+  - EconomyLite allows you to easily migrate your data from another economy plugin
 - Customizable
   - Much of EconomyLite can be changed to suit your needs
-- Username Change Support
-  - Any player can change their name, and EconomyLite can handle it 
 - Virtual Management
   - EconomyLite includes commands to manage virtual accounts
 - Loans

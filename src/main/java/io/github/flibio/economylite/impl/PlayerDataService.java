@@ -11,7 +11,8 @@ import java.io.File;
 public class PlayerDataService extends PlayerServiceCommon {
 
     public PlayerDataService() {
-        super(LocalSqlManager.createInstance(EconomyLite.getInstance(), "data", correctPath(EconomyLite.getInstance().getConfigDir())).get(), true);
+        super(LocalSqlManager.createInstance(EconomyLite.getInstance(), "data", correctPath(EconomyLite.getInstance().getConfigDir().toString()))
+                .get(), true);
     }
 
     private static String correctPath(String path) {

@@ -61,7 +61,7 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     @Override
     public BigDecimal getDefaultBalance(Currency currency) {
-        Optional<Double> bOpt = EconomyLite.getFileManager().getValue("config.conf", "default-balance", Double.class);
+        Optional<Double> bOpt = EconomyLite.getConfigManager().getValue(Double.class, "default-balance", "player");
         if (bOpt.isPresent()) {
             return BigDecimal.valueOf(bOpt.get());
         } else {

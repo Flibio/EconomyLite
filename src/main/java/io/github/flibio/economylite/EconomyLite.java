@@ -39,9 +39,11 @@ import io.github.flibio.economylite.modules.Module;
 import io.github.flibio.economylite.modules.loan.LoanModule;
 import io.github.flibio.economylite.modules.sql.SqlModule;
 import io.github.flibio.utils.commands.CommandLoader;
+import io.github.flibio.utils.config.ConfigManager;
 import io.github.flibio.utils.file.FileManager;
 import io.github.flibio.utils.message.MessageStorage;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.config.ConfigDir;
@@ -60,6 +62,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.stream.events.Comment;
+
 @Plugin(id = PluginInfo.ID, name = PluginInfo.NAME, version = PluginInfo.VERSION, description = PluginInfo.DESCRIPTION)
 public class EconomyLite {
 
@@ -75,7 +79,8 @@ public class EconomyLite {
 
     @Inject private PluginContainer container;
 
-    private static FileManager fileManager;
+    private static ConfigManager currencyManager;
+    private static ConfigManager configManager;
     private static MessageStorage messageStorage;
     private static EconomyLite instance;
 
@@ -94,16 +99,12 @@ public class EconomyLite {
         logger.info("EconomyLite " + PluginInfo.VERSION + " is initializing!");
         instance = this;
         // File setup
-        if (new File(configDir.toString()).isAbsolute()) {
-            fileManager = FileManager.createInstance(this, configDir.toString());
-        } else {
-            fileManager = FileManager.createInstance(this, "./" + configDir.toString());
-        }
+        configManager = ConfigManager.create(configDir, "config.conf", logger);
+        currencyManager = ConfigManager.create(configDir, "currencies.conf", logger);
         initializeFiles();
         initializeCurrencies();
         // Load Message Storage
-        messageStorage = MessageStorage.createInstance(this, configDir.toString());
-        initializeMessage();
+        messageStorage = MessageStorage.create(configDir, "messages", logger);
         // Load modules
         List<Module> postInitModules = new ArrayList<>();
         getModules().forEach(m -> {
@@ -160,56 +161,46 @@ public class EconomyLite {
     }
 
     private void initializeFiles() {
-        fileManager.setDefault("config.conf", "default-balance", Double.class, 0.0);
-        fileManager.setDefault("config.conf", "virt-default-balance", Double.class, 0.0);
-        fileManager.setDefault("config.conf", "debug-logging", Boolean.class, true);
-        fileManager.setDefault("config.conf", "notify-on-admin-commands", Boolean.class, false);
-        fileManager.setDefault("config.conf", "confirm-offline-payments", Boolean.class, false);
-    }
-
-    public static boolean isEnabled(String path) {
-        if (fileManager.getValue("config.conf", path, Boolean.class).isPresent()) {
-            return fileManager.getValue("config.conf", path, Boolean.class).get();
-        } else {
-            getInstance().getLogger().error("An error has occurred loading config value " + path + "! Defaulting to false.");
-            return false;
-        }
+        configManager.setDefault("Default balance of player accounts.", Double.class, 0.0, "default-balance", "player");
+        configManager.setDefault("Default balance of virtual accounts.", Double.class, 0.0, "default-balance", "virtual");
+        configManager.setDefault("Enables or disables debug logging.", Boolean.class, true, "debug-logging");
+        configManager.setDefault("If enabled players will be notified when an admin changes their balance", Boolean.class, false,
+                "notify-on-admin-commands");
+        configManager.setDefault("If enabled players will be asked to confirm payments to an offline player.", Boolean.class, true,
+                "confirm-offline-payments");
+        configManager.save();
     }
 
     private void initializeCurrencies() {
         // Initialize the default currency into file
-        fileManager.setDefault("currencies.conf", "current", String.class, "coin");
-        fileManager.setDefault("currencies.conf", "coin.singular", String.class, "Coin");
-        fileManager.setDefault("currencies.conf", "coin.plural", String.class, "Coins");
-        fileManager.setDefault("currencies.conf", "coin.symbol", String.class, "C");
+        currencyManager.setDefault(String.class, "current", "coin");
+        currencyManager.setDefault(String.class, "Coin", "coin", "singular");
+        currencyManager.setDefault(String.class, "Coins", "coin", "plural");
+        currencyManager.setDefault(String.class, "C", "coin", "symbol");
         Currency defaultCurrency =
-                new LiteCurrency(fileManager.getValue("currencies.conf", "coin.singular", String.class).get(), fileManager.getValue(
-                        "currencies.conf", "coin.plural", String.class).get(), fileManager.getValue("currencies.conf", "coin.symbol", String.class)
-                        .get(), true, 2);
+                new LiteCurrency(currencyManager.getValue("", String.class, "coin", "singular"),
+                        currencyManager.getValue("", String.class, "coin", "plural"), currencyManager.getValue("", String.class, "coin", "symbol"),
+                        true, 2);
         currencyEconService = new CurrencyService(defaultCurrency);
         // Load all of the currencies
-        Optional<ConfigurationNode> fOpt = fileManager.getFile("currencies.conf");
-        if (fOpt.isPresent()) {
-            ConfigurationNode root = fOpt.get();
-            for (Object raw : root.getChildrenMap().keySet()) {
-                if (raw instanceof String) {
-                    String currencyId = (String) raw;
-                    Optional<String> sOpt = fileManager.getValue("currencies.conf", currencyId + ".singular", String.class);
-                    Optional<String> pOpt = fileManager.getValue("currencies.conf", currencyId + ".plural", String.class);
-                    Optional<String> syOpt = fileManager.getValue("currencies.conf", currencyId + ".symbol", String.class);
-                    if (sOpt.isPresent() && pOpt.isPresent() && syOpt.isPresent() && !currencyId.equals("coin")) {
-                        Currency currency = new LiteCurrency(sOpt.get(), pOpt.get(), syOpt.get(), false, 2);
-                        currencyEconService.addCurrency(currency);
-                    }
+        CommentedConfigurationNode root = currencyManager.getNode();
+        for (Object raw : root.getChildrenMap().keySet()) {
+            if (raw instanceof String) {
+                String currencyId = (String) raw;
+                String singular = currencyManager.getValue("", String.class, currencyId, "singular");
+                String plural = currencyManager.getValue("", String.class, currencyId, "plural");
+                String symbol = currencyManager.getValue("", String.class, currencyId, "symbol");
+                if (!singular.isEmpty() && !plural.isEmpty() && !symbol.isEmpty() && !currencyId.equals("coin")) {
+                    Currency currency = new LiteCurrency(singular, plural, symbol, false, 2);
+                    currencyEconService.addCurrency(currency);
                 }
             }
         }
         // Attempt to load the current currency
-        Optional<String> cOpt = fileManager.getValue("currencies.conf", "current", String.class);
-        if (cOpt.isPresent()) {
-            String currentCur = cOpt.get();
+        String current = currencyManager.getValue("", String.class, "current");
+        if (!current.isEmpty()) {
             currencyEconService.getCurrencies().forEach(c -> {
-                if (("economylite:" + currentCur).equalsIgnoreCase(c.getId())) {
+                if (("economylite:" + current).equalsIgnoreCase(c.getId())) {
                     // This is the current currency
                     currencyEconService.setCurrentCurrency(c);
                 }
@@ -217,13 +208,10 @@ public class EconomyLite {
         }
         // If the current currency string failed to load set it to default
         if (currencyEconService.getCurrentCurrency().equals(defaultCurrency)) {
-            fileManager.setValue("currencies.conf", "current", String.class, "coin");
+            currencyManager.forceValue("coin", "current");
+            currencyManager.save();
         }
         logger.info("Using currency: " + currencyEconService.getCurrentCurrency().getName());
-    }
-
-    private void initializeMessage() {
-        messageStorage.defaultMessages("messages");
     }
 
     public Logger getLogger() {
@@ -234,12 +222,20 @@ public class EconomyLite {
         return game;
     }
 
+    public Path getConfigDir() {
+        return configDir;
+    }
+
     public PluginContainer getPluginContainer() {
         return container;
     }
 
-    public static FileManager getFileManager() {
-        return fileManager;
+    public static ConfigManager getCurrencyManager() {
+        return currencyManager;
+    }
+
+    public static ConfigManager getConfigManager() {
+        return configManager;
     }
 
     public static MessageStorage getMessageStorage() {
@@ -268,10 +264,6 @@ public class EconomyLite {
 
     public static List<Module> getModules() {
         return ImmutableList.of(new SqlModule(), new LoanModule());
-    }
-
-    public String getConfigDir() {
-        return configDir.toString();
     }
 
     public String getMainDir() {

@@ -51,7 +51,7 @@ public class CurrencyDeleteCommand extends BaseCommandExecutor<CommandSource> {
                             currencyService.setCurrentCurrency(currencyService.getDefaultCurrency());
                         }
                         currencyService.deleteCurrency(c);
-                        src.sendMessage(messageStorage.getMessage("command.currency.deleted", "currency", c.getDisplayName()));
+                        src.sendMessage(messageStorage.getMessage("command.currency.deleted", "currency", c.getDisplayName().toPlain()));
                     }
                 }
             }
@@ -63,7 +63,7 @@ public class CurrencyDeleteCommand extends BaseCommandExecutor<CommandSource> {
             currencyService.getCurrencies().forEach(currency -> {
                 if (!currency.equals(currencyService.getDefaultCurrency())) {
                     src.sendMessage(Text.of(currency.getDisplayName()).toBuilder().onClick(TextActions.executeCallback(c -> {
-                        src.sendMessage(messageStorage.getMessage("command.currency.deleteconfirm", "currency", currency.getDisplayName())
+                        src.sendMessage(messageStorage.getMessage("command.currency.deleteconfirm", "currency", currency.getDisplayName().toPlain())
                                 .toBuilder().onClick(
                                         TextActions.executeCallback(c2 -> {
                                             if (currencyService.getCurrentCurrency().equals(currency)) {
@@ -71,7 +71,7 @@ public class CurrencyDeleteCommand extends BaseCommandExecutor<CommandSource> {
                                             }
                                             currencyService.deleteCurrency(currency);
                                             src.sendMessage(messageStorage.getMessage("command.currency.deleted", "currency",
-                                                    currency.getDisplayName()));
+                                                    currency.getDisplayName().toPlain()));
                                         })).build());
                     })).build());
                 }

@@ -58,7 +58,7 @@ public class VirtualPayCommand extends BaseCommandExecutor<CommandSource> {
                 if (aOpt.isPresent() && uOpt.isPresent()) {
                     Account payer = aOpt.get();
                     UniqueAccount receiver = uOpt.get();
-                    if (payer.transfer(receiver, ecoService.getDefaultCurrency(), amount, Cause.of(EventContext.empty(),EconomyLite.getInstance
+                    if (payer.transfer(receiver, ecoService.getDefaultCurrency(), amount, Cause.of(EventContext.empty(), EconomyLite.getInstance
                             ()))
                             .getResult().equals(ResultType.SUCCESS)) {
                         src.sendMessage(messageStorage.getMessage("command.pay.success", "target", target.getName()));
@@ -68,8 +68,8 @@ public class VirtualPayCommand extends BaseCommandExecutor<CommandSource> {
                                 label = ecoService.getDefaultCurrency().getDisplayName();
                             }
                             ((Player) target).sendMessage(messageStorage.getMessage("command.pay.target", "amountandlabel",
-                                    Text.of(String.format(Locale.ENGLISH, "%,.2f", amount) + " ").toBuilder().append(label).build(), "sender",
-                                    payer.getDisplayName()));
+                                    String.format(Locale.ENGLISH, "%,.2f", amount) + " " + label.toPlain(), "sender",
+                                    payer.getDisplayName().toPlain()));
                         }
                     } else {
                         src.sendMessage(messageStorage.getMessage("command.pay.failed", "target", target.getName()));

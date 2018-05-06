@@ -3,6 +3,12 @@
  */
 package io.github.flibio.economylite.commands.balance;
 
+import io.github.flibio.economylite.EconomyLite;
+import io.github.flibio.economylite.api.CurrencyEconService;
+import io.github.flibio.utils.commands.AsyncCommand;
+import io.github.flibio.utils.commands.BaseCommandExecutor;
+import io.github.flibio.utils.commands.Command;
+import io.github.flibio.utils.message.MessageStorage;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -13,13 +19,7 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.Text;
-import com.google.common.collect.ImmutableMap;
-import io.github.flibio.economylite.EconomyLite;
-import io.github.flibio.economylite.api.CurrencyEconService;
-import io.github.flibio.utils.commands.AsyncCommand;
-import io.github.flibio.utils.commands.BaseCommandExecutor;
-import io.github.flibio.utils.commands.Command;
-import io.github.flibio.utils.message.MessageStorage;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.math.BigDecimal;
 import java.util.Locale;
@@ -53,9 +53,9 @@ public class BalanceCommand extends BaseCommandExecutor<CommandSource> {
                     if (bal.equals(BigDecimal.ONE)) {
                         label = currency.getDisplayName();
                     }
-                    src.sendMessage(messageStorage.getMessage("command.balanceother",
-                            ImmutableMap.of("player", Text.of(targetName), "balance", Text.of(String.format(Locale.ENGLISH, "%,.2f", bal)), "label",
-                                    label)));
+                    src.sendMessage(messageStorage
+                            .getMessage("command.balanceother", "player", targetName, "balance", String.format(Locale.ENGLISH, "%,.2f", bal), "label",
+                                    TextSerializers.FORMATTING_CODE.serialize(label)));
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.error"));
                 }
@@ -73,8 +73,8 @@ public class BalanceCommand extends BaseCommandExecutor<CommandSource> {
                     if (bal.equals(BigDecimal.ONE)) {
                         label = currency.getDisplayName();
                     }
-                    src.sendMessage(messageStorage.getMessage("command.balance", "balance", Text.of(String.format(Locale.ENGLISH, "%,.2f", bal)),
-                            "label", label));
+                    src.sendMessage(messageStorage.getMessage("command.balance", "balance", String.format(Locale.ENGLISH, "%,.2f", bal),
+                            "label", TextSerializers.FORMATTING_CODE.serialize(label)));
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.error"));
                 }

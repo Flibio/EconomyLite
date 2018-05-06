@@ -64,15 +64,6 @@ public interface VirtualEconService {
     }
 
     /**
-     * Checks if an account exists in the system.
-     * 
-     * @param id The name of the account to check for.
-     * @param cause What is checking if the account exists.
-     * @return If the account exists or not.
-     */
-    public boolean accountExists(String id, Cause cause);
-
-    /**
      * Checks if an account exists in the system for the specified currency.
      * 
      * @param id The name of the account to check for.

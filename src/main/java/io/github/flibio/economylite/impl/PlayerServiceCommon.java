@@ -7,12 +7,14 @@ import io.github.flibio.economylite.CauseFactory;
 
 import io.github.flibio.economylite.EconomyLite;
 import io.github.flibio.economylite.api.PlayerEconService;
+import io.github.flibio.utils.sql.CacheManager;
 import io.github.flibio.utils.sql.SqlManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
+import org.spongepowered.api.service.economy.account.VirtualAccount;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -24,14 +26,24 @@ import java.util.UUID;
 public class PlayerServiceCommon implements PlayerEconService {
 
     private SqlManager manager;
-    private boolean log = true;
+    private boolean log;
     private Logger logger = EconomyLite.getInstance().getLogger();
+
+    private CacheManager<String, BigDecimal> balCache;
+    private CacheManager<String, Boolean> exCache;
+    private CacheManager<String, List<UniqueAccount>> topCache;
 
     public PlayerServiceCommon(SqlManager manager, boolean h2) {
         this.manager = manager;
-        this.log = EconomyLite.isEnabled("debug-logging");
-        if (manager.initialTestConnection())
+        this.log = EconomyLite.getConfigManager().getValue(Boolean.class, false, "debug-logging");
+        if (manager.initialTestConnection()) {
             manager.executeUpdate("CREATE TABLE IF NOT EXISTS economyliteplayers(uuid VARCHAR(36), balance DECIMAL(11,2), currency VARCHAR(1024))");
+            manager.executeUpdate("ALTER TABLE economyliteplayers ADD UNIQUE (uuid)");
+        }
+        // Create caches
+        balCache = CacheManager.create(logger, 64, 360);
+        exCache = CacheManager.create(logger, 128, 360);
+        topCache = CacheManager.create(logger, 16, 30);
     }
 
     public boolean isWorking() {
@@ -39,58 +51,76 @@ public class PlayerServiceCommon implements PlayerEconService {
     }
 
     public BigDecimal getBalance(UUID uuid, Currency currency, Cause cause) {
+        BigDecimal result = balCache.getIfPresent(formId(uuid, currency));
+        if (result != null) {
+            debug("playercommon: {C} Balance of '" + uuid.toString() + "' - " + cause.toString() + " = " + result.toPlainString());
+            return result;
+        }
         Optional<BigDecimal> bOpt =
                 manager.queryType("balance", BigDecimal.class, "SELECT balance FROM economyliteplayers WHERE uuid = ? AND currency = ?",
                         uuid.toString(), currency.getId());
-        BigDecimal result = (bOpt.isPresent()) ? bOpt.get() : BigDecimal.ZERO;
+        result = (bOpt.isPresent()) ? bOpt.get() : BigDecimal.ZERO;
+        balCache.update(formId(uuid, currency), result);
+        exCache.update(formId(uuid, currency), true);
         debug("playercommon: Balance of '" + uuid.toString() + "' - " + cause.toString() + " = " + result.toPlainString());
         return result;
     }
 
     public boolean setBalance(UUID uuid, BigDecimal balance, Currency currency, Cause cause) {
+        boolean result;
         if (accountExists(uuid, currency, cause)) {
-            boolean result = manager.executeUpdate("UPDATE economyliteplayers SET balance = ? WHERE uuid = ? AND currency = ?", balance.toString(),
+            result = manager.executeUpdate("UPDATE economyliteplayers SET balance = ? WHERE uuid = ? AND currency = ?", balance.toString(),
                     uuid.toString(), currency.getId());
             debug("playercommon: +Account Exists+ Setting balance of '" + uuid.toString() + "' to '" + balance.toPlainString() + "' with '"
                     + currency.getId() + "' - " + cause.toString() + " = " + result);
-            return result;
         } else {
-            boolean result = manager.executeUpdate("INSERT INTO economyliteplayers (`uuid`, `balance`, `currency`) VALUES (?, ?, ?)",
+            result = manager.executeUpdate("INSERT INTO economyliteplayers (`uuid`, `balance`, `currency`) VALUES (?, ?, ?)",
                     uuid.toString(), balance.toString(), currency.getId());
             debug("playercommon: +Account Does Not Exist+ Setting balance of '" + uuid.toString() + "' to '" + balance.toPlainString()
                     + "' with '" + currency.getId() + "' - " + cause.toString() + " = " + result);
-            return result;
         }
-    }
-
-    public boolean accountExists(UUID uuid, Cause cause) {
-        boolean result = manager.queryExists("SELECT uuid FROM economyliteplayers WHERE uuid = ?", uuid.toString());
-        debug("playercommon: '" + uuid.toString() + "' exists - " + cause.toString() + " = " + result);
+        if (result) {
+            balCache.update(formId(uuid, currency), balance);
+            exCache.update(formId(uuid, currency), true);
+        }
         return result;
     }
 
     public boolean accountExists(UUID uuid, Currency currency, Cause cause) {
-        boolean result =
-                manager.queryExists("SELECT uuid FROM economyliteplayers WHERE uuid = ? AND currency = ?", uuid.toString(), currency.getId());
-        debug("playercommon: Checking if '" + uuid.toString() + "' exists with '" + currency.getId() + "' - " + cause.toString() + " = "
-                + result);
+        Boolean result = exCache.getIfPresent(formId(uuid, currency));
+        if (result != null) {
+            debug("playercommon: {C} Checking if '" + uuid.toString() + "' exists with '" + currency.getId() + "' - " + cause.toString() + " = "
+                    + result);
+            return result;
+        }
+        result = manager.queryExists("SELECT uuid FROM economyliteplayers WHERE uuid = ? AND currency = ?", uuid.toString(), currency.getId());
+        debug("playercommon: Checking if '" + uuid.toString() + "' exists with '" + currency.getId() + "' - " + cause.toString() + " = " + result);
+        exCache.update(formId(uuid, currency), result);
         return result;
     }
 
     public void clearCurrency(Currency currency, Cause cause) {
         boolean result = manager.executeUpdate("DELETE FROM economyliteplayers WHERE currency = ?", currency.getId());
         debug("playercommon: Clearing currency '" + currency.getId() + "' - " + cause.toString() + " = " + result);
+        balCache.clear();
+        exCache.clear();
+        topCache.clear();
     }
 
     public List<UniqueAccount> getTopAccounts(int start, int end, Cause cause) {
         debug("playercommon: Getting top accounts - " + cause.toString());
+        String mid = start + "-" + end + ":" + EconomyLite.getEconomyService().getDefaultCurrency().getId();
+        List<UniqueAccount> accounts = topCache.getIfPresent(mid);
+        if (accounts != null) {
+            return accounts;
+        }
         int offset = start - 1;
         int limit = end - offset;
-        ArrayList<UniqueAccount> accounts = new ArrayList<>();
+        accounts = new ArrayList<>();
         List<String> uuids =
                 manager.queryTypeList("uuid", String.class,
                         "SELECT uuid FROM economyliteplayers WHERE currency = ? ORDER BY balance DESC LIMIT ?, ?",
-                        EconomyLite.getEconomyService().getDefaultCurrency().getId(), String.valueOf(offset), String.valueOf(limit));
+                        EconomyLite.getEconomyService().getDefaultCurrency().getId(), offset, limit);
         EconomyService ecoService = EconomyLite.getEconomyService();
         for (String uuid : uuids) {
             Optional<UniqueAccount> uOpt = ecoService.getOrCreateAccount(UUID.fromString(uuid));
@@ -98,6 +128,7 @@ public class PlayerServiceCommon implements PlayerEconService {
                 accounts.add(uOpt.get());
             }
         }
+        topCache.update(mid, accounts);
         return accounts;
     }
 
@@ -105,6 +136,8 @@ public class PlayerServiceCommon implements PlayerEconService {
         boolean result = manager.executeUpdate("UPDATE economyliteplayers SET balance = ? WHERE currency = ?", balance.toString(), currency.getId());
         debug("playercommon: +Account Exists+ Setting balance of ALL to '" + balance.toPlainString() + "' with '"
                 + currency.getId() + "' - " + cause.toString() + " = " + result);
+        topCache.clear();
+        balCache.clear();
         return result;
     }
 
@@ -126,11 +159,11 @@ public class PlayerServiceCommon implements PlayerEconService {
         return accounts;
     }
 
-    public void setRawData(String uuid, String bal, String currency) {
-        if (accountExists(UUID.fromString(uuid), CauseFactory.stringCause("Migration"))) {
-            manager.executeUpdate("UPDATE economyliteplayers SET balance = ? WHERE uuid = ? AND currency = ?", bal, uuid, currency);
+    public void setRawData(String uuid, String bal, Currency currency) {
+        if (accountExists(UUID.fromString(uuid), currency, CauseFactory.stringCause("Migration"))) {
+            manager.executeUpdate("UPDATE economyliteplayers SET balance = ? WHERE uuid = ? AND currency = ?", bal, uuid, currency.getId());
         } else {
-            manager.executeUpdate("INSERT INTO economyliteplayers (`uuid`, `balance`, `currency`) VALUES (?, ?, ?)", uuid, bal, currency);
+            manager.executeUpdate("INSERT INTO economyliteplayers (`uuid`, `balance`, `currency`) VALUES (?, ?, ?)", uuid, bal, currency.getId());
         }
     }
 
@@ -138,5 +171,9 @@ public class PlayerServiceCommon implements PlayerEconService {
         if (log) {
             logger.debug(message);
         }
+    }
+
+    private String formId(UUID id, Currency currency) {
+        return id.toString() + ":" + currency.getId();
     }
 }

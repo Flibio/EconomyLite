@@ -53,11 +53,11 @@ public class PayVirtualCommand extends BaseCommandExecutor<Player> {
                 if (aOpt.isPresent() && uOpt.isPresent()) {
                     Account receiver = aOpt.get();
                     UniqueAccount payer = uOpt.get();
-                    if (payer.transfer(receiver, ecoService.getDefaultCurrency(), amount, Cause.of(EventContext.empty(),(EconomyLite.getInstance())))
+                    if (payer.transfer(receiver, ecoService.getDefaultCurrency(), amount, Cause.of(EventContext.empty(), (EconomyLite.getInstance())))
                             .getResult().equals(ResultType.SUCCESS)) {
-                        src.sendMessage(messageStorage.getMessage("command.pay.success", "target", receiver.getDisplayName()));
+                        src.sendMessage(messageStorage.getMessage("command.pay.success", "target", receiver.getDisplayName().toPlain()));
                     } else {
-                        src.sendMessage(messageStorage.getMessage("command.pay.failed", "target", receiver.getDisplayName()));
+                        src.sendMessage(messageStorage.getMessage("command.pay.failed", "target", receiver.getDisplayName().toPlain()));
                     }
                 }
             }

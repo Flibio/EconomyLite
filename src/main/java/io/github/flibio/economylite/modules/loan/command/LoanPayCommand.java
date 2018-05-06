@@ -18,6 +18,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -55,7 +56,7 @@ public class LoanPayCommand extends BaseCommandExecutor<Player> {
                     // Pay only what is needed
                     if (module.getLoanManager().removeLoanBalance(uuid, loanBal)) {
                         // Successfully payed loan
-                        src.sendMessage(messages.getMessage("module.loan.payed", "amount", Text.of(String.format(Locale.ENGLISH, "%,.2f", loanBal)),
+                        src.sendMessage(messages.getMessage("module.loan.payed", "amount", String.format(Locale.ENGLISH, "%,.2f", loanBal),
                                 "label", getPrefix(loanBal, cur)));
                     } else {
                         // Failed to pay
@@ -65,7 +66,7 @@ public class LoanPayCommand extends BaseCommandExecutor<Player> {
                     // Pay entire request
                     if (module.getLoanManager().removeLoanBalance(uuid, payment)) {
                         // Successfully payed loan
-                        src.sendMessage(messages.getMessage("module.loan.payed", "amount", Text.of(String.format(Locale.ENGLISH, "%,.2f", payment)),
+                        src.sendMessage(messages.getMessage("module.loan.payed", "amount", String.format(Locale.ENGLISH, "%,.2f", payment),
                                 "label", getPrefix(payment, cur)));
                     } else {
                         // Failed to pay
@@ -78,11 +79,11 @@ public class LoanPayCommand extends BaseCommandExecutor<Player> {
         }
     }
 
-    private Text getPrefix(double amnt, Currency cur) {
+    private String getPrefix(double amnt, Currency cur) {
         Text label = cur.getPluralDisplayName();
         if (amnt == 1.0) {
             label = cur.getDisplayName();
         }
-        return label;
+        return TextSerializers.FORMATTING_CODE.serialize(label);
     }
 }
