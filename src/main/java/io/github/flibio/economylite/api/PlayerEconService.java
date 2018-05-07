@@ -23,9 +23,22 @@ public interface PlayerEconService {
      * @param uuid The UUID of the player to get the balance of.
      * @param currency The currency to use.
      * @param cause What is getting the balance.
+     * @param cache Whether not to utilize the cache.
      * @return The balance of the player.
      */
-    public BigDecimal getBalance(UUID uuid, Currency currency, Cause cause);
+    public BigDecimal getBalance(UUID uuid, Currency currency, Cause cause, boolean cache);
+
+    /**
+     * Gets the balance of a player. Caching is used.
+     *
+     * @param uuid The UUID of the player to get the balance of.
+     * @param currency The currency to use.
+     * @param cause What is getting the balance.
+     * @return The balance of the player.
+     */
+    default public BigDecimal getBalance(UUID uuid, Currency currency, Cause cause) {
+        return getBalance(uuid, currency, cause, true);
+    }
 
     /**
      * Sets the balance of a player.
@@ -48,7 +61,7 @@ public interface PlayerEconService {
      * @return If the player's balance was changed successfully.
      */
     default public boolean withdraw(UUID uuid, BigDecimal amount, Currency currency, Cause cause) {
-        return setBalance(uuid, getBalance(uuid, currency, cause).subtract(amount), currency, cause);
+        return setBalance(uuid, getBalance(uuid, currency, cause, false).subtract(amount), currency, cause);
     }
 
     /**
@@ -61,7 +74,7 @@ public interface PlayerEconService {
      * @return If the player's balance was changed successfully.
      */
     default public boolean deposit(UUID uuid, BigDecimal amount, Currency currency, Cause cause) {
-        return setBalance(uuid, getBalance(uuid, currency, cause).add(amount), currency, cause);
+        return setBalance(uuid, getBalance(uuid, currency, cause, false).add(amount), currency, cause);
     }
 
     /**

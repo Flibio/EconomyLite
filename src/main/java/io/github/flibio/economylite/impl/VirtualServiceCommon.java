@@ -53,9 +53,9 @@ public class VirtualServiceCommon implements VirtualEconService {
         return manager.testConnection();
     }
 
-    public BigDecimal getBalance(String id, Currency currency, Cause cause) {
+    public BigDecimal getBalance(String id, Currency currency, Cause cause, boolean cache) {
         BigDecimal result = balCache.getIfPresent(formId(id, currency));
-        if (result != null) {
+        if (cache && result != null) {
             debug("virtcommon: {C} Balance of '" + id + "' - " + cause.toString() + " = " + result.toPlainString());
             return result;
         }

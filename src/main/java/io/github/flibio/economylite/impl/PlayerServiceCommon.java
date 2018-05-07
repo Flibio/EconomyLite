@@ -50,9 +50,9 @@ public class PlayerServiceCommon implements PlayerEconService {
         return manager.testConnection();
     }
 
-    public BigDecimal getBalance(UUID uuid, Currency currency, Cause cause) {
+    public BigDecimal getBalance(UUID uuid, Currency currency, Cause cause, boolean cache) {
         BigDecimal result = balCache.getIfPresent(formId(uuid, currency));
-        if (result != null) {
+        if (cache && result != null) {
             debug("playercommon: {C} Balance of '" + uuid.toString() + "' - " + cause.toString() + " = " + result.toPlainString());
             return result;
         }

@@ -18,17 +18,30 @@ public interface VirtualEconService {
 
     /**
      * Gets the balance of an account.
-     * 
+     *
+     * @param id The name of the account to get the balance of.
+     * @param currency The currency to use.
+     * @param cause What is getting the balance.
+     * @param cache Whether or not the cache will be used.
+     * @return The balance of the account.
+     */
+    public BigDecimal getBalance(String id, Currency currency, Cause cause, boolean cache);
+
+    /**
+     * Gets the balance of an account. Caching will be used.
+     *
      * @param id The name of the account to get the balance of.
      * @param currency The currency to use.
      * @param cause What is getting the balance.
      * @return The balance of the account.
      */
-    public BigDecimal getBalance(String id, Currency currency, Cause cause);
+    default public BigDecimal getBalance(String id, Currency currency, Cause cause) {
+        return getBalance(id, currency, cause, true);
+    }
 
     /**
      * Sets the balance of an account.
-     * 
+     *
      * @param id The String of the player to set the balance of.
      * @param balance The new balance of the id.
      * @param currency The currency to use.
@@ -39,7 +52,7 @@ public interface VirtualEconService {
 
     /**
      * Removes currency from an accounts's balance.
-     * 
+     *
      * @param id The name of the account to remove currency from.
      * @param amount The amount of currency to remove.
      * @param currency The currency to use.
@@ -47,12 +60,12 @@ public interface VirtualEconService {
      * @return If the account's balance was changed successfully.
      */
     default public boolean withdraw(String id, BigDecimal amount, Currency currency, Cause cause) {
-        return setBalance(id, getBalance(id, currency, cause).subtract(amount), currency, cause);
+        return setBalance(id, getBalance(id, currency, cause, false).subtract(amount), currency, cause);
     }
 
     /**
      * Adds currency to an account's balance.
-     * 
+     *
      * @param id The name of the account to add currency to.
      * @param amount The amount of currency to add.
      * @param currency The currency to use.
@@ -60,12 +73,12 @@ public interface VirtualEconService {
      * @return If the account's balance was changed successfully.
      */
     default public boolean deposit(String id, BigDecimal amount, Currency currency, Cause cause) {
-        return setBalance(id, getBalance(id, currency, cause).add(amount), currency, cause);
+        return setBalance(id, getBalance(id, currency, cause, false).add(amount), currency, cause);
     }
 
     /**
      * Checks if an account exists in the system for the specified currency.
-     * 
+     *
      * @param id The name of the account to check for.
      * @param currency The currency to check against.
      * @param cause What is checking if the account exists.
@@ -75,7 +88,7 @@ public interface VirtualEconService {
 
     /**
      * Clears a currency from the database.
-     * 
+     *
      * @param currency The currency to clear.
      * @param cause What is checking if the account exists.
      */
@@ -83,7 +96,7 @@ public interface VirtualEconService {
 
     /**
      * Gets the top virtual accounts registered in the EconomyLite system.
-     * 
+     *
      * @param start The starting account to get.
      * @param end The ending account to get.
      * @param cause What is checking if the account exists.
