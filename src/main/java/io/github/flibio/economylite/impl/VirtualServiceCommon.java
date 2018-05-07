@@ -42,7 +42,6 @@ public class VirtualServiceCommon implements VirtualEconService {
             } else {
                 manager.executeUpdate("ALTER TABLE `economylitevirts` CHANGE `id` `id` VARCHAR(1024)");
             }
-            manager.executeUpdate("ALTER TABLE economylitevirts ADD UNIQUE (id)");
         }
         // Create caches
         balCache = CacheManager.create(logger, 64, 360);
