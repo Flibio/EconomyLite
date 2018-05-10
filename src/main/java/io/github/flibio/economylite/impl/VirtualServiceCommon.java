@@ -17,6 +17,7 @@ import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.VirtualAccount;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,10 +44,51 @@ public class VirtualServiceCommon implements VirtualEconService {
                 manager.executeUpdate("ALTER TABLE `economylitevirts` CHANGE `id` `id` VARCHAR(1024)");
             }
         }
+        repair(h2);
         // Create caches
         balCache = CacheManager.create(logger, 64, 360);
         exCache = CacheManager.create(logger, 128, 360);
         topCache = CacheManager.create(logger, 16, 30);
+    }
+
+    private void repair(boolean h2) {
+        if (h2) {
+            try {
+                ResultSet rs = manager.executeQuery("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'ECONOMYLITEVIRTS'").get();
+                rs.next();
+                rs.getString(1);
+                logger.info("Repairing the database...");
+            } catch (Exception e) {
+                logger.debug("Database repairs not necessary!");
+                return;
+            }
+            logger.info("Renaming database...");
+            manager.executeUpdate("ALTER TABLE economylitevirts RENAME TO economylitevirtsold");
+            logger.info("Recreating database...");
+            manager.executeUpdate("CREATE TABLE economylitevirts AS SELECT * FROM economylitevirtsold");
+            logger.info("Dropping database...");
+            manager.executeUpdate("DROP TABLE economylitevirtsold");
+            logger.info("Repairs complete!");
+            return;
+        } else {
+            try {
+                ResultSet rs = manager.executeQuery("show index from economylitevirts where Column_name='id'").get();
+                rs.next();
+                rs.getString(1);
+                logger.info("Repairing the database...");
+            } catch (Exception e) {
+                logger.debug("Database repairs not necessary!");
+                return;
+            }
+            logger.info("Renaming database...");
+            manager.executeUpdate("RENAME TABLE economylitevirts TO economylitevirtsold");
+            logger.info("Recreating database...");
+            manager.executeUpdate("CREATE TABLE economylitevirts AS SELECT * FROM economylitevirtsold");
+            logger.info("Dropping database...");
+            manager.executeUpdate("DROP TABLE economylitevirtssold");
+            logger.info("Repairs complete!");
+            return;
+        }
     }
 
     public boolean isWorking() {

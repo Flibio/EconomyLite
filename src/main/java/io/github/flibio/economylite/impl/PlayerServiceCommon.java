@@ -39,31 +39,51 @@ public class PlayerServiceCommon implements PlayerEconService {
         if (manager.initialTestConnection()) {
             manager.executeUpdate("CREATE TABLE IF NOT EXISTS economyliteplayers(uuid VARCHAR(36), balance DECIMAL(11,2), currency VARCHAR(1024))");
         }
-        repair();
+        repair(h2);
         // Create caches
         balCache = CacheManager.create(logger, 64, 360);
         exCache = CacheManager.create(logger, 128, 360);
         topCache = CacheManager.create(logger, 16, 30);
     }
 
-    public boolean repair() {
-        ResultSet rs = manager.executeQuery("show index from economyliteplayers where Column_name='uuid'").get();
-        try {
-            rs.next();
-            rs.getString(1);
-            logger.info("Repairing the database...");
-        } catch (Exception e) {
-            logger.debug("Database repairs not necessary!");
-            return false;
+    private void repair(boolean h2) {
+        if (h2) {
+            try {
+                ResultSet rs = manager.executeQuery("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'ECONOMYLITEPLAYERS'").get();
+                rs.next();
+                rs.getString(1);
+                logger.info("Repairing the database...");
+            } catch (Exception e) {
+                logger.debug("Database repairs not necessary!");
+                return;
+            }
+            logger.info("Renaming database...");
+            manager.executeUpdate("ALTER TABLE economyliteplayers RENAME TO economyliteplayersold");
+            logger.info("Recreating database...");
+            manager.executeUpdate("CREATE TABLE economyliteplayers AS SELECT * FROM economyliteplayersold");
+            logger.info("Dropping database...");
+            manager.executeUpdate("DROP TABLE economyliteplayersold");
+            logger.info("Repairs complete!");
+            return;
+        } else {
+            try {
+                ResultSet rs = manager.executeQuery("show index from economyliteplayers where Column_name='uuid'").get();
+                rs.next();
+                rs.getString(1);
+                logger.info("Repairing the database...");
+            } catch (Exception e) {
+                logger.debug("Database repairs not necessary!");
+                return;
+            }
+            logger.info("Renaming database...");
+            manager.executeUpdate("RENAME TABLE economyliteplayers TO economyliteplayersold");
+            logger.info("Recreating database...");
+            manager.executeUpdate("CREATE TABLE economyliteplayers AS SELECT * FROM economyliteplayersold");
+            logger.info("Dropping database...");
+            manager.executeUpdate("DROP TABLE economyliteplayersold");
+            logger.info("Repairs complete!");
+            return;
         }
-        logger.info("Renaming database...");
-        manager.executeUpdate("RENAME TABLE economyliteplayers TO economyliteplayersold");
-        logger.info("Recreating database...");
-        manager.executeUpdate("CREATE TABLE economyliteplayers AS SELECT * FROM economyliteplayersold");
-        logger.info("Dropping database...");
-        manager.executeUpdate("DROP TABLE economyliteplayersold");
-        logger.info("Repairs complete!");
-        return true;
     }
 
     public boolean isWorking() {
