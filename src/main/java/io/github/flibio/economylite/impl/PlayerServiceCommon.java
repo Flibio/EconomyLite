@@ -38,12 +38,32 @@ public class PlayerServiceCommon implements PlayerEconService {
         this.log = EconomyLite.getConfigManager().getValue(Boolean.class, false, "debug-logging");
         if (manager.initialTestConnection()) {
             manager.executeUpdate("CREATE TABLE IF NOT EXISTS economyliteplayers(uuid VARCHAR(36), balance DECIMAL(11,2), currency VARCHAR(1024))");
-            manager.executeUpdate("ALTER TABLE economyliteplayers ADD UNIQUE (uuid)");
         }
+        repair();
         // Create caches
         balCache = CacheManager.create(logger, 64, 360);
         exCache = CacheManager.create(logger, 128, 360);
         topCache = CacheManager.create(logger, 16, 30);
+    }
+
+    public boolean repair() {
+        ResultSet rs = manager.executeQuery("show index from economyliteplayers where Column_name='uuid'").get();
+        try {
+            rs.next();
+            rs.getString(1);
+            logger.info("Repairing the database...");
+        } catch (Exception e) {
+            logger.debug("Database repairs not necessary!");
+            return false;
+        }
+        logger.info("Renaming database...");
+        manager.executeUpdate("RENAME TABLE economyliteplayers TO economyliteplayersold");
+        logger.info("Recreating database...");
+        manager.executeUpdate("CREATE TABLE economyliteplayers AS SELECT * FROM economyliteplayersold");
+        logger.info("Dropping database...");
+        manager.executeUpdate("DROP TABLE economyliteplayersold");
+        logger.info("Repairs complete!");
+        return true;
     }
 
     public boolean isWorking() {
