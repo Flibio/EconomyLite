@@ -17,11 +17,15 @@ import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.account.VirtualAccount;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import javax.sql.DataSource;
 
 public class PlayerServiceCommon implements PlayerEconService {
 
@@ -48,12 +52,9 @@ public class PlayerServiceCommon implements PlayerEconService {
 
     private void repair(boolean h2) {
         if (h2) {
-            try {
-                ResultSet rs = manager.executeQuery("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'ECONOMYLITEPLAYERS'").get();
-                rs.next();
-                rs.getString(1);
+            if (needRepair("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'ECONOMYLITEPLAYERS'")) {
                 logger.info("Repairing the database...");
-            } catch (Exception e) {
+            } else {
                 logger.debug("Database repairs not necessary!");
                 return;
             }
@@ -66,12 +67,9 @@ public class PlayerServiceCommon implements PlayerEconService {
             logger.info("Repairs complete!");
             return;
         } else {
-            try {
-                ResultSet rs = manager.executeQuery("show index from economyliteplayers where Column_name='uuid'").get();
-                rs.next();
-                rs.getString(1);
+            if (needRepair("show index from economyliteplayers where Column_name='uuid'")) {
                 logger.info("Repairing the database...");
-            } catch (Exception e) {
+            } else {
                 logger.debug("Database repairs not necessary!");
                 return;
             }
@@ -84,6 +82,29 @@ public class PlayerServiceCommon implements PlayerEconService {
             logger.info("Repairs complete!");
             return;
         }
+    }
+
+    /**
+     * Returns true if database needs to be repaired.
+     */
+    private boolean needRepair(String sql) {
+        DataSource source = manager.getDataSource();
+        try {
+            Connection con = source.getConnection();
+            try {
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.closeOnCompletion();
+                ResultSet rs = ps.executeQuery();
+                rs.next();
+                rs.getString(1);
+            } finally {
+                con.close();
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
     }
 
     public boolean isWorking() {
@@ -183,18 +204,29 @@ public class PlayerServiceCommon implements PlayerEconService {
 
     public List<String> getAccountsMigration() {
         List<String> accounts = new ArrayList<>();
-        Optional<ResultSet> rOpt = manager.executeQuery("SELECT * FROM economyliteplayers");
-        if (rOpt.isPresent()) {
-            ResultSet rs = rOpt.get();
+        try {
+            Connection con = manager.getDataSource().getConnection();
             try {
-                while (rs.next()) {
-                    accounts.add(rs.getString("uuid") + "%-%" + rs.getDouble("balance") + "%-%" + rs.getString("currency"));
+                PreparedStatement ps = con.prepareStatement("SELECT * FROM economyliteplayers");
+                ps.closeOnCompletion();
+
+                ResultSet rs = ps.executeQuery();
+                try {
+                    while (rs.next()) {
+                        accounts.add(rs.getString("uuid") + "%-%" + rs.getDouble("balance") + "%-%" + rs.getString("currency"));
+                    }
+                    rs.close();
+                    return accounts;
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
+                    return accounts;
                 }
-                return accounts;
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-                return accounts;
+
+            } finally {
+                con.close();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return accounts;
     }

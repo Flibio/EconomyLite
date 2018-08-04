@@ -17,11 +17,15 @@ import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.VirtualAccount;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import javax.sql.DataSource;
 
 public class VirtualServiceCommon implements VirtualEconService {
 
@@ -53,12 +57,9 @@ public class VirtualServiceCommon implements VirtualEconService {
 
     private void repair(boolean h2) {
         if (h2) {
-            try {
-                ResultSet rs = manager.executeQuery("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'ECONOMYLITEVIRTS'").get();
-                rs.next();
-                rs.getString(1);
+            if (needRepair("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'ECONOMYLITEVIRTS'")) {
                 logger.info("Repairing the database...");
-            } catch (Exception e) {
+            } else {
                 logger.debug("Database repairs not necessary!");
                 return;
             }
@@ -71,12 +72,9 @@ public class VirtualServiceCommon implements VirtualEconService {
             logger.info("Repairs complete!");
             return;
         } else {
-            try {
-                ResultSet rs = manager.executeQuery("show index from economylitevirts where Column_name='id'").get();
-                rs.next();
-                rs.getString(1);
+            if (needRepair("show index from economylitevirts where Column_name='id'")) {
                 logger.info("Repairing the database...");
-            } catch (Exception e) {
+            } else {
                 logger.debug("Database repairs not necessary!");
                 return;
             }
@@ -89,6 +87,29 @@ public class VirtualServiceCommon implements VirtualEconService {
             logger.info("Repairs complete!");
             return;
         }
+    }
+
+    /**
+     * Returns true if database needs to be repaired.
+     */
+    private boolean needRepair(String sql) {
+        DataSource source = manager.getDataSource();
+        try {
+            Connection con = source.getConnection();
+            try {
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.closeOnCompletion();
+                ResultSet rs = ps.executeQuery();
+                rs.next();
+                rs.getString(1);
+            } finally {
+                con.close();
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
     }
 
     public boolean isWorking() {
