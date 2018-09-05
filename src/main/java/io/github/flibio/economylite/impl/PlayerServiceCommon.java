@@ -107,6 +107,12 @@ public class PlayerServiceCommon implements PlayerEconService {
         return true;
     }
 
+    public void resetCache() {
+        balCache.clear();
+        exCache.clear();
+        topCache.clear();
+    }
+
     public boolean isWorking() {
         return manager.testConnection();
     }

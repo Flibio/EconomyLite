@@ -13,6 +13,7 @@ import io.github.flibio.economylite.commands.MigrateCommand;
 import io.github.flibio.economylite.commands.PayCommand;
 import io.github.flibio.economylite.commands.admin.AddCommand;
 import io.github.flibio.economylite.commands.admin.EconCommand;
+import io.github.flibio.economylite.commands.RefreshCommand;
 import io.github.flibio.economylite.commands.admin.RemoveCommand;
 import io.github.flibio.economylite.commands.admin.SetAllCommand;
 import io.github.flibio.economylite.commands.admin.SetCommand;
@@ -40,9 +41,7 @@ import io.github.flibio.economylite.modules.loan.LoanModule;
 import io.github.flibio.economylite.modules.sql.SqlModule;
 import io.github.flibio.utils.commands.CommandLoader;
 import io.github.flibio.utils.config.ConfigManager;
-import io.github.flibio.utils.file.FileManager;
 import io.github.flibio.utils.message.MessageStorage;
-import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -56,13 +55,9 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import javax.xml.stream.events.Comment;
 
 @Plugin(id = PluginInfo.ID, name = PluginInfo.NAME, version = PluginInfo.VERSION, description = PluginInfo.DESCRIPTION)
 public class EconomyLite {
@@ -154,7 +149,8 @@ public class EconomyLite {
                 new VirtualRemoveCommand(),
                 new VirtualPayCommand(),
                 new PayVirtualCommand(),
-                new MigrateCommand()
+                new MigrateCommand(),
+                new RefreshCommand()
         );
         // Register currency registry
         game.getRegistry().registerModule(Currency.class, new CurrencyRegistryModule());

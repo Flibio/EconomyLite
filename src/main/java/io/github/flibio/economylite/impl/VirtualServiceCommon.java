@@ -112,6 +112,12 @@ public class VirtualServiceCommon implements VirtualEconService {
         return true;
     }
 
+    public void resetCache() {
+        balCache.clear();
+        exCache.clear();
+        topCache.clear();
+    }
+
     public boolean isWorking() {
         return manager.testConnection();
     }
