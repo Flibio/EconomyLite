@@ -1,3 +1,6 @@
+/*
+ * This file is part of EconomyLite, licensed under the MIT License (MIT). See the LICENSE file at the root of this project for more information.
+ */
 package io.github.flibio.economylite.commands;
 
 import io.github.flibio.economylite.EconomyLite;
