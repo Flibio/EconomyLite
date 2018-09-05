@@ -163,7 +163,7 @@ public class EconomyLite {
     private void initializeFiles() {
         configManager.setDefault("Default balance of player accounts.", Double.class, 0.0, "default-balance", "player");
         configManager.setDefault("Default balance of virtual accounts.", Double.class, 0.0, "default-balance", "virtual");
-        configManager.setDefault("Enables or disables debug logging.", Boolean.class, true, "debug-logging");
+        configManager.setDefault("Enables or disables debug logging.", Boolean.class, false, "debug-logging");
         configManager.setDefault("If enabled players will be notified when an admin changes their balance", Boolean.class, false,
                 "notify-on-admin-commands");
         configManager.setDefault("If enabled players will be asked to confirm payments to an offline player.", Boolean.class, true,
