@@ -76,6 +76,9 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     @Override
     public BigDecimal getBalance(Currency currency, Set<Context> contexts) {
+        if (!hasBalance(currency, contexts)) {
+            playerService.setBalance(uuid, getDefaultBalance(currency), currency, CauseFactory.create("New Account"));
+        }
         return playerService.getBalance(uuid, currency, CauseFactory.create("Get Balance"));
     }
 

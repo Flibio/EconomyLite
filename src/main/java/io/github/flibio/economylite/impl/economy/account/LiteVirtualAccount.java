@@ -63,6 +63,9 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public BigDecimal getBalance(Currency currency, Set<Context> contexts) {
+        if (!hasBalance(currency, contexts)) {
+            virtualService.setBalance(name, getDefaultBalance(currency), currency, CauseFactory.create("New Account"));
+        }
         return virtualService.getBalance(name, currency, CauseFactory.create("Get Balance"));
     }
 
