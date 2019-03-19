@@ -5,6 +5,7 @@ package io.github.flibio.economylite.impl.economy.account;
 
 import io.github.flibio.economylite.CauseFactory;
 import io.github.flibio.economylite.EconomyLite;
+import io.github.flibio.economylite.LockUtils;
 import io.github.flibio.economylite.api.CurrencyEconService;
 import io.github.flibio.economylite.api.VirtualEconService;
 import io.github.flibio.economylite.impl.economy.event.LiteEconomyTransactionEvent;
@@ -63,8 +64,10 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public BigDecimal getBalance(Currency currency, Set<Context> contexts) {
-        if (!hasBalance(currency, contexts)) {
-            virtualService.setBalance(name, getDefaultBalance(currency), currency, CauseFactory.create("New Account"));
+        try (LockUtils lock = new LockUtils()) {
+            if (!hasBalance(currency, contexts)) {
+                virtualService.setBalance(name, getDefaultBalance(currency), currency, CauseFactory.create("New Account"));
+            }
         }
         return virtualService.getBalance(name, currency, CauseFactory.create("Get Balance"));
     }
@@ -86,22 +89,26 @@ public class LiteVirtualAccount implements VirtualAccount {
         if (amount.compareTo(BigDecimal.ZERO) == -1 || amount.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT, cause);
         }
-        if (virtualService.setBalance(name, amount, currency, cause)) {
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT, cause);
-        } else {
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT, cause);
+        try (LockUtils lock = new LockUtils()) {
+            if (virtualService.setBalance(name, amount, currency, cause)) {
+                return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT, cause);
+            } else {
+                return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT, cause);
+            }
         }
     }
 
     @Override
     public Map<Currency, TransactionResult> resetBalances(Cause cause, Set<Context> contexts) {
         HashMap<Currency, TransactionResult> results = new HashMap<>();
-        for (Currency currency : currencyService.getCurrencies()) {
-            if (virtualService.accountExists(name, currency, cause)) {
-                if (virtualService.setBalance(name, getDefaultBalance(currency), currency, cause)) {
-                    results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause));
-                } else {
-                    results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause));
+        try (LockUtils lock = new LockUtils()) {
+            for (Currency currency : currencyService.getCurrencies()) {
+                if (virtualService.accountExists(name, currency, cause)) {
+                    if (virtualService.setBalance(name, getDefaultBalance(currency), currency, cause)) {
+                        results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause));
+                    } else {
+                        results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause));
+                    }
                 }
             }
         }
@@ -110,60 +117,68 @@ public class LiteVirtualAccount implements VirtualAccount {
 
     @Override
     public TransactionResult resetBalance(Currency currency, Cause cause, Set<Context> contexts) {
-        if (virtualService.setBalance(name, getDefaultBalance(currency), currency, cause)) {
-            return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause);
-        } else {
-            return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause);
+        try (LockUtils lock = new LockUtils()) {
+            if (virtualService.setBalance(name, getDefaultBalance(currency), currency, cause)) {
+                return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause);
+            } else {
+                return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause);
+            }
         }
     }
 
     @Override
     public TransactionResult deposit(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        BigDecimal newBal = getBalance(currency).add(amount);
-        // Check if the new balance is in bounds
-        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT, cause);
-        }
-        if (virtualService.deposit(name, amount, currency, cause)) {
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT, cause);
-        } else {
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT, cause);
+        try (LockUtils lock = new LockUtils()) {
+            BigDecimal newBal = getBalance(currency).add(amount);
+            // Check if the new balance is in bounds
+            if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
+                return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT, cause);
+            }
+            if (virtualService.deposit(name, amount, currency, cause)) {
+                return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT, cause);
+            } else {
+                return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT, cause);
+            }
         }
     }
 
     @Override
     public TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        BigDecimal newBal = getBalance(currency).subtract(amount);
-        // Check if the new balance is in bounds
-        if (newBal.compareTo(BigDecimal.ZERO) == -1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, TransactionTypes.WITHDRAW, cause);
-        }
-        if (newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.WITHDRAW, cause);
-        }
-        if (virtualService.withdraw(name, amount, currency, cause)) {
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause);
-        } else {
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause);
+        try (LockUtils lock = new LockUtils()) {
+            BigDecimal newBal = getBalance(currency).subtract(amount);
+            // Check if the new balance is in bounds
+            if (newBal.compareTo(BigDecimal.ZERO) == -1) {
+                return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, TransactionTypes.WITHDRAW, cause);
+            }
+            if (newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
+                return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.WITHDRAW, cause);
+            }
+            if (virtualService.withdraw(name, amount, currency, cause)) {
+                return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause);
+            } else {
+                return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause);
+            }
         }
     }
 
     @Override
     public TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        BigDecimal newBal = to.getBalance(currency).add(amount);
-        // Check if the new balance is in bounds
-        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, to, cause);
-        }
-        // Check if the account has enough funds
-        if (amount.compareTo(getBalance(currency)) == 1) {
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, to, cause);
-        }
-        if (withdraw(currency, amount, cause).getResult().equals(ResultType.SUCCESS)
-                && to.deposit(currency, amount, cause).getResult().equals(ResultType.SUCCESS)) {
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, to, cause);
-        } else {
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, to, cause);
+        try (LockUtils lock = new LockUtils()) {
+            BigDecimal newBal = to.getBalance(currency).add(amount);
+            // Check if the new balance is in bounds
+            if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
+                return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, to, cause);
+            }
+            // Check if the account has enough funds
+            if (amount.compareTo(getBalance(currency)) == 1) {
+                return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, to, cause);
+            }
+            if (withdraw(currency, amount, cause).getResult().equals(ResultType.SUCCESS)
+                    && to.deposit(currency, amount, cause).getResult().equals(ResultType.SUCCESS)) {
+                return resultAndEvent(this, amount, currency, ResultType.SUCCESS, to, cause);
+            } else {
+                return resultAndEvent(this, amount, currency, ResultType.FAILED, to, cause);
+            }
         }
     }
 
@@ -189,5 +204,4 @@ public class LiteVirtualAccount implements VirtualAccount {
         Sponge.getEventManager().post(new LiteEconomyTransactionEvent(result, cause));
         return result;
     }
-
 }
