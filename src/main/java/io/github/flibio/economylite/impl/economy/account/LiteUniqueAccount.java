@@ -5,6 +5,7 @@ package io.github.flibio.economylite.impl.economy.account;
 
 import io.github.flibio.economylite.CauseFactory;
 import io.github.flibio.economylite.EconomyLite;
+import io.github.flibio.economylite.LockUtils;
 import io.github.flibio.economylite.api.CurrencyEconService;
 import io.github.flibio.economylite.api.PlayerEconService;
 import io.github.flibio.economylite.impl.economy.event.LiteEconomyTransactionEvent;
@@ -31,16 +32,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Semaphore;
 
 public class LiteUniqueAccount implements UniqueAccount {
 
     private PlayerEconService playerService = EconomyLite.getPlayerService();
     private CurrencyEconService currencyService = EconomyLite.getCurrencyService();
-
-    static private Semaphore lock = new Semaphore(1);
-    static private long threadID = 0;
-    static private int numLock = 0;
 
     private UUID uuid;
     private String name;
@@ -81,11 +77,11 @@ public class LiteUniqueAccount implements UniqueAccount {
 
     @Override
     public BigDecimal getBalance(Currency currency, Set<Context> contexts) {
-        acquireLock();
-        if (!hasBalance(currency, contexts)) {
-            playerService.setBalance(uuid, getDefaultBalance(currency), currency, CauseFactory.create("New Account"));
+        try (LockUtils lock = new LockUtils()) {
+            if (!hasBalance(currency, contexts)) {
+                playerService.setBalance(uuid, getDefaultBalance(currency), currency, CauseFactory.create("New Account"));
+            }
         }
-        releaseLock();
         return playerService.getBalance(uuid, currency, CauseFactory.create("Get Balance"));
     }
 
@@ -106,106 +102,96 @@ public class LiteUniqueAccount implements UniqueAccount {
         if (amount.compareTo(BigDecimal.ZERO) == -1 || amount.compareTo(BigDecimal.valueOf(999999999)) == 1) {
             return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT, cause);
         }
-        acquireLock();
-        if (playerService.setBalance(uuid, amount, currency, cause)) {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT, cause);
-        } else {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT, cause);
+        try (LockUtils lock = new LockUtils()) {
+            if (playerService.setBalance(uuid, amount, currency, cause)) {
+                return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT, cause);
+            } else {
+                return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT, cause);
+            }
         }
     }
 
     @Override
     public Map<Currency, TransactionResult> resetBalances(Cause cause, Set<Context> contexts) {
         HashMap<Currency, TransactionResult> results = new HashMap<>();
-        acquireLock();
-        for (Currency currency : currencyService.getCurrencies()) {
-            if (playerService.accountExists(uuid, currency, cause)) {
-                if (playerService.setBalance(uuid, getDefaultBalance(currency), currency, cause)) {
-                    results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause));
-                } else {
-                    results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause));
+        try (LockUtils lock = new LockUtils()) {
+            for (Currency currency : currencyService.getCurrencies()) {
+                if (playerService.accountExists(uuid, currency, cause)) {
+                    if (playerService.setBalance(uuid, getDefaultBalance(currency), currency, cause)) {
+                        results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause));
+                    } else {
+                        results.put(currency, resultAndEvent(this, getBalance(currency), currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause));
+                    }
                 }
             }
+            return results;
         }
-        releaseLock();
-        return results;
     }
 
     @Override
     public TransactionResult resetBalance(Currency currency, Cause cause, Set<Context> contexts) {
-        acquireLock();
-        if (playerService.setBalance(uuid, getDefaultBalance(currency), currency, cause)) {
-            releaseLock();
-            return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause);
-        } else {
-            releaseLock();
-            return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause);
+        try (LockUtils lock = new LockUtils()) {
+            if (playerService.setBalance(uuid, getDefaultBalance(currency), currency, cause)) {
+                return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause);
+            } else {
+                return resultAndEvent(this, BigDecimal.ZERO, currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause);
+            }
         }
     }
 
     @Override
     public TransactionResult deposit(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        acquireLock();
-        BigDecimal newBal = getBalance(currency).add(amount);
-        // Check if the new balance is in bounds
-        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT, cause);
-        }
-        if (playerService.deposit(uuid, amount, currency, cause)) {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT, cause);
-        } else {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT, cause);
+        try (LockUtils lock = new LockUtils()) {
+            BigDecimal newBal = getBalance(currency).add(amount);
+            // Check if the new balance is in bounds
+            if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
+                return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.DEPOSIT, cause);
+            }
+            if (playerService.deposit(uuid, amount, currency, cause)) {
+                return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.DEPOSIT, cause);
+            } else {
+                return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.DEPOSIT, cause);
+            }
         }
     }
 
     @Override
     public TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        acquireLock();
-        BigDecimal newBal = getBalance(currency).subtract(amount);
-        // Check if the new balance is in bounds
-        if (newBal.compareTo(BigDecimal.ZERO) == -1) {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, TransactionTypes.WITHDRAW, cause);
-        }
-        if (newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.WITHDRAW, cause);
-        }
-        if (playerService.withdraw(uuid, amount, currency, cause)) {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause);
-        } else {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause);
+        try (LockUtils lock = new LockUtils()) {
+            BigDecimal newBal = getBalance(currency).subtract(amount);
+            // Check if the new balance is in bounds
+            if (newBal.compareTo(BigDecimal.ZERO) == -1) {
+                return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, TransactionTypes.WITHDRAW, cause);
+            }
+            if (newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
+                return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, TransactionTypes.WITHDRAW, cause);
+            }
+            if (playerService.withdraw(uuid, amount, currency, cause)) {
+                return resultAndEvent(this, amount, currency, ResultType.SUCCESS, TransactionTypes.WITHDRAW, cause);
+            } else {
+                return resultAndEvent(this, amount, currency, ResultType.FAILED, TransactionTypes.WITHDRAW, cause);
+            }
         }
     }
 
     @Override
     public TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts) {
-        acquireLock();
-        BigDecimal newBal = to.getBalance(currency).add(amount);
-        // Check if the new balance is in bounds
-        if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, to, cause);
-        }
-        // Check if the account has enough funds
-        if (amount.compareTo(getBalance(currency)) == 1) {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, to, cause);
-        }
-        if (withdraw(currency, amount, cause).getResult().equals(ResultType.SUCCESS)
-                && to.deposit(currency, amount, cause).getResult().equals(ResultType.SUCCESS)) {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.SUCCESS, to, cause);
-        } else {
-            releaseLock();
-            return resultAndEvent(this, amount, currency, ResultType.FAILED, to, cause);
+        try (LockUtils lock = new LockUtils()) {
+            BigDecimal newBal = to.getBalance(currency).add(amount);
+            // Check if the new balance is in bounds
+            if (newBal.compareTo(BigDecimal.ZERO) == -1 || newBal.compareTo(BigDecimal.valueOf(999999999)) == 1) {
+                return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_SPACE, to, cause);
+            }
+            // Check if the account has enough funds
+            if (amount.compareTo(getBalance(currency)) == 1) {
+                return resultAndEvent(this, amount, currency, ResultType.ACCOUNT_NO_FUNDS, to, cause);
+            }
+            if (withdraw(currency, amount, cause).getResult().equals(ResultType.SUCCESS)
+                    && to.deposit(currency, amount, cause).getResult().equals(ResultType.SUCCESS)) {
+                return resultAndEvent(this, amount, currency, ResultType.SUCCESS, to, cause);
+            } else {
+                return resultAndEvent(this, amount, currency, ResultType.FAILED, to, cause);
+            }
         }
     }
 
@@ -235,27 +221,5 @@ public class LiteUniqueAccount implements UniqueAccount {
     @Override
     public UUID getUniqueId() {
         return uuid;
-    }
-
-    static private void acquireLock() {
-        if (threadID > 0 && Thread.currentThread().getId() == threadID) {
-            numLock++;
-            return;
-        }
-        try {
-            lock.acquire();
-            threadID = Thread.currentThread().getId();
-	    } catch (InterruptedException e) {
-            e.printStackTrace();
-	    }
-    }
-    
-    static private void releaseLock() {
-        if (numLock == 0) {
-            threadID = 0;
-            lock.release();
-        } else {
-        	numLock--;
-        }
     }
 }
