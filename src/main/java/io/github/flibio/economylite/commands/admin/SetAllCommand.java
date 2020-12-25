@@ -4,6 +4,7 @@
 package io.github.flibio.economylite.commands.admin;
 
 import io.github.flibio.economylite.EconomyLite;
+import io.github.flibio.economylite.api.CurrencyEconService;
 import io.github.flibio.utils.commands.AsyncCommand;
 import io.github.flibio.utils.commands.BaseCommandExecutor;
 import io.github.flibio.utils.commands.Command;
@@ -16,6 +17,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.text.Text;
 
 import java.math.BigDecimal;
@@ -26,24 +28,35 @@ import java.math.BigDecimal;
 public class SetAllCommand extends BaseCommandExecutor<CommandSource> {
 
     private MessageStorage messageStorage = EconomyLite.getMessageStorage();
+    private CurrencyEconService currencyService = EconomyLite.getCurrencyService();
 
     @Override
     public Builder getCommandSpecBuilder() {
         return CommandSpec.builder()
                 .executor(this)
-                .arguments(GenericArguments.doubleNum(Text.of("balance")));
+                .arguments(GenericArguments.string(Text.of("currency")), GenericArguments.doubleNum(Text.of("balance")));
     }
 
     @Override
     public void run(CommandSource src, CommandContext args) {
-        if (args.getOne("balance").isPresent()) {
+        if (args.getOne("currency").isPresent() && args.getOne("balance").isPresent()) {
             String targetName = "all players";
+            String currency = args.<String>getOne("currency").get();
             BigDecimal newBal = BigDecimal.valueOf(args.<Double>getOne("balance").get());
-            if (EconomyLite.getPlayerService().setBalanceAll(newBal, EconomyLite.getCurrencyService().getCurrentCurrency(),
-                    Cause.of(EventContext.empty(),(EconomyLite.getInstance())))) {
-                src.sendMessage(messageStorage.getMessage("command.econ.setsuccess", "name", targetName));
-            } else {
-                src.sendMessage(messageStorage.getMessage("command.econ.setfail", "name", targetName));
+            boolean found = false;
+            for (Currency c : currencyService.getCurrencies()) {
+                if (c.getDisplayName().toPlain().equalsIgnoreCase(currency)) {
+                    found = true;
+                    if (EconomyLite.getPlayerService().setBalanceAll(newBal, EconomyLite.getCurrencyService().getCurrentCurrency(),
+                            Cause.of(EventContext.empty(), (EconomyLite.getInstance())))) {
+                        src.sendMessage(messageStorage.getMessage("command.econ.setsuccess", "name", targetName));
+                    } else {
+                        src.sendMessage(messageStorage.getMessage("command.econ.setfail", "name", targetName));
+                    }
+                }
+            }
+            if (!found) {
+                src.sendMessage(messageStorage.getMessage("command.econ.currency.invalid", "currency", currency));
             }
         } else {
             src.sendMessage(messageStorage.getMessage("command.error"));
