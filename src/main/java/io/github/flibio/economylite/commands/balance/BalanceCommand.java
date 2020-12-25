@@ -65,7 +65,7 @@ public class BalanceCommand extends BaseCommandExecutor<CommandSource> {
                     }
                     if (!found) {
                         src.sendMessage(messageStorage.getMessage("command.econ.currency.invalid", "currency", currency));
-                        src.sendMessage(messageStorage.getMessage("command.usage", "command", "subcommands"));
+                        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/balance", "subcommands", "[<currency>] [<player>]"));
                     }
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.error"));
@@ -95,7 +95,7 @@ public class BalanceCommand extends BaseCommandExecutor<CommandSource> {
                     }
                     if (!found) {
                         src.sendMessage(messageStorage.getMessage("command.econ.currency.invalid", "currency", currency));
-                        src.sendMessage(messageStorage.getMessage("command.usage", "command", "subcommands"));
+                        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/balance", "subcommands", "[<currency>] [<player>]"));
                     }
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.error"));
