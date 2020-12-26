@@ -15,7 +15,7 @@ import io.github.flibio.utils.commands.Command;
 import io.github.flibio.utils.message.MessageStorage;
 
 @AsyncCommand
-@Command(aliases = {"economy", "econ", "eco"}, permission = "economylite.admin.econ")
+@Command(aliases = {"economy", "econ", "eco", "meco"}, permission = "economylite.admin.econ")
 public class EconCommand extends BaseCommandExecutor<CommandSource> {
 
     private MessageStorage messageStorage = EconomyLite.getMessageStorage();
@@ -28,8 +28,8 @@ public class EconCommand extends BaseCommandExecutor<CommandSource> {
 
     @Override
     public void run(CommandSource src, CommandContext args) {
-        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/econ", "subcommands", "add | set | remove <player> <currency> <amount>"));
-        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/econ", "subcommands", "setall <currency> <amount>"));
+        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/econ", "subcommands", "add | set | remove <player> <amount> [<currency>]"));
+        src.sendMessage(messageStorage.getMessage("command.usage", "command", "/econ", "subcommands", "setall <amount> [<currency>]"));
     }
 
 }

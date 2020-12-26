@@ -40,12 +40,12 @@ public class RemoveCommand extends BaseCommandExecutor<CommandSource> {
     public Builder getCommandSpecBuilder() {
         return CommandSpec.builder()
                 .executor(this)
-                .arguments(GenericArguments.user(Text.of("player")), GenericArguments.string(Text.of("currency")), GenericArguments.doubleNum(Text.of("amount")));
+                .arguments(GenericArguments.user(Text.of("player")), GenericArguments.doubleNum(Text.of("amount")), GenericArguments.optional(GenericArguments.string(Text.of("currency"))));
     }
 
     @Override
     public void run(CommandSource src, CommandContext args) {
-        if (args.getOne("player").isPresent() && args.getOne("currency").isPresent() && args.getOne("amount").isPresent()) {
+        if (args.getOne("player").isPresent() && args.getOne("amount").isPresent() && args.getOne("currency").isPresent()) {
             User target = args.<User>getOne("player").get();
             String targetName = target.getName();
             String currency = args.<String>getOne("currency").get();
@@ -68,6 +68,23 @@ public class RemoveCommand extends BaseCommandExecutor<CommandSource> {
                 }
                 if (!found) {
                     src.sendMessage(messageStorage.getMessage("command.econ.currency.invalid", "currency", currency));
+                }
+            } else {
+                src.sendMessage(messageStorage.getMessage("command.error"));
+            }
+        } else if (args.getOne("player").isPresent() && args.getOne("amount").isPresent()) {
+            User target = args.<User>getOne("player").get();
+            String targetName = target.getName();
+            BigDecimal toRemove = BigDecimal.valueOf(args.<Double>getOne("amount").get());
+            Optional<UniqueAccount> uOpt = EconomyLite.getEconomyService().getOrCreateAccount(target.getUniqueId());
+            if (uOpt.isPresent()) {
+                UniqueAccount targetAccount = uOpt.get();
+                if (targetAccount.withdraw(currencyService.getCurrentCurrency(), toRemove,
+                        Cause.of(EventContext.empty(), (EconomyLite.getInstance()))).getResult().equals(ResultType.SUCCESS)) {
+                    src.sendMessage(messageStorage.getMessage("command.econ.removesuccess", "name", targetName));
+                    attemptNotify(target);
+                } else {
+                    src.sendMessage(messageStorage.getMessage("command.econ.removefail", "name", targetName));
                 }
             } else {
                 src.sendMessage(messageStorage.getMessage("command.error"));

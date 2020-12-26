@@ -111,11 +111,11 @@ public class PayCommand extends BaseCommandExecutor<Player> {
             Optional<UniqueAccount> tOpt = ecoService.getOrCreateAccount(target.getUniqueId());
             if (uOpt.isPresent() && tOpt.isPresent()) {
                 if (uOpt.get()
-                        .transfer(tOpt.get(), ecoService.getDefaultCurrency(), amount, Cause.of(EventContext.empty(), (EconomyLite.getInstance())))
+                        .transfer(tOpt.get(), currency, amount, Cause.of(EventContext.empty(), (EconomyLite.getInstance())))
                         .getResult().equals(ResultType.SUCCESS)) {
-                    Text label = ecoService.getDefaultCurrency().getPluralDisplayName();
+                    Text label = currency.getPluralDisplayName();
                     if (amount.equals(BigDecimal.ONE)) {
-                        label = ecoService.getDefaultCurrency().getDisplayName();
+                        label = currency.getDisplayName();
                     }
                     src.sendMessage(messageStorage.getMessage("command.pay.success", "target", targetName, "amountandlabel",
                             String.format(Locale.ENGLISH, "%,.0f", amount) + " " + label.toPlain()));

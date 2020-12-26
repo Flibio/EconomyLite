@@ -34,12 +34,12 @@ public class SetAllCommand extends BaseCommandExecutor<CommandSource> {
     public Builder getCommandSpecBuilder() {
         return CommandSpec.builder()
                 .executor(this)
-                .arguments(GenericArguments.string(Text.of("currency")), GenericArguments.doubleNum(Text.of("balance")));
+                .arguments(GenericArguments.doubleNum(Text.of("balance")), GenericArguments.optional(GenericArguments.string(Text.of("currency"))));
     }
 
     @Override
     public void run(CommandSource src, CommandContext args) {
-        if (args.getOne("currency").isPresent() && args.getOne("balance").isPresent()) {
+        if (args.getOne("balance").isPresent() && args.getOne("currency").isPresent()) {
             String targetName = "all players";
             String currency = args.<String>getOne("currency").get();
             BigDecimal newBal = BigDecimal.valueOf(args.<Double>getOne("balance").get());
@@ -47,7 +47,7 @@ public class SetAllCommand extends BaseCommandExecutor<CommandSource> {
             for (Currency c : currencyService.getCurrencies()) {
                 if (c.getDisplayName().toPlain().equalsIgnoreCase(currency)) {
                     found = true;
-                    if (EconomyLite.getPlayerService().setBalanceAll(newBal, EconomyLite.getCurrencyService().getCurrentCurrency(),
+                    if (EconomyLite.getPlayerService().setBalanceAll(newBal, c,
                             Cause.of(EventContext.empty(), (EconomyLite.getInstance())))) {
                         src.sendMessage(messageStorage.getMessage("command.econ.setsuccess", "name", targetName));
                     } else {
@@ -57,6 +57,15 @@ public class SetAllCommand extends BaseCommandExecutor<CommandSource> {
             }
             if (!found) {
                 src.sendMessage(messageStorage.getMessage("command.econ.currency.invalid", "currency", currency));
+            }
+        } else if (args.getOne("balance").isPresent()) {
+            String targetName = "all players";
+            BigDecimal newBal = BigDecimal.valueOf(args.<Double>getOne("balance").get());
+            if (EconomyLite.getPlayerService().setBalanceAll(newBal, EconomyLite.getCurrencyService().getCurrentCurrency(),
+                    Cause.of(EventContext.empty(), (EconomyLite.getInstance())))) {
+                src.sendMessage(messageStorage.getMessage("command.econ.setsuccess", "name", targetName));
+            } else {
+                src.sendMessage(messageStorage.getMessage("command.econ.setfail", "name", targetName));
             }
         } else {
             src.sendMessage(messageStorage.getMessage("command.error"));

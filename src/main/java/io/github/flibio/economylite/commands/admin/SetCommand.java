@@ -40,12 +40,12 @@ public class SetCommand extends BaseCommandExecutor<CommandSource> {
     public Builder getCommandSpecBuilder() {
         return CommandSpec.builder()
                 .executor(this)
-                .arguments(GenericArguments.user(Text.of("player")), GenericArguments.string(Text.of("currency")), GenericArguments.doubleNum(Text.of("balance")));
+                .arguments(GenericArguments.user(Text.of("player")), GenericArguments.doubleNum(Text.of("balance")), GenericArguments.optional(GenericArguments.string(Text.of("currency"))));
     }
 
     @Override
     public void run(CommandSource src, CommandContext args) {
-        if (args.getOne("player").isPresent() && args.getOne("currency").isPresent() && args.getOne("balance").isPresent()) {
+        if (args.getOne("player").isPresent() && args.getOne("balance").isPresent() && args.getOne("currency").isPresent()) {
             User target = args.<User>getOne("player").get();
             String targetName = target.getName();
             String currency = args.<String>getOne("currency").get();
@@ -68,6 +68,23 @@ public class SetCommand extends BaseCommandExecutor<CommandSource> {
                 }
                 if (!found) {
                     src.sendMessage(messageStorage.getMessage("command.econ.currency.invalid", "currency", currency));
+                }
+            } else {
+                src.sendMessage(messageStorage.getMessage("command.error"));
+            }
+        } else if (args.getOne("player").isPresent() && args.getOne("balance").isPresent()) {
+            User target = args.<User>getOne("player").get();
+            String targetName = target.getName();
+            BigDecimal newBal = BigDecimal.valueOf(args.<Double>getOne("balance").get());
+            Optional<UniqueAccount> uOpt = EconomyLite.getEconomyService().getOrCreateAccount(target.getUniqueId());
+            if (uOpt.isPresent()) {
+                UniqueAccount targetAccount = uOpt.get();
+                if (targetAccount.setBalance(currencyService.getCurrentCurrency(), newBal,
+                        Cause.of(EventContext.empty(), (EconomyLite.getInstance()))).getResult().equals(ResultType.SUCCESS)) {
+                    src.sendMessage(messageStorage.getMessage("command.econ.setsuccess", "name", targetName));
+                    attemptNotify(target);
+                } else {
+                    src.sendMessage(messageStorage.getMessage("command.econ.setfail", "name", targetName));
                 }
             } else {
                 src.sendMessage(messageStorage.getMessage("command.error"));
