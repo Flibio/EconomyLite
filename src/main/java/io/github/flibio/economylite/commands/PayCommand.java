@@ -42,7 +42,7 @@ public class PayCommand extends BaseCommandExecutor<Player> {
     public Builder getCommandSpecBuilder() {
         return CommandSpec.builder()
                 .executor(this)
-                .arguments(GenericArguments.user(Text.of("player")), GenericArguments.doubleNum(Text.of("amount")), GenericArguments.optional(GenericArguments.string(Text.of("currency"))));
+                .arguments(GenericArguments.player(Text.of("player")), GenericArguments.doubleNum(Text.of("amount")), GenericArguments.optional(GenericArguments.string(Text.of("currency"))));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PayCommand extends BaseCommandExecutor<Player> {
             if (amount.doubleValue() < 1) {
                 src.sendMessage(messageStorage.getMessage("command.pay.invalid"));
             } else {
-                User target = args.<User>getOne("player").get();
+                Player target = args.<Player>getOne("player").get();
                 if (!EconomyLite.getConfigManager().getValue(Boolean.class, false, "confirm-offline-payments") || target.isOnline()) {
                     // Complete the payment
                     pay(target, amount, currency, src);
@@ -78,7 +78,7 @@ public class PayCommand extends BaseCommandExecutor<Player> {
                     if (amount.doubleValue() < 1) {
                         src.sendMessage(messageStorage.getMessage("command.pay.invalid"));
                     } else {
-                        User target = args.<User>getOne("player").get();
+                        Player target = args.<Player>getOne("player").get();
                         if (!EconomyLite.getConfigManager().getValue(Boolean.class, false, "confirm-offline-payments") || target.isOnline()) {
                             // Complete the payment
                             pay(target, amount, currency1, src);
@@ -104,7 +104,7 @@ public class PayCommand extends BaseCommandExecutor<Player> {
         }
     }
 
-    private void pay(User target, BigDecimal amount, Currency currency, Player src) {
+    private void pay(Player target, BigDecimal amount, Currency currency, Player src) {
         String targetName = target.getName();
         if (!target.getUniqueId().equals(src.getUniqueId())) {
             Optional<UniqueAccount> uOpt = ecoService.getOrCreateAccount(src.getUniqueId());
