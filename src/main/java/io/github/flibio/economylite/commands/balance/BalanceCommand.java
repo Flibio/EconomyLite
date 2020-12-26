@@ -59,7 +59,7 @@ public class BalanceCommand extends BaseCommandExecutor<CommandSource> {
                                 label = c.getDisplayName();
                             }
                             src.sendMessage(messageStorage
-                                    .getMessage("command.balanceother", "player", targetName, "balance", String.format(Locale.ENGLISH, "%,.2f", bal), "label",
+                                    .getMessage("command.balanceother", "player", targetName, "balance", String.format(Locale.ENGLISH, "%,.0f", bal), "label",
                                             TextSerializers.FORMATTING_CODE.serialize(label)));
                         }
                     }
@@ -89,7 +89,7 @@ public class BalanceCommand extends BaseCommandExecutor<CommandSource> {
                             if (bal.equals(BigDecimal.ONE)) {
                                 label = c.getDisplayName();
                             }
-                            src.sendMessage(messageStorage.getMessage("command.balance", "balance", String.format(Locale.ENGLISH, "%,.2f", bal),
+                            src.sendMessage(messageStorage.getMessage("command.balance", "balance", String.format(Locale.ENGLISH, "%,.0f", bal),
                                     "label", TextSerializers.FORMATTING_CODE.serialize(label)));
                         }
                     }
@@ -115,7 +115,7 @@ public class BalanceCommand extends BaseCommandExecutor<CommandSource> {
                     if (bal.equals(BigDecimal.ONE)) {
                         label = currentCurrency.getDisplayName();
                     }
-                    src.sendMessage(messageStorage.getMessage("command.balance", "balance", String.format(Locale.ENGLISH, "%,.2f", bal),
+                    src.sendMessage(messageStorage.getMessage("command.balance", "balance", String.format(Locale.ENGLISH, "%,.0f", bal),
                             "label", TextSerializers.FORMATTING_CODE.serialize(label)));
                 } else {
                     src.sendMessage(messageStorage.getMessage("command.error"));
